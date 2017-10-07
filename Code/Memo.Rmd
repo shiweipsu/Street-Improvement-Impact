@@ -1,0 +1,7 @@
+---
+title: "Memo"
+output: html_document
+---
+
+Treatment corridor: SW Stark_Oak
+Comparison corridor: NW Everett, SW Alder
