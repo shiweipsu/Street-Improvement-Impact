@@ -3,5 +3,8 @@ title: "Memo"
 output: html_document
 ---
 
-Treatment corridor: SW Stark_Oak
+Treatment corridor 1: SW Stark_Oak
 Comparison corridor: NW Everett, SW Alder
+
+Treatment corridor 2: SW Braodway
+Comparison corridor: SW 2nd Ave
