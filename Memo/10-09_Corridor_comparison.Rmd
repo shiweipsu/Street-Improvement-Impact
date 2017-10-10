@@ -1,0 +1,107 @@
+---
+title: "10-09_Corridor_comparison"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+source("../Code/merge_or_wac_with_corridor.R")
+library(dplyr)
+```
+
+# Compare treatment and control corridor
+
+## compare retail employment percentiles of each corridor in terms of Portland retail employment in general are similar or not
+
+### calculte average retail employment for each corridor
+
+```{r}
+
+corridor_ave <- function(df){
+  df_avg <- df %>% 
+   mutate(business=CNS07+CNS18) %>% 
+    summarise(CNS07_ave=mean(CNS07,na.rm=T),
+            CNS18_avg=mean(CNS18,na.rm=T),
+            business_avg=mean(business,na.rm=T))
+  df_avg
+}
+
+corridor_list <- list(stark_oak_service,nw_everett_service,sw_alder_service)
+
+corridor_averages <- lapply(corridor_list,corridor_ave)
+
+corridor_averages[1]
+corridor_averages[2]
+corridor_averages[3]
+```
+
+### get quantiles
+```{r}
+# exclude blocks with no jobs in service sectors
+# portland_service_no0_servic <- portland_service[apply(portland_service[,c(3:10)],1,function(x) !all(x==0)),] 
+
+portland_service$business <- portland_service$CNS07+portland_service$CNS18
+
+quantile(portland_service$C000,probs = seq(0, 1, by= 0.05),na.rm = T)
+quantile(portland_service$CNS07,probs = seq(0, 1, by= 0.05),na.rm = T)
+quantile(portland_service$CNS18,probs = seq(0, 1, by= 0.05),na.rm = T)
+quantile(portland_service$business,probs = seq(0, 1, by= 0.05),na.rm = T)
+```
+
+
+## compare percent of retial jobs in each corridor in terms of total service jobs are similar or not
+```{r}
+
+corridor_busi_pct <- function(df){
+  df_ave <- df  %>% 
+  filter(year=="2010") %>% 
+  mutate(business = CNS07 + CNS18) %>%
+  mutate(service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19) %>%
+  mutate(service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19) %>%
+  mutate(busi_perc1 = business/service1) %>%
+  mutate(busi_perc2 = business/service2)
+  
+  df_ave
+}
+
+corridor_busi_pct <- lapply(corridor_list,corridor_busi_pct)
+
+t.test(corridor_busi_pct[[1]]$busi_perc1, corridor_busi_pct[[2]]$busi_perc1)
+t.test(corridor_busi_pct[[1]]$busi_perc2, corridor_busi_pct[[2]]$busi_perc2)
+
+t.test(corridor_busi_pct[[1]]$busi_perc1, corridor_busi_pct[[3]]$busi_perc1)
+t.test(corridor_busi_pct[[1]]$busi_perc2, corridor_busi_pct[[3]]$busi_perc2)
+
+```
+
+
+## compare the growth rate of retial jobs are similar or not
+```{r}
+growth <- function(x)x/lag(x)-1
+annual_grth <- function(df){
+ df_grth <- df %>% 
+  group_by(year) %>% 
+  summarise(CNS07=sum(CNS07, na.rm=T),
+          CNS18=sum(CNS18, na.rm=T),
+          business=CNS07+CNS18) %>% 
+  filter(!is.na(year)) %>% 
+  mutate(CNS07_grth=growth(CNS07),
+         CNS18_grth=growth(CNS18),
+         busi_grth=growth(business))
+}
+  
+corridor_grth <- lapply(corridor_list,annual_grth)
+
+t.test(corridor_grth[[1]]$CNS07_grth,corridor_grth[[2]]$CNS07_grth)
+t.test(corridor_grth[[1]]$CNS18_grth,corridor_grth[[2]]$CNS18_grth)
+t.test(corridor_grth[[1]]$busi_grth,corridor_grth[[2]]$busi_grth)
+
+t.test(corridor_grth[[1]]$CNS07_grth,corridor_grth[[3]]$CNS07_grth)
+t.test(corridor_grth[[1]]$CNS18_grth,corridor_grth[[3]]$CNS18_grth)
+t.test(corridor_grth[[1]]$busi_grth,corridor_grth[[3]]$busi_grth)
+
+
+```
+
