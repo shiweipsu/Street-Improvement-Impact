@@ -1,0 +1,54 @@
+---
+title: "10-09_DID"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+source("../Code/merge_or_wac_with_corridor.R")
+library(ggplot2)
+```
+
+# Use DID method to analysis the impact of street improvement on stark_oak corridor in 2010 (nw_everett as comparison)
+
+## Set up table for modelling
+### Use 2008 as before, 2012 as after
+```{r}
+stark_oak <- stark_oak_service %>% 
+  mutate(At=if_else(year<"2010",0,1),
+         Tt="Treatment")
+
+nw_everett <- nw_everett_service %>% 
+  mutate(At=if_else(year<"2010",0,1),
+         Tt="Control")
+
+sw_alder <- sw_alder_service %>% 
+  mutate(At=if_else(year<"2010",0,1),
+         Tt="Control")
+
+stark_oak_did <- rbind(stark_oak, sw_alder)
+
+stark_oak_agg <- stark_oak_did %>% 
+  group_by(Tt,year) %>% 
+  summarise(CNS07=sum(CNS07,na.rm=T),
+            CNS18=sum(CNS18,na.rm=T)) %>% 
+  filter(!is.na(year))
+
+ggplot(stark_oak_agg, aes(x=year,y=CNS07,color=Tt)) +
+  geom_line()
+
+```
+
+
+## DID analysis: 2008 as before, 2012 as after
+```{r}
+stark_oak_CNS07_did <- lm(CNS07~Tt*At,stark_oak_did)
+summary(stark_oak_CNS07_did)
+
+stark_oak_CNS18_did <- lm(CNS18~Tt*At,stark_oak_did)
+summary(stark_oak_CNS18_did)
+```
+
+
+
