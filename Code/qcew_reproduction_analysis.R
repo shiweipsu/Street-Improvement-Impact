@@ -82,3 +82,14 @@ t.test(stark_tab$AVG_EMP_SUM, alder_tab$AVG_EMP_SUM)
 t.test(stark_tab$AVG_EMP_SUM, alder_tab$AVG_EMP_SUM)
 
 ##DiD attempt
+
+stark_did <- qcew_stark %>% as.data.frame() %>% group_by(YEAR) %>% summarise(AVG_EMP_SUM = sum(AVG_EMP)) %>% 
+  mutate(Policy = 1)
+everett_did <-qcew_nw %>% as.data.frame() %>% group_by(YEAR) %>% summarise(AVG_EMP_SUM = sum(AVG_EMP)) %>%  
+  mutate(Policy = 0)
+stark_did <- bind_rows(stark_did, everett_did)
+
+stark_did <- stark_did %>% mutate(Construction = ifelse(YEAR < 2010, 0,1))
+
+stark_did_lm <- lm(AVG_EMP_SUM ~ Policy*Construction, stark_did)
+summary(stark_did_lm)

@@ -2,7 +2,9 @@
 title: "Data Needs for Corridor Study"
 author: "Jamaal Green"
 date: "October 17, 2017"
-output: pdf_document
+output:
+  word_document: default
+  pdf_document: default
 ---
 
 As we move into expanding our study site beyond the Portland pilot we need to have the appropriate data available for analysis. What follows is a brief description of the necessary data sources. Many of these datasets are public, but a few are proprietary or your city may not normally make them available. In such a case, we would ask your assistance in gaining this data in a timely manner.
@@ -11,10 +13,12 @@ As we move into expanding our study site beyond the Portland pilot we need to ha
 
 What follows are datasets that are explicitly *spatial* in nature and we would require them in an existing spatial format such as in a shapefile or GeoJSON file:
 
-1.  Infrastructure and Buuldings
+1.  Infrastructure 
   + Bike network- bike network data that includes the construction data for segments
   + Improved sidewalk/road calming- road calming or improved sidewalk segments if of interest
+2.  Buildings and Neighborhood
   + Building outline/parcel data- assuming we have point data for establishments we can more easily designate improved corridors by joining establishments to existing parcel and building data. This is also important for trying to identify first floor businesses
+  + Neighborhood or zip code boundary files for the city- neighborhood boundaries allow for additional identifcation variables for corridors and help with overall final map products
 
 ##Tabular Data
 
@@ -29,12 +33,13 @@ These are data that do not need to be given to us in a spatial format. What foll
 if(!require(pacman)){install.packages("pacman"): library(pacman)}
 p_load(pander, dplyr)
 
-qcew_sample <- tibble::tribble(~CaseID, ~BizName, ~Address,~City, ~State, ~Zip, ~Jan, ~Feb, ~X, ~Y,
-"1098", "Coffee Galore", "123 Fairfield", "Portland", "OR", 97212, 12, 20, 122.1, 45.2,
-"2304", "Doughnuts Now", "346 Broadway", "Portland", "OR", 97210, 4, 6, 122.1, 45.3,
-"3704", "Bar Bar", "769 Burnside", "Portland", "OR", 97210, 12, 13, 122.1, 45.4)
+qcew_sample <- tibble::tribble(~CaseID, ~NAICS, ~BizName, ~Address,~City, ~State, ~Zip, ~Jan, ~Feb, ~...Dec, ~X, ~Y,
+"1098", 586901, "Coffee Galore", "123 Fairfield", "Portland", "OR", 97212, 12, 20, 18, 122.1, 45.2,
+"2304", 586902, "Doughnuts Now", "346 Broadway", "Portland", "OR", 97210, 4, 6, 5, 122.1, 45.3,
+"3704", 586901, "Bar Bar", "769 Burnside", "Portland", "OR", 97210, 12, 13, 13, 122.1, 45.4)
 
-pander(qcew_sample, caption = "Sample QCEW Data")
+pander(qcew_sample, caption = "Sample QCEW Data", justify = c("left", "left", "left", "left", "left", "center",
+                                                              "right", "right", "right", "right", "left", "left"))
 
 
 ```
