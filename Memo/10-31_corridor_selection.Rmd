@@ -1,0 +1,39 @@
+---
+title: "Corridor Selection Approach?"
+author: "Jamaal Green"
+date: "October 31, 2017"
+output: pdf_document
+---
+
+For the PDX pilot we would like to have additional corridors in order to grow our sample size. Given the the more qualitative nature of our initial corridor selection, it is unclear what the most appropriate next step is. 
+
+##Synthetic Control
+
+Prof. Liu recommended a synthetic control approach in order to bypass the selection issues involved in corridor identification. Unfortunately, the client cities are not comfortable with synthetic controls and have nominated corridors for consideration. 
+
+##Nominated Corridors
+
+Prof. Liu has reviewed some of these corridors and found some appropriate but many inappropriate. This may be the best option given local knowledge of corridors. We can test any obvious construct validity issues such as whether the corridor seems excessively residential visually or through the use of t-tests or some other difference of mean tests to make sure corridors are applicable. 
+
+Unfortunately, we do not have nominated corridors for PDX.
+
+##GIS Processing Approach
+
+An approach to try and solve this would be to sample segments of the road network in the city and compare those attributes to our treatment corridor. The basic workflow for such an operation may look something like this:
+
+1.  Place road network and employment data in a desktop GIS
+2.  Select roads that fall under commercial zones or commercial and denser residential zones
+3.  Apply a geoprocessing tool that cuts network segments of some predefined length
+  - Question as to whether it is necessary to dissolve streets before segments by some additional attribute
+4.  Draw a buffer around the new segments and perform a spatial join with the employment data and aggregate employment
+5.  Filter the buffered corridors on some minimal employment numbers (50, maybe?)
+6.  Take the new buffered corridors, run t-tests against the treatment corridor, and keep those buffered corridors that come back non-significant
+
+While this seems relatively straightforward the hardest part will be managing the street network data and making sure that its idiosyncracies don't make creating the initial segments impossible or too difficult.
+
+##Local Knowledge Approach
+
+Finally, we may want to consider reaching out to planners, developers, or retail interests about what corridors they think are appropriate. This will take time, but already follows the approach we're taking with other cities.
+
+No one approach here seems ideal. The GIS processing approach is more systematic, but it also has the potential to take a long time and you must deal with the vicissitudes of GIS. Synthetic controls remain attractive, but I understand there's no demand for it on the client side. 
+
