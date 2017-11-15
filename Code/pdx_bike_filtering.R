@@ -2,7 +2,7 @@
 
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(sf, stringr, ggplot2, dplyr)
+p_load(sf, stringr, dplyr)
 
 pdx_bike <- st_read("https://opendata.arcgis.com/datasets/dbba62f675ba4847968c3bd5dbf9345a_75.geojson")
 
