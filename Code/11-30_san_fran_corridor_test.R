@@ -52,9 +52,4 @@ ca_lehd_corridors <- ca_lehd_corridors %>% select(geoid, year, TotEmp = C000,
 sf_compare <- ca_lehd_corridors %>% filter(Treatment == 0)
 sf_treat <- ca_lehd_corridors %>% filter(Treatment == 1)
 
-sf_compare %>% group_by(year, StName) %>% summarise(totemp = sum(TotEmp))
-sf_treat %>% group_by(year, TreatStreet) %>% summarise(totemp = sum(TotEmp))
 
-#Looks Like Post Street is outlier, let's drop and see what looks like
-sf_treat <- sf_treat %>% filter(TreatStreet != "Post St")
-sf_compare <- sf_compare %>% filter(StName != "Geary Street")
