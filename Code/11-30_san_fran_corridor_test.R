@@ -8,7 +8,7 @@ library(lehdr)
 
 #import, reproject treatment/corridors to make buffering easier
 
-sf_compare <- st_read("Data/Bicycle_Network/sf_comparison_corridorsNAD83.shp")
+sf_compare <- st_read("Data/Bicycle_Network/sf_comparison_corridorsNAD83_clean.shp")
 sf_treat <- st_read("Data/Bicycle_Network/sf_treatment_dissolvedNAD83.shp")
 
 sf_compare <- st_transform(sf_compare, 5070)
@@ -31,8 +31,8 @@ ca_lehd <- st_transform(ca_lehd, 5070)
 
 #create buffers and get the spatial join between our buffered polygons and shapes
 #and filter out non-null block groups for the intersection
-sf_compare_buff <- st_buffer(sf_compare, 10)
-sf_treat_buff <- st_buffer(sf_treat, 10)
+sf_compare_buff <- st_buffer(sf_compare, 20)
+sf_treat_buff <- st_buffer(sf_treat, 5)
 
 ca_lehd <- st_join(ca_lehd, sf_compare_buff)
 ca_lehd <- st_join(ca_lehd, sf_treat_buff)
@@ -53,3 +53,5 @@ sf_compare <- ca_lehd_corridors %>% filter(Treatment == 0)
 sf_treat <- ca_lehd_corridors %>% filter(Treatment == 1)
 
 
+t.test(sf_compare$TotEmp, sf_treat$TotEmp)
+t.test(sf_compare$Retail, sf_treat$Retail)
