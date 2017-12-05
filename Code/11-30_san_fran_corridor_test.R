@@ -18,7 +18,7 @@ sf_treat <- st_transform(sf_treat, 5070)
 #sf_city <- block_groups(state = "CA", county = "San Francisco")
 sf_city <- blocks(state = "CA", county = "San Francisco")
 
-years <- 2007:2015
+years <- 2005:2015
 
 ca_lehd <- map_df(years, grab_lodes, state = "ca", lodes_type = "wac", job_type = "JT01", 
                   segment = "S000", download_dir = "Data/lodes_raw")
@@ -54,5 +54,10 @@ sf_compare <- ca_lehd_corridors %>% filter(Treatment == 0)
 sf_treat <- ca_lehd_corridors %>% filter(Treatment == 1)
 
 
-t.test(sf_compare$TotEmp, sf_treat$TotEmp)
-t.test(sf_compare$Retail, sf_treat$Retail)
+#t.test(sf_compare$TotEmp, sf_treat$TotEmp)
+#t.test(sf_compare$Retail, sf_treat$Retail)
+
+readr::write_csv(ca_lehd, "Data/SanFran/SF_lehd.csv")
+saveRDS(ca_lehd_corridors, "Data/SanFran/SF_corridors_sf.RDS")
+
+rm(list = ls())
