@@ -1,0 +1,216 @@
+---
+title: "San Francisco Corridor Study (Reproducing Wei's Approach)"
+author: "Jamaal Green"
+date: "December 4, 2017"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(sf, pander, broom, purrr, stargazer, tidyr, hrbrthemes, ggthemes, ggplot2, dplyr)
+
+sf_lehd <- readr::read_csv("E:/Street-Improvement-Impact/Data/SanFran/SF_lehd.csv")
+sf_corridors <- readRDS("E:/Street-Improvement-Impact/Data/SanFran/SF_corridors_sf.RDS")
+
+```
+
+## Introduction
+
+As part of the piloting process for the project I've been assigned to attempt to reproduce Wei's analysis of Portland corridors using San Francisco data. I've identified three test corridors Post, Sutter, and 17th streets. All three corridors are in the Northeastern part of the city. Their comparison corridors were all on paralell streets within a few blocks of the treatment corridors. Unfortunately, San Francisco does not have an extensive network of protected bike lanes so I had to choose corridors with regular bike lanes listed (primarily paint on the side of the road, though the lanes are clearly demarcated). Finally, I collected LEHD data from 2005-2015 in order to measure changes in total, retail, and hospitality/accomodations employment.
+
+
+##Corridor Comparisons
+
+###Corridor General Trends
+
+Overall, the study corridors track relatively closely to city employment growth as a whole except for the treatment corridors. Treatment corridors basically saw no positive accomodations employment growth compared to treatment corridors and the city. There is a similar divergence for total employment but this is less important for the study. On retail, both the treatment and control corridors largely lost employment whereas the city as a whole saw robust retail employment growth over the past ten years.  
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE, fig.width=7.5}
+
+#get san francisco total emp, retail and accomodation totals by year
+sf_trend <- sf_lehd  %>% 
+  mutate(Treatment = ifelse(!is.na(full_stree), 1, 0), 
+         Corridors = ifelse(Treatment == 1, "Treatment", ifelse(
+                               Treatment == 0 & !is.na(StName), "Control", "City")))
+
+sf_trend <- sf_trend %>% group_by(Treatment, Corridors, year) %>% 
+  summarise(TotEmp = sum(C000, na.rm = TRUE), TotRetail = sum(CNS07, na.rm = TRUE),
+            TotAccom = sum(CNS18, na.rm = TRUE))
+
+sf_trend <- sf_trend %>% ungroup() %>% group_by(Corridors) %>% 
+  mutate(TotEmp2005 = first(TotEmp), TotRetail2005 = first(TotRetail), TotAccom2005 = first(TotAccom))
+
+sf_trend <- sf_trend %>% ungroup() %>% group_by(Corridors) %>% 
+  mutate(TotEmpIdx = (TotEmp - TotEmp2005)/TotEmp2005,
+         TotRetailIdx = (TotRetail - TotRetail2005)/TotRetail2005 * 100,
+         TotAccomIDx = (TotAccom - TotAccom2005)/TotAccom2005 * 100)
+
+sf_trend_long <- sf_trend %>% ungroup() %>% gather(EmpIndustry, EmpIndex, 10:12)
+
+#first plots comparing city to corridors
+
+p1 <- ggplot(sf_trend_long, aes(as.character(year), EmpIndex, group = Corridors, colour = Corridors)) 
+p1 + geom_line() + theme_bw() + labs(x = "Year", y = "Employment Index (2005)", 
+                                     title = "Corridor and City Employment Change (2005-2015)") +
+   theme(panel.border = element_blank()) + guides(fill = guide_legend(title = element_blank())) +
+  facet_wrap(~EmpIndustry, ncol = 1, scales = "free_y")
+
+corridor_sum <- sf_corridors %>% group_by(Treatment, year) %>% summarise(TotEmp = sum(TotEmp, na.rm = TRUE), TotRetail = sum(Retail, na.rm = TRUE), TotAccom = sum(Accomodation, na.rm = TRUE)) %>% 
+  mutate(Corridors = ifelse(Treatment == 1, "Treatment", ifelse(Treatment == 0, "Control", "City")))
+
+corridor_tall <- corridor_sum %>%  as.data.frame() %>% select(-geometry) %>% 
+  ungroup() %>% gather(EmpIndustry, EmpCount, 3:5)
+
+#p2 <- ggplot(corridor_sum, aes(x = as.character(year), y = TotEmp, group = as.character(Treatment), colour = as.character(Treatment))) 
+
+#p2 + geom_line() + labs(x = "Year", y = "Total Employment", title = "Corridor Employment Comparison") + theme_bw() + theme(panel.border = element_blank()) + guides(fill = guide_legend(title = "Treatment"))
+
+
+```
+
+Looking at absolute employment growth between the study corridors shows that they seem to track each other relatively well. Interestingly, the treatment and control corridors switch places with respect to accomodations and retail employment as treatment corridors lead the way in accomodations employment and lag behind control corridors for retail. 
+
+```{r echo=FALSE, fig.width =7.5}
+
+
+
+p3 <- ggplot(corridor_tall, aes(x = as.character(year), y = EmpCount, colour = as.character(Treatment), group = as.character(Treatment)))  + geom_line() + theme_bw() + theme(panel.border = element_blank()) +
+  facet_wrap(~EmpIndustry, ncol = 1, scales = "free_y") + labs(x = "Year", y = "Total Employment", title = "Corridor Employment Comparison", colour = "Treatment") 
+
+print(p3)
+
+```
+
+Beyond the industrial differences, attempting to compare the control and treatment corridors is further complicated when testing to see if they are equivalent. T-test results shift from significant to non-significant based on what industries are compared and how treatment and control corridors are aggregated or not. 
+
+For example, comparing total employment of the treatment and control corridors without aggregating blocks results in non-significant results, but comparing retail employment alone is significantly different.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+sf_treat <- sf_corridors %>% as.data.frame() %>% filter(Treatment == 1)
+sf_control <- sf_corridors %>% as.data.frame() %>% filter(Treatment == 0)
+
+tot_emp_block <- t.test(sf_treat$TotEmp, sf_control$TotEmp)
+#pander(tot_emp_block, caption = "T-test of Total Employment of Individual Blocks", style = "rmarkdown")
+
+retail_emp_block <- t.test(sf_treat$Retail, sf_control$Retail)
+#pander(retail_emp_block, caption = "T-test of Retail Employment of Individual Blocks", style = "rmarkdown")
+
+accom_emp_block <- t.test(sf_treat$Accomodation, sf_control$Accomodation)
+#pander(accom_emp_block, caption = "T-test of Accomodation Employment of Individual Blocks", style = "rmarkdown", split.cells = 20)
+
+Employment <- c("Total Employment", "Retail", "Accom.")
+
+t_tab <- map_df(list(tot_emp_block, retail_emp_block, accom_emp_block), tidy)
+t_tab <- t_tab[c("estimate", "statistic", "p.value", "conf.low", "conf.high")]
+t_tab <- cbind(t_tab, Employment)
+t_tab <- t_tab %>% rename(Estimate = estimate, Statistics = statistic, Pval = p.value, Conf.Low = conf.low,
+                          Conf.High = conf.high) %>% select(Employment, everything())
+pander(t_tab)
+```
+
+These differences become more stark when the employment is aggregated at the corridor level where every employment type has statistically significant t-test results.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+sf_corridor_agg <- sf_corridors %>% as.data.frame() %>% gather(EmpType, EmpTotals, 3:6) %>% 
+  group_by(Treatment, year, EmpType) %>% summarise(EmpTotals = sum(EmpTotals))
+
+sf_treat_agg <- sf_corridor_agg %>% filter(Treatment == 1)
+sf_control_agg <- sf_corridor_agg %>% filter(Treatment == 0)
+
+tot_emp_agg <- t.test(sf_treat_agg[sf_treat_agg$EmpType == "TotEmp",]$EmpTotals, sf_control_agg[sf_control_agg$EmpType == "TotEmp",]$EmpTotals)
+
+retail_emp_agg <- t.test(sf_treat_agg[sf_treat_agg$EmpType == "Retail",]$EmpTotals, sf_control_agg[sf_control_agg$EmpType == "Retail",]$EmpTotals)
+
+accom_emp_agg <- t.test(sf_treat_agg[sf_treat_agg$EmpType == "Accomodation",]$EmpTotals, sf_control_agg[sf_control_agg$EmpType == "Accomodation",]$EmpTotals)
+
+t_tab2 <- map_df(list(tot_emp_agg, retail_emp_agg, accom_emp_agg), tidy)
+
+t_tab2 <- t_tab2[c("estimate", "statistic", "p.value", "conf.low", "conf.high")]
+t_tab2 <- cbind(t_tab2, Employment)
+t_tab2 <- t_tab2 %>% rename(Estimate = estimate, Statistics = statistic, Pval = p.value, Conf.Low = conf.low,
+                          Conf.High = conf.high) %>% select(Employment, everything())
+
+pander(t_tab2)
+```
+
+
+##Running the Models
+
+
+###Difference-in-Difference
+
+The following tables show the difference-in-difference estimates for the Sutter and Post Street treatment corridors and the 17th Street treatment corridor, respectively. Both Sutter and Post streets had 2010 listed as the year of their lane construction and we kept together while 17th street's consstruction was one year later. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+#grab the 2010 bike lane corridors
+
+sf_2010_corridors <- sf_corridors %>% 
+  filter(TreatStreet != "17th St" | StName != "18th Street") 
+
+sf_2010_corridors <- sf_2010_corridors %>% mutate(Year_Installed = 
+                                                    ifelse(is.na(Installed), 2010, Installed))
+
+sf_2010_corridors <- sf_2010_corridors %>% 
+  mutate(Construction = ifelse(year < 2010, "Before", "After"))
+
+sf_2010_did <- lm(Retail~ Construction*Treatment, data = sf_2010_corridors)
+sf_2010_did_accom <- lm(Accomodation ~ Construction*Treatment, data = sf_2010_corridors)
+
+stargazer(sf_2010_did, sf_2010_did_accom,title = "Difference-in-Difference for Sutter and Post Streets",
+          header = F)
+
+sf_2011_corridors <- sf_corridors %>% 
+  filter(TreatStreet == "17th St" | StName == "18th Street") %>% 
+  mutate(Year_Installed = ifelse(is.na(Installed), 2011, Installed),
+         Construction = ifelse(year < 2011, "Before", "After"))
+
+sf_2011_did <- lm(Retail ~ Construction*Treatment, data = sf_2011_corridors)
+sf_2011_did_accom <- lm(Accomodation ~ Construction*Treatment, data = sf_2011_corridors)
+
+
+stargazer(sf_2011_did, sf_2011_did_accom, title = "Difference-in-Difference for 17th Street", header = F)
+
+```
+
+Both DiD estimates show a non-significant effect of treatment on both retail and accomodation employment for our respective corridors. The construction date dummy variable for the 17th Street model is significant showing that there may be some kind of time effect at play. 
+
+###Interrupted Time Series
+
+Similar to the DiD the simple interrupted time series results were all non-significant. Given this evidence, it seems unlikely that the installation of bike lanes affected the economic growth tracjectories of our selected corridors.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+sf_2010_corridors <- sf_2010_corridors %>% mutate(TimeElapsed = year - 2005)
+sf_2011_corridors <- sf_2011_corridors %>% mutate(TimeElapsed = year - 2005)
+
+sf_2010_its <- sf_2010_corridors %>% filter(Treatment == 1)
+sf_2010_its_lm <- lm(Retail ~ TimeElapsed*Construction, data = sf_2010_its)
+sf_2010_its_lm_accom <- lm(Accomodation ~ TimeElapsed*Construction, data = sf_2010_its)
+
+sf_2011_its <- sf_2011_corridors %>% filter(Treatment == 1)
+sf_2011_its_lm <- lm(Retail ~ TimeElapsed*Construction, data = sf_2011_its)
+sf_2011_its_lm_accom <- lm(Accomodation ~ TimeElapsed*Construction, data = sf_2011_its)
+
+stargazer(sf_2010_its_lm, sf_2010_its_lm_accom, 
+          title = "Interrupted Time Series Estimates for the Post and Sutter St. Corridors",
+          header = FALSE)
+
+stargazer(sf_2011_its_lm, sf_2011_its_lm_accom, title = "Interrupted Time Series Estimates for 17th Street",
+          header = FALSE)
+
+```
+
+
+
+##Appendix
+
+![Figure 1: Treatment and Control Corridors](E:/Street-Improvement-Impact/Memo/images/11-30_SF_candidate_corridors.pdf)
+
