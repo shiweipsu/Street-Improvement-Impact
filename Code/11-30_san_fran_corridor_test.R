@@ -26,7 +26,8 @@ ca_lehd <- map_df(years, grab_lodes, state = "ca", lodes_type = "wac", job_type 
 #ca_lehd <- ca_lehd %>% mutate(geoid = str_sub(w_geocode, 1, 12)) %>% group_by(year, geoid) %>% 
  # summarise_if(is.numeric, sum)
 
-ca_lehd <- ca_lehd %>%inner_join(sf_city, by =c("w_geocode" = "GEOID10")) %>% st_as_sf()
+ca_lehd <- ca_lehd %>%inner_join(sf_city, by =c("w_geocode" = "GEOID10")) %>% 
+  st_as_sf()
 
 ca_lehd <- st_transform(ca_lehd, 5070)
 
@@ -43,11 +44,12 @@ ca_lehd <- ca_lehd %>% select(-29:-53, -55:-71)
 ca_lehd_corridors <- ca_lehd %>% filter(!is.na(StName) | !is.na(full_stree))
 ca_lehd_corridors <- ca_lehd_corridors %>% mutate(Treatment = ifelse(!is.na(full_stree), 1, 0))
 
-ca_lehd_corridors <- ca_lehd_corridors %>% select(GEOID = w_geocode, year, TotEmp = C000, 
-                                                  Retail = CNS07, ArtsRec = CNS17, 
-                                                  Accomodation = CNS18, StName, Comparator,
-                                                  TreatStreet = full_stree, Installed = install_ye,
-                                                  Treatment)
+ca_lehd_corridors <- ca_lehd_corridors %>% 
+  select(GEOID = w_geocode, year, TotEmp = C000, 
+        Retail = CNS07, ArtsRec = CNS17, 
+        Accomodation = CNS18, StName, Comparator,
+        TreatStreet = full_stree, Installed = install_ye,
+        Treatment)
 
 #rename our sf_treat and compare for visualization and modeling
 sf_compare <- ca_lehd_corridors %>% filter(Treatment == 0)
