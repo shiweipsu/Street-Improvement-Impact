@@ -29,7 +29,7 @@ seattle_lehd <- seattle_lehd %>% select(4:5, 21, 34:84, 86:88)
 #feature 332 was spitting out an error...i just dropped it
 seattle_lehd <- seattle_lehd[-332,]
 
-st_write(seattle_lehd, "Data/seattle_lehd.geojson")
+st_write(seattle_lehd, "Data/seattle_lehd.geojson", delete_dsn = TRUE)
 
 # austin, tx-----
 #austin test----
@@ -40,7 +40,7 @@ target_place <- "Austin"
 
 austin.sf <- nitc_lehd(years = years, target_state = "tx", target_county = "travis", target_place = "Austin")
 
-st_write(austin.sf, "Data/austin_lehd.geojson")
+st_write(austin.sf, "Data/austin_lehd.geojson", delete_dsn = TRUE)
 
 #memphis test-----
 
@@ -50,3 +50,16 @@ target_place <- "Memphis"
 
 memphis.sf <- nitc_lehd(years = years, target_state = "tn", target_county = target_county,
                         target_place = "Memphis")
+
+st_write(memphis.sf, "Data/memphis_lehd.geojson", delete_dsn = TRUE)
+
+#minneapolis test-----
+
+years <- 2004:2015
+target_county <- "hennepin"
+target_place <- "Minneapolis"
+
+minn.sf <- nitc_lehd(years = years, target_state = "mn",
+                     target_county = target_county, target_place = target_place)
+
+st_write(minn.sf, "Data/minn_lehd.geojson", delete_dsn = TRUE)
