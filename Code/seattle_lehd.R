@@ -6,6 +6,8 @@ options(tigris_class = "sf")
 install_github("jamgreen/lehdr")
 library(lehdr)
 
+source("Code/grab_place_lehd_func.R")
+
 #Seattle-----
 
 years <- 2004:2015
@@ -28,3 +30,23 @@ seattle_lehd <- seattle_lehd %>% select(4:5, 21, 34:84, 86:88)
 seattle_lehd <- seattle_lehd[-332,]
 
 st_write(seattle_lehd, "Data/seattle_lehd.geojson")
+
+# austin, tx-----
+#austin test----
+
+years <- 2004:2015
+target_county <- "travis"
+target_place <- "Austin"
+
+austin.sf <- nitc_lehd(years = years, target_state = "tx", target_county = "travis", target_place = "Austin")
+
+st_write(austin.sf, "Data/austin_lehd.geojson")
+
+#memphis test-----
+
+years <- 2004:2015
+target_county <- "shelby"
+target_place <- "Memphis"
+
+memphis.sf <- nitc_lehd(years = years, target_state = "tn", target_county = target_county,
+                        target_place = "Memphis")
