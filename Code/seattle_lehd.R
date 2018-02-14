@@ -63,3 +63,21 @@ minn.sf <- nitc_lehd(years = years, target_state = "mn",
                      target_county = target_county, target_place = target_place)
 
 st_write(minn.sf, "Data/minn_lehd.geojson", delete_dsn = TRUE)
+
+#indianapolis test, the indy approach failed, going manual----
+years <- 2004:2015
+target_county <- "marion"
+target_place <- "Indianapolis"
+
+indy_lehd <- grab_lodes(state = "in", year = years, lodes_type = "wac",
+                        job_type = "JT01", segment = "S000",
+                        download_dir = "Data/in_lehd")
+
+indy_block <- blocks(state = "in", county = "marion")
+
+indy_block <- indy_block %>% select(GEOID10) %>% 
+  left_join(indy_lehd, by = c("GEOID10" = "w_geocode"))
+
+
+st_write(indy_block, "Data/indy_lehd.geojson", delete_dsn = TRUE)
+
