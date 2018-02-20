@@ -1,8 +1,9 @@
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(sf, tigris, glue, dplyr)
+p_load(devtools, sf, tigris, glue, dplyr)
 
 options(tigris_class = "sf")
-
+install_github("jamgreen/lehdr")
+library(lehdr)
 
 nitc_lehd <- function(years, target_state, target_county, target_place) {
   
