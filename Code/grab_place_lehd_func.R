@@ -1,3 +1,9 @@
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(sf, tigris, glue, dplyr)
+
+options(tigris_class = "sf")
+
+
 nitc_lehd <- function(years, target_state, target_county, target_place) {
   
   state_lehd <- grab_lodes(state = target_state, year = years, lodes_type = "wac", 
