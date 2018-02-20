@@ -29,7 +29,7 @@ nitc_lehd <- function(years, target_state, target_county, target_place) {
   
   return(place_lehd)
   
-  st_write(place_lehd, glue::glue("Data/{target_place}_lehd.geojson"))
+  st_write(place_lehd, glue::glue("Data/{target_place}_lehd.geojson"), delete_dsn = TRUE)
   
   
 }
