@@ -9,7 +9,7 @@ employ_ratio_test <- function(corridor_df) {
 corridor_df <- as.data.frame(corridor_df)
 
 corridor_t <- corridor_df %>% mutate(Retail=CNS07,
-                                     Food_Accom=CNS08,
+                                     Food_Accom=CNS18,
                                      Business = CNS07 + CNS18,
                                      Service = CNS07 +  CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
                                      ratio1 = Business/Service)
@@ -25,7 +25,9 @@ corridor_df <- as.data.frame(corridor_df)
 corridor_grouped_df <- corridor_df %>%  group_by(Name, year) %>% 
   summarise_if(is.numeric, sum) %>% 
   ungroup() %>% 
-  mutate(Business = CNS07 + CNS18,
+  mutate(Retail = CNS07,
+         Food_Accom = CNS18,
+         Business = CNS07 + CNS18,
          Service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + 
            CNS17 + CNS18 + CNS19,
          Service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
