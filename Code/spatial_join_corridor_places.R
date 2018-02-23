@@ -21,5 +21,5 @@ buff_crs <- st_crs(minn_buff)
 minn_lehd <- st_transform(minn_lehd, crs = buff_crs)
 
 corridor_poly <- st_join(minn_lehd, minn_buff, left = FALSE)
-corridor_poly <- corridor_poly %>% select(3:30, 58:64)
+corridor_poly <- corridor_poly %>% select(3:30, 55:64)
 st_write(corridor_poly, "Data/minneapolis/minn_corridor_lehd_NAD83.shp", delete_dsn = TRUE)
