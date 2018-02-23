@@ -14,9 +14,16 @@ corridor_t <- corridor_df %>% mutate(Business = CNS07 + CNS18,
                                      Service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
                                      ratio1 = Business/Service1,
                                      ratio2 = Business/Service2)
+
+corridor_t <- corridor_df %>% mutate(Retail=CNS07,
+                                     Food_Accom=CNS08,
+                                     Business = CNS07 + CNS18,
+                                     Service = CNS07 +  CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                     ratio1 = Business/Service)
 return(corridor_t)  
 }
 
+# Definition of Service is from EPA Smart Location Database, 5-tier employment classification scheme, adding retail, service, and entertainment
 
 growth_rate <- function(corridor_df) {
   
@@ -31,6 +38,11 @@ corridor_grouped_df <- corridor_df %>%  group_by(Name, year) %>%
          Service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
          ratio1 = Business/Service1,
          ratio2 = Business/Service2) %>% 
+  mutate(Retail=CNS07,
+         Food_Accom=CNS18,
+         Business = CNS07 + CNS18,
+         Service = CNS07 + CNS16 + CNS17 + CNS18,
+         ratio1 = Business/Service) %>% 
   ungroup() %>% group_by(Name) %>% 
   mutate(biz_growth = Business/lag(Business),
          service_growth1 = Service1/lag(Service1),
