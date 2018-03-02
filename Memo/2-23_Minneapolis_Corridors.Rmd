@@ -1,0 +1,303 @@
+---
+title: "Minneapolis Corridor Comparisons"
+author: "Jamaal Green"
+date: "February 23, 2018"
+output: 
+  pdf_document:
+    includes:
+      in_header: header.tex
+---
+
+```{r setup,include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+
+This is a test document for checking whether the functions Wei and I have worked on can work efficiently with new data. I was able to digitize and join LEHD data to 4 of the 5 corridor pairs given to us by the project leads. What follows will be a series of t-test and quatile estimates. I'm testing this report format so as to try and figure out a workflow that is less a series of bespoke, disarticulated script files with something more organized.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(sf, ggplot2, ggthemes, dplyr)
+
+source("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Code\\corridor_comparison_functions.R")
+
+minn_corridor <- st_read("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Data\\minneapolis\\minn_corridor_lehd_NAD83.shp")
+
+minn_lehd <- st_read("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Data\\minneapolis\\minn_lehd.geojson") %>% as.data.frame()
+
+minn_emp_ratio <- employ_ratio_test(minn_corridor)
+
+minn_growth <- growth_rate(minn_corridor)
+
+minn_lehd_2007 <- minn_lehd %>% filter(year == "2007", C000 > 0)
+
+#prep quantile dataframe
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2007$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(minn_lehd_2007$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(minn_lehd_2007$CNS08, probs = p, na.rm = TRUE),
+                       probs = p)
+
+```
+
+##Corridor Comparisons
+
+Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Minneapolis as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. Finally, we perform a t-test, a statisical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. All of these figures use 2007 employment numbers from the LEHD as that is the earliest year before the first improvement project. 
+
+###Riverside Ave.
+
+Our first corridor group consists of the Riverside and Cedar Ave corridors. The Cedar Ave comparison corridor is only 2,000 feet and covers three census blocks and is too small for meaningful comparison but we shall continue forward with the analysis.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+#group 1
+riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", year == "2007")
+cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2007")
+
+riverside <- riverside %>% summarise(TotEmp = sum(C000), RetailEmp = sum(CNS07),
+                                     AccomEmp = sum(CNS08))
+
+cedar <- cedar %>% summarise(TotEmp = sum(C000), RetailEmp = sum(CNS07),
+                             AccomEmp = sum(CNS08))
+
+#t-tests
+
+riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", year == "2007")
+cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2007")
+
+riverside <- riverside %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+cedar <- cedar %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+
+t.test(riverside$business, cedar$business)
+t.test(riverside$busi_perc1, cedar$busi_perc1)
+t.test(riverside$busi_perc2, cedar$busi_perc2)
+
+```
+
+The following table shows total, retail, and accomodations employment for Riverside and Cedar and the city based percentile rank of the corridors. Both corridors are in the top 5% of the city in terms of the number of total and retail. Neither corridor has any accomodations employment.  
+
+
+| Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------------|---------|------------|-----------|---------|------------|-----------|
+| Riverside Ave. | 5341    | 199        | 102         | 95      | 95         | 95       |
+| Cedar Ave.     | 672     | 97          | 0         | 95      | 95         | N/A       |
+
+Table 1: Riverside and Cedar Avenue Employment Percentiles
+
+
+
+We performed t-tests on three metrics at the census block level: "business" employment, the sum of retail and accomodations employment; a "business share" metric that is the share of employment in a census block of business employment over the sum of other services industries such as professional/scientific services, public administration and educational services; finally, a second business share metric on a smaller share of services employment including professional/scientific services, administrative/waste management services and arts/accommodation services (check appendix for variable definitions).
+
+On all three metrics the t-test returned non-significant results meaning that there is not a statistically significant difference in the mean employment levels between the two corridors. This means that the corridors are comparable and are appropriate for continued testing. 
+
+###Franklin Ave
+
+The Franklin Avenue corridors are both within the top 10% of areas in the city with respect total and retail employment, though the Franklin treatment corridor is in the 90th percentile of total employment compared to the 95th percentile of the Franklin control corridor. The Franklin Avenue control corridor is also in the top 5% of areas of the city in accommodations employment while the improvement corridor has no accomodations employment.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+#group 2
+
+franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2007")
+minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2007")
+
+franklin <- franklin %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                   accom_emp = sum(CNS08))
+
+minnehaha <- minnehaha %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                     accom_emp = sum(CNS08))
+
+#t-tests
+
+franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2007")
+minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2007")
+
+franklin <- franklin %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+minnehaha <- minnehaha %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+
+t.test(franklin$business, minnehaha$business)
+t.test(franklin$busi_perc1, minnehaha$busi_perc1)
+t.test(franklin$busi_perc2, minnehaha$busi_perc2)
+```
+
+
+| Corridor           | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|--------------------|---------|------------|-----------|---------|------------|-----------|
+| Franklin/Riverside | 340     | 39         | 0         | 90      | 95         | N/A       |
+| Franklin/Minnehaha | 1366    | 19         | 187       | 95      | 95         | 95        |
+
+Table 2: Franklin Ave. Corridors Employment Percentiles
+
+In terms of the t-tests both corridors have statistically non-significant differences in "business" employment and their business employment share categories. Thus these corridors are appropriate comparators for further study.
+
+###Central Avenue
+
+Both the Central and University Avenue corridors have total and retail employment in the top 5% of blocks in the city. Central Avenue also has accommodations employment equal to the top 5% of blocks in the city.
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2007")
+university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2007")
+
+central <- central %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                   accom_emp = sum(CNS08))
+
+university <- university %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                     accom_emp = sum(CNS08))
+
+#t-tests
+
+central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2007")
+university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2007")
+
+central <- central %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+university <- university %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+
+t.test(central$business, university$business)
+t.test(central$busi_perc1, university$busi_perc1)
+t.test(central$busi_perc2, university$busi_perc2)
+```
+
+
+| Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------------|---------|------------|-----------|---------|------------|-----------|
+| Central Ave    | 572     | 97         | 16        | 95      | 95         | 95        |
+| University Ave | 1182    | 164        | 0         | 95      | 95         | N/A       |
+
+Table 3: Central and University Avenue Corridors Employment Percentiles
+
+All t-tests came back non-significant at the .05 level meaning that the two corridors are apprrpaite comparators. 
+
+###Lyndale Avenue South
+
+Lyndale and Grand Avenue diverge in terms of their total employment numbers but are both in the 95th percentile of retail employment when compared to the rest of the city.  
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+lyndale <- minn_corridor %>% filter(Name == "Lyndale Ave S (improvement)", year == "2007")
+grand <- minn_corridor %>% filter(Name == "Grand Ave (control)", year == "2007")
+
+lyndale <- lyndale %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                   accom_emp = sum(CNS08))
+
+grand <- grand %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                     accom_emp = sum(CNS08))
+
+#t-tests
+
+lyndale <- minn_corridor %>% filter(Name == "Lyndale Ave S (improvement)", year == "2007")
+grand <- minn_corridor %>% filter(Name == "Grand Ave (control)", year == "2007")
+
+lyndale <- lyndale %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+grand <- grand %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+
+t.test(lyndale$business, grand$business)
+t.test(lyndale$busi_perc1, grand$busi_perc1)
+t.test(lyndale$busi_perc2, grand$busi_perc2)
+
+
+```
+
+| Corridor | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------|---------|------------|-----------|---------|------------|-----------|
+| Lyndale  | 412     | 106        | 0         | 95      | 95         | N/A       |
+| Grand    | 76      | 19         | 0         | 80      | 95         | N/A       |
+
+Table 4: Lyndale and Grand Avenue Corridors Employment Percentiles
+
+All t-tests came back non-significant emaning that the corridors are acceptable comparators. 
+
+###North 2nd Street
+
+North 2nd Street and Broadway Avenue both have total and retail employment in the 95th percentile while Broadway also is in the 95th percentile for the city in accomodations employment, though that translates to only 2 accommodations jobs for the corridor. 
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+second <- minn_corridor %>% filter(Name == "North 2nd Street (improvement)", year == "2007")
+  
+broadway <- minn_corridor %>% filter(Name == "Broadway Ave (control)", year == "2007")
+
+second <- second %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                   accom_emp = sum(CNS08))
+
+broadway <- broadway %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
+                                     accom_emp = sum(CNS08))
+
+#t-tests
+
+second <- minn_corridor %>% filter(Name == "North 2nd Street (improvement)", year == "2007")
+broadway <- minn_corridor %>% filter(Name == "Broadway Ave (control)", year == "2007")
+
+second <- second %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+broadway <- broadway %>% mutate(business = CNS07 + CNS18,
+                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                  busi_perc1 = business/service1,
+                                  busi_perc2 = business/service2)
+
+
+t.test(second$business, broadway$business)
+t.test(second$busi_perc1, broadway$busi_perc1)
+t.test(second$busi_perc2, broadway$busi_perc2)
+  
+```
+
+
+| Corridor   | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|------------|---------|------------|-----------|---------|------------|-----------|
+| Second St. | 2570    | 42         | 0         | 95      | 95         | N/A       |
+| Broadway   | 734     | 36         | 2         | 95      | 95         | 95        |
+
+Table 5: North 2nd Street and Broadway Corridors Employment Profile
+
+All t-tests came back non-significant emaning that the corridors are acceptable comparators. 
