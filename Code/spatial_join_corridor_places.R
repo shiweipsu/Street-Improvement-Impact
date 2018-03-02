@@ -2,13 +2,20 @@ if(!require(pacman)){install.packages("pacman"); library(pacman)}
 p_load(sf, dplyr)
 
 
-indy_buff <- st_read("Data/indianapolis/indy_corridor_buffer.shp")
-indy_lehd <- st_read("Data/indianapolis/indy_lehd_NAD83.shp")
+indy_buff <- st_read("Data/indianapolis/indy_corridors.shp")
+indy_lehd <- st_read("Data/indianapolis/indy_lehd.geojson")
 
-buff_crs <- st_crs(indy_buff)
+
+buff_crs <- 5070
+
+indy_buff <- st_transform(indy_buff, crs = buff_crs)
 indy_lehd <- st_transform(indy_lehd, crs = buff_crs)
 
+indy_buff <- st_buffer(indy_buff, dist = 10)
+
 corridor_poly <- st_join(indy_lehd, indy_buff, left = FALSE)
+corridor_poly <- corridor_poly %>% select(3:30, 55:63)
+
 st_write(corridor_poly, "Data/indianapolis/indy_corridor_lehd_NAD83.shp", delete_dsn = TRUE)
 
 #minneapolis
