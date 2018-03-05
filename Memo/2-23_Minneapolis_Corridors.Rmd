@@ -2,10 +2,13 @@
 title: "Minneapolis Case Study"
 author: "Jamaal Green"
 date: "February 23, 2018"
-output: 
+output:
+  word_document: default
   pdf_document:
     includes:
       in_header: header.tex
+fig_width: 6
+fig_height: 4
 ---
 
 ```{r setup,include=FALSE}
@@ -105,6 +108,8 @@ Our first test in corridor comparability is comparing the count of the total num
 
 ###Riverside Ave.
 
+![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_riverside_corridor_blkgrp.png")
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 1
 
@@ -176,6 +181,8 @@ On all three metrics the t-test returned non-significant results meaning that th
 
 ###Franklin Ave
 
+![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_franklin_corridor_blkgrp.png")
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 2
 
@@ -240,6 +247,8 @@ In terms of the t-tests both corridors have statistically non-significant differ
 
 ###Central Avenue
 
+![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_central_ave_corridor_blkgrp.png")
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 3
 
@@ -300,6 +309,8 @@ Table 3: Central and University Avenue Corridors Employment Percentiles
 All t-tests came back non-significant at the .05 level meaning that the two corridors are apprrpaite comparators. 
 
 ###Lyndale Avenue South
+
+![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_lyndale_corridor_blkgrp.png")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 4
@@ -363,6 +374,8 @@ Table 4: Lyndale and Grand Avenue Corridors Employment Percentiles
 All t-tests came back non-significant emaning that the corridors are acceptable comparators. 
 
 ###North 2nd Street
+
+![North 2nd Street Corridor]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_north_2ndstreet_corridor_blkgrp.png")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 5
