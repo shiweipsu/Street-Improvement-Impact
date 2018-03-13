@@ -1,0 +1,28 @@
+---
+title: "ITS"
+author: "Wei Shi"
+date: "March 13, 2018"
+output: html_document
+---
+
+```{r}
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(sf, ggplot2, ggthemes, dplyr)
+
+source("C:\\Users\\shiwei\\Desktop\\Street-Improvement\\Code\\corridor_comparison_functions.R")
+
+minn_corridor <- st_read("C:\\Users\\shiwei\\Desktop\\Street-Improvement\\CityData\\Minneapolis\\minn_corridor_lehd_wgs84.geojson")
+
+minn_lehd <- st_read("C:\\Users\\shiwei\\Desktop\\Street-Improvement\\CityData\\Minneapolis\\minn_lehd.geojson") %>% as.data.frame()
+
+minn_emp_ratio <- employ_ratio_test(minn_corridor)
+
+minn_growth <- growth_rate(minn_corridor)
+```
+
+
+```{r}
+riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)")
+riverside <- riverside %>% mutate(business = CNS07 + CNS18)
+```
+
