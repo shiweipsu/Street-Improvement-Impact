@@ -22,7 +22,50 @@ minn_growth <- growth_rate(minn_corridor)
 
 
 ```{r}
-riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)")
-riverside <- riverside %>% mutate(business = CNS07 + CNS18)
+# group 1
+
+riverside <- minn_corridor %>% filter(Group==1) %>% mutate(business = CNS07 + CNS18)  
+
+riverside_agg <- riverside %>%
+  group_by(year, Type) %>%
+  summarise(CNS07=sum(CNS07),
+            CNS18=sum(CNS18),
+            business=sum(business))
+
+constrct_year <- as.numeric(as.character(riverside[riverside$Type=="improvement",]$BuildStart))[1]
+
+base_year <- riverside_agg %>% filter(year == constrct_year) %>% 
+  rename(CNS07_base=CNS07,CNS18_base=CNS18, business_base=business)
+
+riverside_plot <- as.data.frame(riverside_agg) %>%
+  left_join(base_year, by="Type") %>%
+  mutate(CNS07_sd=CNS07/CNS07_base*100,
+         CNS18_sd=CNS18/CNS18_base*100,
+         business_sd=business/business_base*100) %>% 
+  select(Type, year=year.x, CNS07_sd,CNS18_sd,business_sd) %>% 
+  filter(!is.na(CNS07_sd))
+
+
+
 ```
+
+```{r}
+
+require(ggthemes)
+
+ggplot(riverside_plot, aes(x=as.numeric(as.character(year)), y=CNS07_sd, group=Type,colour=Type,shape=Type)) + geom_line() +
+  geom_rect(aes(xmin = constrct_year, xmax = constrct_year+1, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = constrct_year+1, xmax = 2015, ymin = -Inf, ymax = Inf),fill = "darkolivegreen3",linetype=0,alpha = 0.03) +
+  geom_text(x=2009.5,y=150,label="Construction",colour="grey40",size=4)+
+  geom_text(x=2012.5,y=150,label="Post \n construction",colour="grey40",size=4)+
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21,21,23))+
+  scale_x_continuous(breaks=c(2002:2015)) +
+  theme_minimal() +
+  labs(title = "Retail Service Employment Comparison: Riverside", x="Year",y="Employment Index",
+       caption = "Employment is indexed to 2009")
+```
+
+# adjust legend
 
