@@ -1,5 +1,5 @@
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(sf, purrr, dplyr)
+p_load(sf, purrr,glue, lubridate, dplyr)
 
 
 #LEHD Corridor Comparisons-----
@@ -50,3 +50,36 @@ return(corridor_grouped_df)
 
 
 #QCEW Corridor Comparisons-------
+
+
+
+#Aggregated trend plots
+
+make_agg_trend_table <- function(df, group, construct_year) {
+  
+  #prepare tables for plotting
+  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+
+  df <- df %>% filter(Group == group) %>%
+    mutate(business = CNS07 + CNS18)
+  
+
+  df_agg <- df %>% group_by(year, Type) %>%
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business))
+  
+  base_year <-  df_agg %>% filter(year == as.character(construct_year)) %>% 
+    select(CNS07_base = CNS07, CNS18_base = CNS18, business_base = business, Type, year)
+  
+  
+  df_plot <- df_agg %>%  
+    left_join(base_year, by = "Type") %>%
+    mutate(CNS07_sd = CNS07/CNS07_base*100,
+           CNS18_sd = CNS18/CNS18_base*100,
+           business_sd = business/business_base*100) %>%
+    select(Type, year = year.x, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+  
+  return(df_plot)
+  
+}
