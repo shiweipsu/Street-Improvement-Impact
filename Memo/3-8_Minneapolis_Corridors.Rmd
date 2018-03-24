@@ -8,8 +8,8 @@ output:
     includes:
       in_header: header.tex
     number_sections: true
-fig_width: 6
-fig_height: 4
+fig_width: 7
+fig_height: 5
 ---
 
 ```{r setup,include=FALSE}
@@ -112,19 +112,9 @@ Our first test in corridor comparability is comparing the count of the total num
 
 ###Riverside Ave.
 
-![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_riverside_corridor_blkgrp.png")
+![](images/minneapolis_riverside_corridor_blkgrp.png)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#group 1
 
-group1 <- minn_corridor %>% filter(Group == 1, year == "2015")
-
-p1 <- ggplot() + geom_sf(data = group1, aes(fill = Name)) +
-  theme_void() + labs(title = "Riverside Ave Corridor Study Area")
-
-plot(p1)
-
-```
 
 Our first corridor group consists of the Riverside and Cedar Ave corridors. The Cedar Ave comparison corridor is only 2,000 feet and covers three census blocks and is too small for meaningful comparison but we shall continue forward with the analysis.
 
@@ -186,17 +176,19 @@ On all three metrics the t-test returned non-significant results meaning that th
 
 ###Franklin Ave
 
-![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_franklin_corridor_blkgrp.png")
+![](images/minneapolis_franklin_corridor_blkgrp.png)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 2
 
-group2 <- minn_corridor %>% filter(Group == 2, year == "2015")
 
-p2 <- ggplot() + geom_sf(data = group2, aes(fill = Name)) +
-  theme_void() + labs(title = "Franklin Ave Corridor Study Area")
 
-plot(p2)
+# group2 <- minn_corridor %>% filter(Group == 2, year == "2015")
+# 
+# p2 <- ggplot() + geom_sf(data = group2, aes(fill = Name)) +
+#   theme_void() + labs(title = "Franklin Ave Corridor Study Area")
+# 
+# plot(p2)
 
 ```
 
@@ -252,19 +244,9 @@ In terms of the t-tests both corridors have statistically non-significant differ
 
 ###Central Avenue
 
-![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_central_ave_corridor_blkgrp.png")
+![](images/minneapolis_central_ave_corridor_blkgrp.png)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#group 3
 
-group3 <- minn_corridor %>% filter(Group == 3, year == "2015")
-
-p3 <- ggplot() + geom_sf(data = group3, aes(fill = Name)) +
-  theme_void() + labs(title = "Central Ave Corridor Study Area")
-
-plot(p3)
-
-```
 
 Both the Central and University Avenue corridors have total and retail employment in the top 5% of blocks in the city. Central Avenue also has accommodations employment equal to the top 5% of blocks in the city.
 
@@ -380,7 +362,7 @@ All t-tests came back non-significant emaning that the corridors are acceptable 
 
 ###North 2nd Street
 
-![North 2nd Street Corridor]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_north_2ndstreet_corridor_blkgrp.png")
+![North 2nd Street Corridor](here:here("Memo/images/minneapolis_north_2ndstreet_corridor_blkgrp.png"))
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #group 5
@@ -397,13 +379,6 @@ plot(p5)
 North 2nd Street and Broadway Avenue both have total and retail employment in the 95th percentile while Broadway also is in the 95th percentile for the city in accomodations employment, though that translates to only 2 accommodations jobs for the corridor. 
 
 
-
-
-```{r message=FALSE, warning=FALSE, include=FALSE}
-
-
-  
-```
 
 ```{r}
 second <- minn_corridor %>% filter(Name == "North 2nd Street (improvement)", year == "2007")
@@ -454,6 +429,13 @@ All t-tests came back non-significant emaning that the corridors are acceptable 
 ###Riverside Avenue
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+riverside_agg <- make_agg_trend_table(minn_corridor, group = 1, construct_year = 2009)
+riverside_agg_plot <- make_agg_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2012)
+
+plot(riverside_agg_plot)
+
+
 riverside <- minn_corridor %>% filter(Group==1) %>% mutate(business = CNS07 + CNS18)  
 
 riverside_agg <- riverside %>%
@@ -500,6 +482,9 @@ plot(ats_riverside)
 ###Franklin Avenue
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+franklin_agg <- make_agg_trend_table(minn_corridor, group = 2, construct_year  = 2011)
+franklin_agg_plot <- make_agg_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = "2011", end_year = "2011", corridor_name = "Franklin Ave. Corridor")
 
+franklin_agg_plot
 
 ```
