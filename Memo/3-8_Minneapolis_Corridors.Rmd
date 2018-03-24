@@ -178,20 +178,6 @@ On all three metrics the t-test returned non-significant results meaning that th
 
 ![](images/minneapolis_franklin_corridor_blkgrp.png)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#group 2
-
-
-
-# group2 <- minn_corridor %>% filter(Group == 2, year == "2015")
-# 
-# p2 <- ggplot() + geom_sf(data = group2, aes(fill = Name)) +
-#   theme_void() + labs(title = "Franklin Ave Corridor Study Area")
-# 
-# plot(p2)
-
-```
-
 The Franklin Avenue corridors are both within the top 10% of areas in the city with respect total and retail employment, though the Franklin treatment corridor is in the 90th percentile of total employment compared to the 95th percentile of the Franklin control corridor. The Franklin Avenue control corridor is also in the top 5% of areas of the city in accommodations employment while the improvement corridor has no accomodations employment.
 
 
@@ -297,19 +283,9 @@ All t-tests came back non-significant at the .05 level meaning that the two corr
 
 ###Lyndale Avenue South
 
-![]("C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact\\Memo\\images\\minneapolis_lyndale_corridor_blkgrp.png")
+![](images/minneapolis_lyndale_corridor_blkgrp.png)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#group 4
 
-group4 <- minn_corridor %>% filter(Group == 4, year == "2015")
-
-p4 <- ggplot() + geom_sf(data = group4, aes(fill = Name)) +
-  theme_void() + labs(title = "Lyndale Ave Corridor Study Area")
-
-plot(p4)
-
-```
 
 Lyndale and Grand Avenue diverge in terms of their total employment numbers but are both in the 95th percentile of retail employment when compared to the rest of the city. 
 
@@ -362,25 +338,14 @@ All t-tests came back non-significant emaning that the corridors are acceptable 
 
 ###North 2nd Street
 
-![North 2nd Street Corridor](here:here("Memo/images/minneapolis_north_2ndstreet_corridor_blkgrp.png"))
+![](images/minneapolis_north_2ndstreet_corridor_blkgrp.png)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#group 5
-
-group5 <- minn_corridor %>% filter(Group == 5, year == "2015")
-
-p5 <- ggplot() + geom_sf(data = group5, aes(fill = Name)) +
-  theme_void() + labs(title = "N 2nd Street Corridor Study Area")
-
-plot(p5)
-
-```
 
 North 2nd Street and Broadway Avenue both have total and retail employment in the 95th percentile while Broadway also is in the 95th percentile for the city in accomodations employment, though that translates to only 2 accommodations jobs for the corridor. 
 
 
 
-```{r}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 second <- minn_corridor %>% filter(Name == "North 2nd Street (improvement)", year == "2007")
   
 broadway <- minn_corridor %>% filter(Name == "Broadway Ave (control)", year == "2007")
@@ -435,56 +400,14 @@ riverside_agg_plot <- make_agg_trend_plot(riverside_agg, industry = "Retail", co
 
 plot(riverside_agg_plot)
 
-
-riverside <- minn_corridor %>% filter(Group==1) %>% mutate(business = CNS07 + CNS18)  
-
-riverside_agg <- riverside %>%
-  group_by(year, Type) %>%
-  summarise(CNS07=sum(CNS07),
-            CNS18=sum(CNS18),
-            business=sum(business))
-
-constrct_year <- as.numeric(as.character(riverside[riverside$Type=="improvement",]$BuildStart))[1]
-
-base_year <- riverside_agg %>% filter(year == constrct_year) %>% 
-  rename(CNS07_base=CNS07,CNS18_base=CNS18, business_base=business)
-
-riverside_plot <- as.data.frame(riverside_agg) %>%
-  left_join(base_year, by="Type") %>%
-  mutate(CNS07_sd=CNS07/CNS07_base*100,
-         CNS18_sd=CNS18/CNS18_base*100,
-         business_sd=business/business_base*100) %>% 
-  select(Type, year=year.x, CNS07_sd,CNS18_sd,business_sd) %>% 
-  filter(!is.na(CNS07_sd))
-
-riverside_plot$Type <- factor(riverside_plot$Type, levels = rev(levels(riverside_plot$Type)))
-
-#making the plot
-
-ats_riverside <- ggplot(riverside_plot, aes(x=as.numeric(as.character(year)), y=CNS07_sd, group=Type,colour=Type,shape=Type)) + geom_line() +
-  geom_rect(aes(xmin = constrct_year, xmax = constrct_year+1, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
-  geom_rect(aes(xmin = constrct_year+1, xmax = 2015, ymin = -Inf, ymax = Inf),fill = "darkolivegreen3",linetype=0,alpha = 0.03) +
-  geom_text(x=2009.5,y=150,label="Construction",colour="grey40",size=4)+
-  geom_text(x=2012.5,y=150,label="Post \n construction",colour="grey40",size=4)+
-  geom_line() + 
-  geom_point(size=3, fill="white") +
-  scale_shape_manual(values=c(22,21,21,23))+
-  scale_x_continuous(breaks=c(2002:2015)) +
-  theme_minimal() +
-  labs(title = "Retail Service Employment Comparison: Riverside", x="Year",y="Employment Index",
-       caption = "Employment is indexed to 2009") +
-  scale_fill_discrete(name = "Corridor Type")
-
-plot(ats_riverside)
-
 ```
 
 ###Franklin Avenue
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 franklin_agg <- make_agg_trend_table(minn_corridor, group = 2, construct_year  = 2011)
-franklin_agg_plot <- make_agg_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = "2011", end_year = "2011", corridor_name = "Franklin Ave. Corridor")
+franklin_agg_plot <- make_agg_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
 
-franklin_agg_plot
+plot(franklin_agg_plot)
 
 ```
