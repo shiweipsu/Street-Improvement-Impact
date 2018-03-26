@@ -115,16 +115,16 @@ make_agg_trend_plot <- function(df_plot, industry, corridor_name,
     geom_line()  +
     geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
               fill = "#adff2f",linetype=0,alpha = 0.03) +
-    geom_rect(aes(xmin = as.Date(end_date, "%Y") + 1, xmax = as.Date("2015-01-01", "%Y"), ymin = -Inf, ymax = Inf),
-              fill = "#7cfc00", linetype=0,alpha = 0.03) +
-    geom_text(x= construct_date, y = 150,label="Construction",colour="grey40",size = 4, hjust = 0) +
-    geom_text(x= end_date, y= 150,label="Post \n construction",colour="grey40",size = 4, hjust = 0) +
+    # geom_rect(aes(xmin = as.Date(end_date, "%Y") + 1, xmax = as.Date("2015-01-01", "%Y"), ymin = -Inf, ymax = Inf),
+    #           fill = "#7cfc00", linetype=0,alpha = 0.03) +
+    # geom_text(x= construct_date, y = 150,label="Construction",colour="grey40",size = 4, hjust = 0) +
+    # geom_text(x= end_date, y= 150,label="Post \n construction",colour="grey40",size = 4, hjust = 1) +
     geom_point(size = 3, fill="white") +
     scale_shape_manual(values=c(22,21,21,23))+
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("{industry} Services Employment Comparison: {corridor_name}"), x="Year",y="Employment Index",
-         caption = glue("Employment is indexed to {construct_year}")) +
+    labs(title = glue("{industry} Services Employment Comparison:\n {corridor_name}"), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to {construct_year}\n Shaded Area is Construction Period")) +
     guides(title = "Street Type")
   
   
