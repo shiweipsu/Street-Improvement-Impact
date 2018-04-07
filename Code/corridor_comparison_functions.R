@@ -11,8 +11,11 @@ corridor_df <- as.data.frame(corridor_df)
 corridor_t <- corridor_df %>% mutate(Retail=CNS07,
                                      Food_Accom=CNS18,
                                      Business = CNS07 + CNS18,
-                                     Service = CNS07 +  CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                     ratio1 = Business/Service)
+                                     Service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + 
+                                       CNS17 + CNS18 + CNS19,
+                                     Service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+                                     ratio1 = Business/Service1,
+                                     ratio2 = Business/Service2)
 return(corridor_t)  
 }
 
@@ -22,8 +25,12 @@ growth_rate <- function(corridor_df) {
   
 corridor_df <- as.data.frame(corridor_df)
   
-corridor_grouped_df <- corridor_df %>%  group_by(Name, year) %>% 
-  summarise_if(is.numeric, sum) %>% 
+corridor_grouped_df <- corridor_df %>%  
+  mutate(Group=as.factor(Group),
+         BuildStart=as.factor(BuildStart),
+         BuildEnd=as.factor(BuildEnd)) %>% 
+  group_by(Name, year) %>% 
+  summarise_each(funs(if(is.numeric(.)) sum(., na.rm = TRUE) else first(.))) %>% 
   ungroup() %>% 
   mutate(Retail = CNS07,
          Food_Accom = CNS18,
@@ -35,6 +42,8 @@ corridor_grouped_df <- corridor_df %>%  group_by(Name, year) %>%
          ratio2 = Business/Service2) %>% 
   ungroup() %>% group_by(Name) %>% 
   mutate(biz_growth = Business/lag(Business),
+         retail_growth = Retail/lag(Retail),
+         food_accom_growth = Food_Accom/lag(Food_Accom),
          service_growth1 = Service1/lag(Service1),
          service_growth2 = Service2/lag(Service2))
 
