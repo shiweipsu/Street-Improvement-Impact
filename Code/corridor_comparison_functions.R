@@ -141,3 +141,21 @@ make_agg_trend_plot <- function(df_plot, industry, corridor_name,
 }
 
 
+# DID ---------------------------------------------------------------------
+
+did_analysis <- function(df_did, group, endyear){
+  df_did <- df_did %>% filter(group==Group) %>% 
+    mutate(prepost=ifelse(as.numeric(as.character(year))>endyear,1,0),
+           business=CNS07+CNS18)
+  did_CNS07 <- lm(CNS07~Type + prepost + Type*prepost, data=df_did)
+  did_CNS18 <- lm(CNS18~Type + prepost + Type*prepost, data=df_did)
+  did_busi <- lm(business ~ Type + prepost + Type*prepost, data=df_did)
+  
+  did_final <- list(did_CNS07, did_CNS18, did_busi)
+  
+  return(did_final)
+  
+  #did_CNS07
+  #return(did_CNS18)
+  #return(did_busi)
+}
