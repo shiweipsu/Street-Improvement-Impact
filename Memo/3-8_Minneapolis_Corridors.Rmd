@@ -20,6 +20,8 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 
+![](images/minn_corridors.png)
+
 #Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shows how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
@@ -496,3 +498,6 @@ make_agg_trend_plot(north_agg, industry = "Accommodation", corridor_name = "Nort
 ##Conclusions
 
 The aggregated trend analyses presented here show  some potentially interesting effects of street improvement for a select set of corridors, but there do not seem to be any clear patterns running in any given direction. At best, we may be able to conclude that the descriptive data offered here does not show any *negative* effect of street improvement on retail or accommodations employment, and, in some cases, may have a positive effect on employment growth. The trend analysis does offer some tantalizing potential of positive employment effects that the difference-in-difference or time series regression can more accurately tease out. 
+
+#Difference-in-Difference
+
