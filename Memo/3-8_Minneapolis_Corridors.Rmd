@@ -505,6 +505,8 @@ As mentioned in the introduction, difference-in-difference (DiD) is a linear mod
 
 ##Riverside Ave. Corridor
 
+The Riverside/Cedar Avenue corridors do not exhibit a statistically significant effect of new bicycle infrastructure placement. 
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
