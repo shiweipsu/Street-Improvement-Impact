@@ -7,7 +7,7 @@ output:
   pdf_document:
     includes:
       in_header: header.tex
-    number_sections: true
+    number_sections: yes
 fig_width: 7
 fig_height: 5
 ---
@@ -82,7 +82,7 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, sf, ggplot2, ggthemes, dplyr)
+p_load(here, stargazer, sf, ggplot2, ggthemes, dplyr)
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
@@ -501,3 +501,15 @@ The aggregated trend analyses presented here show  some potentially interesting 
 
 #Difference-in-Difference
 
+As mentioned in the introduction, difference-in-difference (DiD) is a linear modeling approach designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved. The approach looks at the change in the variable of interest in the treatment group before and after it is treated compared to the change in the variable of interest in the control group. This section presents the DiD results for each of the corridors. 
+
+##Riverside Ave. Corridor
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+riverside_did <- did_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
+
+stargazer(riverside_did[[1]], riverside_did[[2]], riverside_did[[3]], title = "Riverside Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
