@@ -16,7 +16,7 @@ fig_height: 5
 
 knitr::opts_chunk$set(cache = TRUE)
 
-#knitr::opts_knit$set(root.dir = normalizePath(path = #"C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact"))
+
 ```
 
 
@@ -505,7 +505,7 @@ As mentioned in the introduction, difference-in-difference (DiD) is a linear mod
 
 ##Riverside Ave. Corridor
 
-The Riverside/Cedar Avenue corridors do not exhibit a statistically significant effect of new bicycle infrastructure placement. 
+The Riverside/Cedar Avenue treatment corridor does not exhibit a statistically significant effect of new bicycle infrastructure placement. The important term in the table is the Typeimprovement:prepost variable. That is the "difference" term, a dummy variable representing observations that received treatment in the post-construction period. The combination of the two gives allows us to determine whether there is a statistically significant impact of the treatment. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -515,3 +515,61 @@ riverside_did <- did_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
 stargazer(riverside_did[[1]], riverside_did[[2]], riverside_did[[3]], title = "Riverside Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
 ```
+
+##Franklin Ave. Corridor
+
+The Franklin Avenue corridor difference term is also non-significant even though the improvement corridor did exhibit some employment growth. Again, the difference term is measuring the impact of the treatment after its been installed and post-installation there is little employment growth in the treatment corridor at all. This can be checked visually if you examine the plots from the aggregated trend section concerning the corridor. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+franklin_did <- did_analysis(df_did = minn_corridor, group = 2, endyear = 2011)
+
+stargazer(franklin_did[[1]], franklin_did[[2]], franklin_did[[3]], title = "Franklin Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
+
+##Central Ave. Corridor
+
+Central Avenue's difference term is non-significant suggesting the treatment does not have a statistical effect on employment in the corridor. Though the improvement corridor has a negative growth trend for accommodations and greater "business" employment it is not tied to strett improvement construction. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+central_did <- did_analysis(df_did = minn_corridor, group = 3, endyear = 2012)
+
+stargazer(central_did[[1]], central_did[[2]], central_did[[3]], title = "Central Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
+
+##Lyndale Ave. Corridor
+
+For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment but no statistically significant effect for retail or greater "business" employment. The difference term coefficient of $\beta$ = -3.607 implies that the infrastructure construction is responsible for the loss of approximately 3.6 accommodation jobs per census block compared to the untreated corridor.    
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+lyndale_did <- did_analysis(df_did = minn_corridor, group = 4, endyear = 2009)
+
+stargazer(lyndale_did[[1]], lyndale_did[[2]], lyndale_did[[3]], title = "Lyndale Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
+
+##North Second Street Corridor
+
+All difference terms are non-signficant for the North Second Street corridor. Again, this suggests that there is not a statistically significant effect of the infrastructure improvement for this corridor compared to its control corridor, in this case, Broadway Avenue. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+north_did <- did_analysis(df_did = minn_corridor, group = 5, endyear = 2011)
+
+stargazer(north_did[[1]], north_did[[2]], north_did[[3]], title = "North Second St.Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
+
+##Conclusion
+
+Overall, it does not seem that infrastructure placement had a statistically discernible effect on employment in our corridors or interest. There is some evidence that the placement of the new lane had a negative effect in accommodations employment for the Lyndale Avenue corridor, but there was no equivalent effect for retail jobs or the broader "business" category. This very specified effect probably has more to do with accommodations employment more generally than with the infrastructure, but this research cannot say with any definitiveness what that may or may not be. 
+
+While the results here are largely non-significant, this is not an argument against expanding existing bicycle infrastructure or improving it. At minimum, new bicycle infrastructure has zero effect on employment in these corridors showing there's no harm, in terms of employment. The claim that improve bicycles infrastructure will hurt business hiring on major commercial corridors, then, is not supported.
