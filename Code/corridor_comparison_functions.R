@@ -165,7 +165,7 @@ did_analysis <- function(df_did, group, endyear){
 
 
 its_analysis <- function(df_its, group, endyear){
-  df_its <- df_its %>% filter(group==Group,Type=="Study") %>% 
+  df_its <- df_its %>% filter(group==Group,Type=="Study" | Type == "improvement") %>% 
     mutate(prepost=ifelse(as.numeric(as.character(year))>endyear,1,0),
            ts_year=as.numeric(as.character(year))-2003,
            business=CNS07+CNS18)
@@ -181,7 +181,7 @@ its_analysis <- function(df_its, group, endyear){
 
 
 agg_its_analysis <- function(df_its, group, endyear){
-  df_its <- df_its %>% filter(group==Group,Type=="Study") %>% 
+  df_its <- df_its %>% filter(group==Group,Type=="Study" | Type == "improvement") %>% 
     mutate(business=CNS07+CNS18) %>% 
     group_by(year) %>%
     summarise(CNS07 = sum(CNS07),
