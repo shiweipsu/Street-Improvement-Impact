@@ -160,6 +160,28 @@ did_analysis <- function(df_did, group, endyear){
   #return(did_busi)
 }
 
+did_agg_analysis <- function(df_did, group, endyear){
+  df_did <- df_did %>% filter(group==Group) %>% 
+    mutate(business=CNS07+CNS18) %>% 
+    group_by(Type, year) %>% 
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business)) %>% 
+    mutate(prepost=ifelse(as.numeric(as.character(year))>endyear,1,0))
+ 
+   did_CNS07 <- lm(CNS07~Type + prepost + Type*prepost, data=df_did)
+  did_CNS18 <- lm(CNS18~Type + prepost + Type*prepost, data=df_did)
+  did_busi <- lm(business ~ Type + prepost + Type*prepost, data=df_did)
+  
+  did_final <- list(did_CNS07, did_CNS18, did_busi)
+  
+  return(did_final)
+  
+  #did_CNS07
+  #return(did_CNS18)
+  #return(did_busi)
+}
+
 
 # ITS ---------------------------------------------------------------------
 
@@ -169,9 +191,9 @@ its_analysis <- function(df_its, group, endyear){
     mutate(prepost=ifelse(as.numeric(as.character(year))>endyear,1,0),
            ts_year=as.numeric(as.character(year))-2003,
            business=CNS07+CNS18)
-  its_CNS07 <- lm(CNS07~ts_year + prepost + ts_year*prepost, data=df_its)
-  its_CNS18 <- lm(CNS18~ts_year + prepost + ts_year*prepost, data=df_its)
-  its_busi <- lm(business ~ ts_year + prepost + ts_year*prepost, data=df_its)
+  its_CNS07 <- lm(CNS07~ts_year + prepost + ts_year*prepost + GEOID10, data=df_its)
+  its_CNS18 <- lm(CNS18~ts_year + prepost + ts_year*prepost + GEOID10, data=df_its)
+  its_busi <- lm(business ~ ts_year + prepost + ts_year*prepost + GEOID10, data=df_its)
   
   its_final <- list(its_CNS07, its_CNS18, its_busi)
   
