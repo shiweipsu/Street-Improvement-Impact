@@ -1,5 +1,5 @@
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(sf, purrr,glue, ggthemes, ggplot2, lubridate, dplyr)
+p_load(glue, ggthemes, ggplot2, lubridate, dplyr)
 
 
 #LEHD Corridor Comparisons-----
@@ -62,7 +62,7 @@ return(corridor_grouped_df)
 
 
 
-#Aggregated trend plots---------------------------------------------
+#Aggregated trend tables and plots---------------------------------------------
 
 agg_trend_table <- function(df, group) {
   
@@ -81,6 +81,55 @@ agg_trend_table <- function(df, group) {
   return(df_plot)
   
 }
+
+agg_trend_plot <- function(df_plot, industry, corridor_name, 
+                                 industry_code = c("CNS07", "CNS18", "business"), 
+                                 construct_year, end_year) {
+  
+  df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  #df_plot$year <- year(df_plot$year)
+  
+  #prepare construct_year and end_year as a date
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  #construct_date <- year(construct_year)
+  
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  #end_date <- year(end_year)
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    # geom_rect(aes(xmin = as.Date(end_date, "%Y") + 1, xmax = as.Date("2015-01-01", "%Y"), ymin = -Inf, ymax = Inf),
+    #           fill = "#7cfc00", linetype=0,alpha = 0.03) +
+    # geom_text(x= construct_date, y = 150,label="Construction",colour="grey40",size = 4, hjust = 0) +
+    # geom_text(x= end_date, y= 150,label="Post \n construction",colour="grey40",size = 4, hjust = 1) +
+    geom_point(size = 3, fill="white") +
+    scale_shape_manual(values=c(22,21,21,23))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Services Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
+         caption = "Shaded area represents the construction period") +
+    guides(title = "Street Type")
+  
+  
+  plot(ats_df)
+}
+
+#aggregated trend index tables and plots------------------------------
 
 agg_index_trend_table <- function(df, group, construct_year) {
   
