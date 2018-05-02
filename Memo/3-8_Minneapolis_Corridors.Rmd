@@ -126,8 +126,9 @@ Our first corridor group consists of the Riverside and Cedar Ave corridors. The 
 
 #comparisons-----
 
-riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", year == "BuildStart-1")
-cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2007")
+riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", 
+                                      year == as.numeric(as.character(BuildStart))-1)
+cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2008")
 
 riverside <- riverside %>% summarise(TotEmp = sum(C000)/nrow(riverside), RetailEmp = sum(CNS07)/nrow(riverside),
                                      AccomEmp = sum(CNS08)/nrow(riverside))
@@ -138,8 +139,8 @@ cedar <- cedar %>% summarise(TotEmp = sum(C000), RetailEmp = sum(CNS07),
 
 #t-tests----
 
-riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", year == "2007")
-cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2007")
+riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", year == "2008")
+cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2008")
 
 riverside <- riverside %>% mutate(business = CNS07 + CNS18,
                                   service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
@@ -505,14 +506,18 @@ As mentioned in the introduction, difference-in-difference (DiD) is a linear mod
 
 ##Riverside Ave. Corridor
 
-The Riverside/Cedar Avenue treatment corridor does not exhibit a statistically significant effect of new bicycle infrastructure placement. The important term in the table is the Typeimprovement:prepost variable. That is the "difference" term, a dummy variable representing observations that received treatment in the post-construction period. The combination of the two gives allows us to determine whether there is a statistically significant impact of the treatment. 
+The Riverside/Cedar Avenue treatment corridor exhibits a statistically significant and positive effect of infrastructure construction on the number of retail jobs and a positive, but non-significant, effect on accommodations employment. According to our model, Riverside Avenue grew by more than 285 jobs compared to the control control corridor. The important term in the table is the Typeimprovement:prepost variable. That is the "difference" term, a dummy variable representing observations that received treatment in the post-construction period.  
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
-riverside_did <- did_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
+#riverside_did <- did_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
 
-stargazer(riverside_did[[1]], riverside_did[[2]], riverside_did[[3]], title = "Riverside Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+# stargazer(riverside_did[[1]], riverside_did[[2]], riverside_did[[3]], title = "Riverside Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+riverside_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
+
+stargazer(riverside_agg_did[[1]], riverside_agg_did[[2]], riverside_agg_did[[3]], title = "Riverside Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
 ```
 
@@ -573,3 +578,24 @@ stargazer(north_did[[1]], north_did[[2]], north_did[[3]], title = "North Second 
 Overall, it does not seem that infrastructure placement had a statistically discernible effect on employment in our corridors or interest. There is some evidence that the placement of the new lane had a negative effect in accommodations employment for the Lyndale Avenue corridor, but there was no equivalent effect for retail jobs or the broader "business" category. This very specified effect probably has more to do with accommodations employment more generally than with the infrastructure, but this research cannot say with any definitiveness what that may or may not be. 
 
 While the results here are largely non-significant, this is not an argument against expanding existing bicycle infrastructure or improving it. At minimum, new bicycle infrastructure has zero effect on employment in these corridors showing there's no harm, in terms of employment. The claim that improve bicycles infrastructure will hurt business hiring on major commercial corridors, then, is not supported.
+
+#Interrupted Time Series
+
+As described earlier, interrupted time series (ITS) is an econometric technique that estimates the impact of an intervention over time. This approach allows us to track the treatment corridor over time and estimate the impact of the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.
+
+While ITS is a useful technique it does require much more available data than a difference-in-difference approach or even an aggregated trend analysis. In particular, ITS requires enough pre-treatment data in order to accurately represent any underlying trends in the data. While post-treatment does not necessarily require as many data points as pre-treatment, analysts still need enough post-treatment data to reasonably estimate the impact of the treatment. This limit imposes two costs on researchers. First, as mentioned, is you need more data, overall, to run a proper ITS compared to other techniques. Second, you need a sufficient amount of data *post-treatment* to truly ascertain the impact. This means that depending on the data available infrastructure improvements has to have been concluded probably no later than 2012. But even recognizing these limits, ITS offers a powerful alternative technique for estimating the causal impact of improved infrastructure. 
+
+##Riverside Avenue
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+riverside_its <- its_analysis(minn_corridor, group = 1, endyear = 2009)
+
+riverside_agg_its <- agg_its_analysis(df_its = minn_corridor, group = 1, endyear = 2009)
+
+stargazer(riverside_its[[1]], riverside_its[[2]], riverside_its[[3]], type = "text", 
+          title = "Interrupted Time Series- Riverside Ave.", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+stargazer(riverside_agg_its[[1]], riverside_agg_its[[2]], riverside_agg_its[[3]], type = "text", 
+          title = "Aggregated Interrupted Time Series- Riverside Ave.", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+```
