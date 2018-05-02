@@ -62,9 +62,27 @@ return(corridor_grouped_df)
 
 
 
-#Aggregated trend plots
+#Aggregated trend plots---------------------------------------------
 
-make_agg_trend_table <- function(df, group, construct_year) {
+agg_trend_table <- function(df, group) {
+  
+  #prepare tables for plotting
+  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  
+  df <- df %>% filter(Group == group) %>%
+    mutate(business = CNS07 + CNS18)
+  
+  
+  df_plot <- df %>% group_by(year, Type) %>%
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business))
+  
+  return(df_plot)
+  
+}
+
+agg_index_trend_table <- function(df, group, construct_year) {
   
   #prepare tables for plotting
   df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
@@ -93,7 +111,7 @@ make_agg_trend_table <- function(df, group, construct_year) {
   
 }
 
-make_agg_trend_plot <- function(df_plot, industry, corridor_name, 
+agg_index_trend_plot <- function(df_plot, industry, corridor_name, 
                                 industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
                                 construct_year, end_year) {
   
