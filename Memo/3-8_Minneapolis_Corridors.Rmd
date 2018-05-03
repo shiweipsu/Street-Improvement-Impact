@@ -400,8 +400,8 @@ Riverside retail employment trends seem to suggest a possible positive effect of
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-riverside_agg <- make_agg_trend_table(minn_corridor, group = 1, construct_year = 2009)
-riverside_agg_plot <- make_agg_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+riverside_agg <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
+riverside_agg_plot <- agg_index_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 
 
 ```
@@ -410,7 +410,8 @@ The Riverside accommodations patterns are more mixed. Employment growth for the 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-riverside_agg_plot <- make_agg_trend_plot(riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_plot <- agg_index_trend_plot(riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
 
 ```
@@ -421,8 +422,8 @@ Retail employment does show consistent, though moderate, growth for the improvem
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-franklin_agg <- make_agg_trend_table(minn_corridor, group = 2, construct_year  = 2011)
-franklin_agg_plot <- make_agg_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
+franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
+franklin_agg_plot <- agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
 
 
 ```
@@ -433,7 +434,7 @@ In terms of accommodations employment the trend analysis is relatively ambiguous
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-franklin_agg_plot <- make_agg_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
+franklin_agg_plot <- agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
 
 ```
 
@@ -442,8 +443,8 @@ franklin_agg_plot <- make_agg_trend_plot(franklin_agg, industry = "Accommodation
 Central Avenue shows a clear positive retail employment trend post-construction for the treatment corridor that eventually overtakes the control corridor in the latest period. Note that both corridors have positive employment trends post-construction though the control corridor has its most dramatic year to year growth during the construction period. 
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-central_agg <- make_agg_trend_table(minn_corridor, group = 3, construct_year = 2012)
-central_agg_plot <- make_agg_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+central_agg <- agg_index_trend_table(minn_corridor, group = 3, construct_year = 2012)
+central_agg_plot <- agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
 
 ```
 
@@ -451,7 +452,7 @@ The accommodations employment trend is more ambiguous. The treatment corridor sa
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-make_agg_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+agg_index_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
 ```
 
@@ -461,16 +462,16 @@ Retail employment on the Lyndale Avenue corridor looks to only have just recover
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-lyndale_trend <- make_agg_trend_table(minn_corridor, group = 4, construct_year = 2008)
+lyndale_trend <- agg_index_trend_table(minn_corridor, group = 4, construct_year = 2008)
 
-make_agg_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 ```
 
 In terms of accommodations employment, the treatment corridor shows no real effect due to construction showing only modest overall employment growth since 2008. 
 
 ```{r echo = FALSE, message=FALSE, warning=FALSE}
 
-make_agg_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 ```
 
 
@@ -480,9 +481,9 @@ North 2nd Street's employment trends point towards a probable impact of street i
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-north_agg <- make_agg_trend_table(minn_corridor, group = 5, construct_year = 2011)
+north_agg <- agg_index_trend_table(minn_corridor, group = 5, construct_year = 2011)
 
-make_agg_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
 
 ```
 
@@ -490,8 +491,7 @@ Accommodations employment growth is quite robust for the treatment corridor but 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-make_agg_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd",
-                    construct_year = 2011, end_year = 2012)
+agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
 ```
 
@@ -502,18 +502,14 @@ The aggregated trend analyses presented here show  some potentially interesting 
 
 #Difference-in-Difference
 
-As mentioned in the introduction, difference-in-difference (DiD) is a linear modeling approach designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved. The approach looks at the change in the variable of interest in the treatment group before and after it is treated compared to the change in the variable of interest in the control group. This section presents the DiD results for each of the corridors. 
+As mentioned in the introduction, difference-in-difference (DiD) is a linear modeling approach designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved. The approach looks at the change in the variable of interest in the treatment group before and after it is treated compared to the change in the variable of interest in the control group. This section presents the DiD results for each of the corridors. While they may appear overwhelming, the Typeimprovement:prepost coefficient is the value that matters for our DiD model. If that therm is significant, then we have evidence that the infrastructure treatment did have a casusal effect on our variables of interest. 
 
 ##Riverside Ave. Corridor
 
-The Riverside/Cedar Avenue treatment corridor exhibits a statistically significant and positive effect of infrastructure construction on the number of retail jobs and a positive, but non-significant, effect on accommodations employment. According to our model, Riverside Avenue grew by more than 285 jobs compared to the control control corridor. The important term in the table is the Typeimprovement:prepost variable. That is the "difference" term, a dummy variable representing observations that received treatment in the post-construction period.  
+The Riverside/Cedar Avenue treatment corridor exhibits a statistically significant and positive effect of infrastructure construction on the number of retail jobs and a positive, but non-significant, effect on accommodations employment. According to our model, Riverside Avenue grew by more than 285 jobs compared to the control corridor.   
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-
-#riverside_did <- did_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
-
-# stargazer(riverside_did[[1]], riverside_did[[2]], riverside_did[[3]], title = "Riverside Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
 riverside_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
 
@@ -523,25 +519,25 @@ stargazer(riverside_agg_did[[1]], riverside_agg_did[[2]], riverside_agg_did[[3]]
 
 ##Franklin Ave. Corridor
 
-The Franklin Avenue corridor difference term is also non-significant even though the improvement corridor did exhibit some employment growth. Again, the difference term is measuring the impact of the treatment after its been installed and post-installation there is little employment growth in the treatment corridor at all. This can be checked visually if you examine the plots from the aggregated trend section concerning the corridor. 
+The Franklin Avenue corridor difference term is also significant with an estimate that the infrastructure treatment is responsible . According to our estimates, the infrastructure placement on Franklin Avenue is responsible for an additional 120 retail jobs with no statistically significant effect for accommodations jobs. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
-franklin_did <- did_analysis(df_did = minn_corridor, group = 2, endyear = 2011)
+franklin_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 2, endyear = 2011)
 
-stargazer(franklin_did[[1]], franklin_did[[2]], franklin_did[[3]], title = "Franklin Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+stargazer(franklin_agg_did[[1]], franklin_agg_did[[2]], franklin_agg_did[[3]], title = "Franklin Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
 ```
 
 ##Central Ave. Corridor
 
-Central Avenue's difference term is non-significant suggesting the treatment does not have a statistical effect on employment in the corridor. Though the improvement corridor has a negative growth trend for accommodations and greater "business" employment it is not tied to strett improvement construction. 
+Central Avenue's difference term is significant and highly negative. For Central Avenue, therefore, the installation of the new infrastructure is responsible for the loss of approximately 203 accommodations jobs compared to the control corridor. This result can be intuited if you revisit the aggregate employment graph for the Central Avenue corridors and you can see there is a large gap in the overall number of accommodations jobs between the treatment and control corridor. Additionally, the control corridor has more robust growth over time compared to the treatment. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
-central_did <- did_analysis(df_did = minn_corridor, group = 3, endyear = 2012)
+central_did <- did_agg_analysis(df_did = minn_corridor, group = 3, endyear = 2012)
 
 stargazer(central_did[[1]], central_did[[2]], central_did[[3]], title = "Central Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
@@ -549,12 +545,12 @@ stargazer(central_did[[1]], central_did[[2]], central_did[[3]], title = "Central
 
 ##Lyndale Ave. Corridor
 
-For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment but no statistically significant effect for retail or greater "business" employment. The difference term coefficient of $\beta$ = -3.607 implies that the infrastructure construction is responsible for the loss of approximately 3.6 accommodation jobs per census block compared to the untreated corridor.    
+For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment. Again, the interpretation of the difference term is that "but for" the installation of the infrastructure Lyndale Avenue would have nearly 109 additional accommodations jobs. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
-lyndale_did <- did_analysis(df_did = minn_corridor, group = 4, endyear = 2009)
+lyndale_did <- did_agg_analysis(df_did = minn_corridor, group = 4, endyear = 2009)
 
 stargazer(lyndale_did[[1]], lyndale_did[[2]], lyndale_did[[3]], title = "Lyndale Ave. Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
@@ -562,12 +558,12 @@ stargazer(lyndale_did[[1]], lyndale_did[[2]], lyndale_did[[3]], title = "Lyndale
 
 ##North Second Street Corridor
 
-All difference terms are non-signficant for the North Second Street corridor. Again, this suggests that there is not a statistically significant effect of the infrastructure improvement for this corridor compared to its control corridor, in this case, Broadway Avenue. 
+Our difference-in-difference estimation shows a positive and significant effect of treatment responsible for approximately 247 accommodations jobs while retail has a negative but non-significant effect. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
-north_did <- did_analysis(df_did = minn_corridor, group = 5, endyear = 2011)
+north_did <- did_agg_analysis(df_did = minn_corridor, group = 5, endyear = 2011)
 
 stargazer(north_did[[1]], north_did[[2]], north_did[[3]], title = "North Second St.Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
 
@@ -575,27 +571,66 @@ stargazer(north_did[[1]], north_did[[2]], north_did[[3]], title = "North Second 
 
 ##Conclusion
 
-Overall, it does not seem that infrastructure placement had a statistically discernible effect on employment in our corridors or interest. There is some evidence that the placement of the new lane had a negative effect in accommodations employment for the Lyndale Avenue corridor, but there was no equivalent effect for retail jobs or the broader "business" category. This very specified effect probably has more to do with accommodations employment more generally than with the infrastructure, but this research cannot say with any definitiveness what that may or may not be. 
+Overall, there are mixed effects of infrastructure improvement on retail and accommodations jobs. Three corridors- North Second, Franklin, and Riverside- show positive effects of new infrastructure placement but only for retail or accommadations employment. The negative results are also significant for only one of the industries. The mixed nature of the results in terms of significance and affected industries offer some preliminary evidence that the infrastructure does indeed have an effect, but it is unclear exactly what that effect is. 
 
-While the results here are largely non-significant, this is not an argument against expanding existing bicycle infrastructure or improving it. At minimum, new bicycle infrastructure has zero effect on employment in these corridors showing there's no harm, in terms of employment. The claim that improve bicycles infrastructure will hurt business hiring on major commercial corridors, then, is not supported.
+More importantly, while these results are interesting they should be taken with a heavy grain of salt. Difference-in-difference requires a certain set of assumptions in order for its results to be valid, and, unfortunately, many of the corridors tested do not fit. Two of the main assumptions, the parallel trend assumption, and the independence assumption, are violated in most of these models. The parallel trends assumption dictates that in order for a DiD estimate to be valid the trend in your variable of interest must be similar between your two groups before treatment. In plain terms, the growth trajectory of the two groups should be similar before a policy is enacted. This is not the case for a few of the corridors where it is clear that either the treatment or the control corridor had a dramatically different growth trajectory before treatment even began. The independence assumption basically states that the two groups should not be able to affect each other. A clear violation of this assumption is seen for the Frnaklin Avenue corridor where the control and treatment corridors are the same stretch road. It is unlikely that a change from one corridor will not affect the other as they are touching. As such, while interesting, these DiD estimates are not appropriate. 
 
 #Interrupted Time Series
 
 As described earlier, interrupted time series (ITS) is an econometric technique that estimates the impact of an intervention over time. This approach allows us to track the treatment corridor over time and estimate the impact of the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.
 
-While ITS is a useful technique it does require much more available data than a difference-in-difference approach or even an aggregated trend analysis. In particular, ITS requires enough pre-treatment data in order to accurately represent any underlying trends in the data. While post-treatment does not necessarily require as many data points as pre-treatment, analysts still need enough post-treatment data to reasonably estimate the impact of the treatment. This limit imposes two costs on researchers. First, as mentioned, is you need more data, overall, to run a proper ITS compared to other techniques. Second, you need a sufficient amount of data *post-treatment* to truly ascertain the impact. This means that depending on the data available infrastructure improvements has to have been concluded probably no later than 2012. But even recognizing these limits, ITS offers a powerful alternative technique for estimating the causal impact of improved infrastructure. 
+While ITS is a useful technique it does require much more available data than a difference-in-difference approach or even an aggregated trend analysis. In particular, ITS requires enough pre-treatment data in order to accurately represent any underlying trends in the data. While post-treatment does not necessarily require as many data points as pre-treatment, analysts still need enough post-treatment data to reasonably estimate the impact of the treatment. This limit imposes two costs on researchers. First, as mentioned, you need more data, overall, to run a proper ITS compared to other techniques. Second, you need a sufficient amount of data *post-treatment* to truly ascertain the impact. This means that depending on the data available infrastructure improvements has to have been concluded probably no later than 2012. But even recognizing these limits, ITS offers a powerful alternative technique for estimating the causal impact of improved infrastructure. 
 
 ##Riverside Avenue
 
+The Riverside Ave corridor does not exhibit a level or slope change from the pre-treatment trend patterns in our current specification of the model. While the ts_year coefficient for retail is positive and significant this only tells us that the growth trend of retail employment for the corridor is itself positive. The non-significant **prepost** and **ts_year:pre_post** indicate that there was neither a level or slope change attributable to the treatment. 
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-riverside_its <- its_analysis(minn_corridor, group = 1, endyear = 2009)
 
 riverside_agg_its <- agg_its_analysis(df_its = minn_corridor, group = 1, endyear = 2009)
 
-stargazer(riverside_its[[1]], riverside_its[[2]], riverside_its[[3]], type = "text", 
-          title = "Interrupted Time Series- Riverside Ave.", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
 
 stargazer(riverside_agg_its[[1]], riverside_agg_its[[2]], riverside_agg_its[[3]], type = "text", 
-          title = "Aggregated Interrupted Time Series- Riverside Ave.", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+          title = "Interrupted Time Series- Riverside Ave.", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+```
+
+##Franklin Avenue
+
+Franklin Avenue exhibits mixed results. For accommodations employment the corridor lost a significant number of jobs, thus the large, negative and statistically significant change in level seen in the **prepost** term, but also there is a positive shift in the *slope*. This is seen visually in the aggregate employment chart for accommodations employment for the corridor where there is a clear drop in employment after construction and then a massive jump in employment between 2014 and 2015. Due to a lack of data it is unclear whether this rise will taper off creating a new, higher level of employment, but it does seem like the corridor potentially has a positive shift in accommodations employment.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+franklin_its <- agg_its_analysis(df_its = minn_corridor,  group = 2, endyear = 2011)
+
+stargazer(franklin_its[[1]], franklin_its[[2]], franklin_its[[3]], type = "text", title = "Interrupted Time Series- Franklin Ave.", column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
+
+```
+
+##Central Avenue
+
+Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slop for the accomodations employment term.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+central_its <- agg_its_analysis(df_its = minn_corridor, group = 3, endyear = 2012)
+
+stargazer(central_its[[1]], central_its[[2]], central_its[[3]], type = "text", title = "Interrupted Time Series- Central Ave.", column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
+
+
+```
+
+##Lyndale Avenue
+
+Lyndale exhibits a similar pattern to Central but with the construction completed in 2009 we have enough data post-treatment to have more valid results. In this case, there is a negative, statistically significant drop in the level of accommodations employment for the corridor but a postivive, significant slope. Again, when examining the aggregate employment trend graphs we see a clear drop in employment in 2009 and 2010 and a seeming return to the pre-treatment level with a positive slope. The positive growth trend continues through 2015 but it is unclear if we will see a leveling off of new employment at a higher level or if employment will collapse again.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+lyndale_its <- agg_its_analysis(minn_corridor, group = 4, endyear = 2009)
+
+stargazer(lyndale_its[[1]], lyndale_its[[2]], lyndale_its[[3]], type = "text", title = "Interrupted Time Series- Lyndale Ave.", column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
+
 ```
