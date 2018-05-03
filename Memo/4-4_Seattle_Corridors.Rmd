@@ -78,7 +78,7 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, sf, ggplot2, ggthemes, dplyr)
+p_load(here, sf, ggplot2, ggthemes, dplyr, stargazer)
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
@@ -163,6 +163,11 @@ forthave_growth <- seattle_growth %>%
 t.test(secondave_growth$biz_growth,forthave_growth$biz_growth)
 t.test(secondave_growth$retail_growth,forthave_growth$retail_growth)
 t.test(secondave_growth$food_accom_growth,forthave_growth$food_accom_growth)
+
+secondave_agg <- agg_trend_table(seattle_corridor, group = 1)
+agg_trend_plot(secondave_agg, industry = "business", corridor_name = "2nd Ave.", construct_year = 2014, end_year = 2015)
+agg_trend_plot(secondave_agg, industry = "CNS07", corridor_name = "2nd Ave.", construct_year = 2014, end_year = 2015)
+agg_trend_plot(secondave_agg, industry = "CNS18", corridor_name = "2nd Ave.", construct_year = 2014, end_year = 2015)
 ```
 
 ### Corridor employment amount
@@ -189,8 +194,8 @@ The bike facility installation has just taken place in 2014. The newest employme
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-secondave_agg <- make_agg_trend_table(seattle_corridor, group = 1, construct_year = 2014)
-secondave_agg_plot <- make_agg_trend_plot(secondave_agg, industry = "Business", corridor_name = "2nd Ave.",industry_code = "business_sd", construct_year = 2014, end_year = 2015)
+secondave_agg <- agg_index_trend_table(seattle_corridor, group = 1, construct_year = 2014)
+secondave_agg_plot <- agg_index_trend_plot(secondave_agg, industry = "Business", corridor_name = "2nd Ave.",industry_code = "business_sd", construct_year = 2014, end_year = 2015)
 
 
 ```
@@ -202,7 +207,7 @@ Although there is a great increase of retail after bike lane installation on 2nd
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-secondave_agg_plot <- make_agg_trend_plot(secondave_agg, industry = "Retail", corridor_name = "2nd Ave.",industry_code = "CNS07_sd", construct_year = 2014, end_year = 2015)
+secondave_agg_plot <- agg_index_trend_plot(secondave_agg, industry = "Retail", corridor_name = "2nd Ave.",industry_code = "CNS07_sd", construct_year = 2014, end_year = 2015)
 
 
 ```
@@ -211,10 +216,11 @@ Food and accomodation employment trend is similar to business trend presend abov
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-secondave_agg_plot <- make_agg_trend_plot(secondave_agg, industry = "Food & Accommodations", corridor_name = "2nd Ave.",industry_code = "CNS18_sd", construct_year = 2014, end_year = 2015)
+secondave_agg_plot <- agg_index_trend_plot(secondave_agg, industry = "Food & Accommodations", corridor_name = "2nd Ave.",industry_code = "CNS18_sd", construct_year = 2014, end_year = 2015)
 
 
 ```
+
 
 ## Broadway Street.
 
@@ -279,6 +285,11 @@ TukeyHSD(aov(biz_growth~Type, data=brwy_growth))
 TukeyHSD(aov(retail_growth~Type, data=brwy_growth))
 TukeyHSD(aov(food_accom_growth~Type, data=brwy_growth))
 
+brwy_agg <- agg_trend_table(seattle_corridor, group = 2)
+agg_trend_plot(brwy_agg, industry = "business", corridor_name = "Broadway", construct_year = 2014, end_year = 2015)
+agg_trend_plot(brwy_agg, industry = "CNS07", corridor_name = "Broadway", construct_year = 2014, end_year = 2015)
+agg_trend_plot(brwy_agg, industry = "CNS18", corridor_name = "Broadway", construct_year = 2014, end_year = 2015)
+
 ```
 
 ### Corridor employment amount
@@ -308,8 +319,8 @@ The bike facility installation has taken place in 2013. The business employment 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-brwy_agg <- make_agg_trend_table(seattle_corridor, group = 2, construct_year = 2013)
-brwy_agg_plot <- make_agg_trend_plot(brwy_agg, industry = "Business", corridor_name = "Broadway",industry_code = "business_sd", construct_year = 2013, end_year = 2014)
+brwy_agg <- agg_index_trend_table(seattle_corridor, group = 2, construct_year = 2013)
+brwy_agg_plot <- agg_index_trend_plot(brwy_agg, industry = "Business", corridor_name = "Broadway",industry_code = "business_sd", construct_year = 2013, end_year = 2014)
 
 
 ```
@@ -320,7 +331,7 @@ Retail employment trend is very similar for improvement corridor and 15th Ave E 
 There is a significant drop of retail employment after bike lane installation in Broadway corridor, but the control corridors constinues to grow. Although it starts to recover after one year, there is still caveats that bike lane might negatively affect retail services.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-brwy_agg_plot <- make_agg_trend_plot(brwy_agg, industry = "Retail", corridor_name = "Broadway",industry_code = "CNS07_sd", construct_year = 2013, end_year = 2014)
+brwy_agg_plot <- agg_index_trend_plot(brwy_agg, industry = "Retail", corridor_name = "Broadway",industry_code = "CNS07_sd", construct_year = 2013, end_year = 2014)
 
 
 ```
@@ -331,16 +342,16 @@ Food/accomodation employment in improvement corridor jumps greatly after one-yea
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-brwy_agg_plot <- make_agg_trend_plot(brwy_agg, industry = "Food & Accommodations", corridor_name = "Broadway",industry_code = "CNS18_sd", construct_year = 2013, end_year = 2014)
+brwy_agg_plot <- agg_index_trend_plot(brwy_agg, industry = "Food & Accommodations", corridor_name = "Broadway",industry_code = "CNS18_sd", construct_year = 2013, end_year = 2014)
 
 
 ```
 
-## Roosevelt Way.
+## Roosevelt Way
 
 ![Roosevelt Way Corridor](images/seattle_roosevelt.png)
 
-Our second improvement corridor is Roosevelt Way, and it has two control corridors: University Way and N 45th St.They all locate in North Seattle, close to University District.
+Our third improvement corridor is Roosevelt Way, and it has two control corridors: University Way and N 45th St.They all locate in North Seattle, close to University District.
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
@@ -399,7 +410,10 @@ TukeyHSD(aov(biz_growth~Type, data=rsvt_growth))
 TukeyHSD(aov(retail_growth~Type, data=rsvt_growth))
 TukeyHSD(aov(food_accom_growth~Type, data=rsvt_growth))
 
-
+rsvt_agg <- agg_trend_table(seattle_corridor, group = 3)
+agg_trend_plot(rsvt_agg, industry = "business", corridor_name = "Roosevelt Way", construct_year = 2014, end_year = 2015)
+agg_trend_plot(rsvt_agg, industry = "CNS07", corridor_name = "Rossevelt Way.", construct_year = 2014, end_year = 2015)
+agg_trend_plot(rsvt_agg, industry = "CNS18", corridor_name = "Roosevelt Way", construct_year = 2014, end_year = 2015)
 ```
 
 ### Corridor employment amount
@@ -429,8 +443,8 @@ The total business employment trend for three corridors over this recent decade 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-rsvt_agg <- make_agg_trend_table(seattle_corridor, group = 3, construct_year = 2016)
-rsvt_agg_plot <- make_agg_trend_plot(rsvt_agg, industry = "Business", corridor_name = "Roosevelt",industry_code = "business_sd", construct_year = 2016, end_year = 2017)
+rsvt_agg <- agg_index_trend_table(seattle_corridor, group = 3, construct_year = 2015)
+rsvt_agg_plot <- agg_index_trend_plot(rsvt_agg, industry = "Business", corridor_name = "Roosevelt",industry_code = "business_sd", construct_year = 2016, end_year = 2017)
 
 
 ```
@@ -440,7 +454,7 @@ Retail employment trend is very similar for improvement corridor and 45th St cor
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-rsvt_agg_plot <- make_agg_trend_plot(rsvt_agg, industry = "Retail", corridor_name = "Roosevelt",industry_code = "CNS07_sd", construct_year = 2016, end_year = 2017)
+rsvt_agg_plot <- agg_index_trend_plot(rsvt_agg, industry = "Retail", corridor_name = "Roosevelt",industry_code = "CNS07_sd", construct_year = 2016, end_year = 2017)
 
 
 ```
@@ -449,8 +463,78 @@ Food and accomodation employment trend is more fluctuated. Imporvement corridor 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-rsvt_agg_plot <- make_agg_trend_plot(rsvt_agg, industry = "Food & Accommodations", corridor_name = "Roosevelt",industry_code = "CNS18_sd", construct_year = 2016, end_year = 2017)
+rsvt_agg_plot <- agg_index_trend_plot(rsvt_agg, industry = "Food & Accommodations", corridor_name = "Roosevelt",industry_code = "CNS18_sd", construct_year = 2016, end_year = 2017)
 
 
 ```
 
+# DID analysis
+As mentioned in the introduction, difference-in-difference (DID) is a linear modeling approach that infers casual relationship. The causal effect is estimated through the difference between change in the variable of interest in the treatment group before and after it is treated compared with the corresponding change in control group.
+
+## Second Avenue corridor
+```{r}
+secondave_did <- did_analysis(seattle_corridor,group = 1, 2014)
+stargazer(secondave_did[[1]],secondave_did[[2]],secondave_did[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+secondave_did_agg <- did_agg_analysis(seattle_corridor,group = 1, 2014)
+stargazer(secondave_did_agg[[1]],secondave_did_agg[[2]],secondave_did_agg[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+```
+
+Three models, using retail employment, food/accommodation employment and business employment (sum of the previous two) as dependent variable, are estimated. The key interest term in the table is Study:prepost variable. This DID estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent.The 2nd Avenue treatment corridor does not exhibit a statistically significant effect of new bicycle infrastructure replacement.
+
+## Broadway corridor
+```{r}
+broadway_did <- did_analysis(seattle_corridor,group = 2, 2013)
+stargazer(broadway_did[[1]],broadway_did[[2]],broadway_did[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+broadway_did_agg <- did_agg_analysis(seattle_corridor,group = 2, 2013)
+stargazer(broadway_did_agg[[1]],broadway_did_agg[[2]],broadway_did_agg[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+```
+
+Similarly, the DID estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent. Although there is a big jump of food/accomotion employment in Broadway treatment corridor, the causal inference does not exhibit a statistically significant effect of new bicycle infrastructure replacement on employment.
+
+## Roosevelt Way
+The Roosevelt Way corridor experienced bike lane construction in 2016, one year later than the newest LEHD data. Thus, we cannot conduct DID analysis because there is no after treatment data points for the corridors. 
+
+
+# Interupted time series
+Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where the installation of new bicycled facility happens. The estimation of pre-post parameter indicates the impact of interruption on change of intersted outcome variable, while the estimation of  
+
+
+## Second Avenue corridor
+```{r}
+secondave_its <- its_analysis(seattle_corridor,group = 1, 2014)
+stargazer(secondave_its[[1]],secondave_its[[2]],secondave_its[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+secondave_its_agg <- agg_its_analysis(seattle_corridor,group = 1, 2014)
+stargazer(secondave_its_agg[[1]],secondave_its_agg[[2]],secondave_its_agg[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+
+```
+
+As the construction year is 2014,  Three models, using retail employment, food/accommodation employment and business employment (sum of the previous two) as dependent variable, are estimated. The key interest term in the table is Study:prepost variable. This DID estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent.The 2nd Avenue treatment corridor does not exhibit a statistically significant effect of new bicycle infrastructure replacement.
+
+
+## Broadway corridor
+```{r}
+broadway_its <- its_analysis(seattle_corridor,group = 2, 2013)
+stargazer(broadway_its[[1]],broadway_its[[2]],broadway_its[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+broadway_its_agg <- agg_its_analysis(seattle_corridor,group = 2, 2013)
+stargazer(broadway_its_agg[[1]],broadway_its_agg[[2]],broadway_its_agg[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+
+```
+
+Similarly, the DID estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent. Although there is a big jump of food/accomotion employment in Broadway treatment corridor, the causal inference does not exhibit a statistically significant effect of new bicycle infrastructure replacement on employment.
+
+## Roosevelt Way corridor
+```{r}
+roosevelt_its <- its_analysis(seattle_corridor,group = 3, 2016)
+stargazer(roosevelt_its[[1]],roosevelt_its[[2]],roosevelt_its[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+```
+
+Similarly, the DID estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent. Although there is a big jump of food/accomotion employment in Broadway treatment corridor, the causal inference does not exhibit a statistically significant effect of new bicycle infrastructure replacement on employment.
