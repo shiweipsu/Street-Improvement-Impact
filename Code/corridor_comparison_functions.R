@@ -126,7 +126,7 @@ agg_trend_plot <- function(df_plot, industry, corridor_name,
     guides(title = "Street Type")
   
   
-  plot(ats_df)
+  return(ats_df)
 }
 
 #aggregated trend index tables and plots------------------------------
@@ -204,7 +204,7 @@ agg_index_trend_plot <- function(df_plot, industry, corridor_name,
     guides(title = "Street Type")
   
   
-  plot(ats_df)
+  return(ats_df)
 }
 
 

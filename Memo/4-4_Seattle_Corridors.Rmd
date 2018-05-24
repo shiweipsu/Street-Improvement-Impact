@@ -406,7 +406,7 @@ Retail employment trend is very similar for improvement corridor and 45th St cor
 
 Food and accommodation employment trend is more fluctuated. Improvement corridor has an apparent recession between 2009-2011, while 45th St didn't change much besides the spike in 2010. University Way is the most fluctuated corridor. However, taking into account of the average trend over this decade, the two control corridors are similar to improvement corridor.
 
-CORRIDOR COMPARISON SUMMARY TABLE
+**CORRIDOR COMPARISON SUMMARY TABLE**
 
 #4. Data Analysis
 ## 4.1 Second Avenue Corridor
