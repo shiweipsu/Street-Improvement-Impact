@@ -8,8 +8,6 @@ output:
     includes:
       in_header: header.tex
     number_sections: yes
-fig_width: 7
-fig_height: 5
 ---
 
 ```{r setup,include=FALSE}
@@ -22,29 +20,29 @@ knitr::opts_chunk$set(cache = TRUE)
 
 ![](images/minn_corridors.png)
 
-#Introduction
+#1. Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shows how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
-#Data Sources/Methodology
+#2. Data Sources/Methodology
 
 For this study we used the Longitudinal Employment Household Dynamics Dataset (LEHD). It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This dataset tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. 
 
-##Methdology
+##2.1  Methdology
 
 We have applied three methods in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an integrated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis. 
 
-###Corridor Comparison Selection
+###2.1.1  Corridor Comparison Selection
 
 In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed. Ideally, these corridors are made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and accommodations related jobs. Additionally, we will only use corridors where street improvements were installed between 2008 and 2013 in order to guarantee with have sufficient data to track pre and post-treatment employment trends. 
 
 Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
 
-###Aggregated Trend Comparison
+###2.1.2  Aggregated Trend Comparison
 
 This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
 
-###Difference-in-Difference
+###2.1.3  Difference-in-Difference
 
 The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between improved and comparison corridors within the same time period. This is known as a difference-in-difference (DID) approach. It is a designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved.  It requires data from pre/post intervention such as panel data (individual level data overtime) or cross-sectional data (individual or group level). The approach looks at the change in the variable of interest in the treatment group before and after it is treated. In this case this means looking at some time period before and after a street improvement. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods will give an unbiased estimate of the effect of the treatment. DID is a useful technique when randomization on the individual level is not possible. This approach removes biases in the second period comparisons between the treatment group and control group that could be result from permanent differences between those groups, as well as biases from comparisons over time in the treatment group that could be the result of trends. A key assumption of DID estimate is that the differences between control group and treatment group would have remained constant in the absence of treatment. 
 
@@ -59,7 +57,7 @@ $\beta_3$ is the DID estimate of the treatment effect
 
 If the DID estimate $\beta_3$  is significant and positive, then that indicates a positive effect of the street improvement. Conversely if the estimate is significant and negative that indicates a negative effect of the improvement. Finally, a non-significant result indicates the improvement had no statistically discernible effect. 
 
-###Interrupted Time Series
+###2.1.4  Interrupted Time Series
 
 Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. This approach tracks the treatment corridor over time and estimates the impact by the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.  
 
@@ -82,7 +80,7 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, stargazer, sf, ggplot2, ggthemes, dplyr)
+p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr)
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
@@ -108,11 +106,11 @@ quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2007$C000, probs = p, na.r
 
 ```
 
-#Corridor Comparisons
+#3. Corridor Comparisons
 
 Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Minneapolis as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. Finally, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. All of these figures use 2007 employment numbers from the LEHD as that is the earliest year before the first improvement project. 
 
-##Riverside Ave.
+##3.1 Riverside Ave.
 
 ![Riverside Avenue Corridor](images/minneapolis_riverside_corridor_blkgrp.png)
 
@@ -161,6 +159,9 @@ t.test(riverside$busi_perc2, cedar$busi_perc2)
 
 ```
 
+
+###3.1.1 Corrdior Employment Counts
+
 The following table shows total, retail, and accommodations employment for Riverside and Cedar and the city based percentile rank of the corridors. Both corridors are in the top 5% of the city in terms of the number of total and retail. Neither corridor has any accommodations employment.  
 
 
@@ -171,15 +172,36 @@ The following table shows total, retail, and accommodations employment for River
 
 Table 1: Riverside and Cedar Avenue Employment Percentiles
 
-
+###3.1.2 Corridor Average Employment Comparisons
 
 We performed t-tests on three metrics at the census block level: "business" employment, the sum of retail and accommodations employment; a "business share" metric that is the share of employment in a census block of business employment over the sum of other services industries such as professional/scientific services, public administration and educational services; finally, a second business share metric on a smaller share of services employment including professional/scientific services, administrative/waste management services and arts/accommodation services (check appendix for variable definitions).
 
 On all three metrics the t-test returned non-significant results meaning that there is not a statistically significant difference in the mean employment levels between the two corridors. This means that the corridors are comparable and are appropriate for continued testing. 
 
-##Franklin Ave
+###3.1.3 Employment Trend Comparisons
+
+Riverside retail employment trends seem to suggest a possible positive effect of the bike infrastructure installation with a major jump in employment in the two years immediately after construction and positively trending employment growth since the initial jumps. The comparison corridor's (Cedar Avenue) employment remains basically unchanged except for a minor bump between 2010 and 2011 where employment returns to 2009 levels. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
+
+riverside_agg <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
+
+riverside_agg_retail_plot <- agg_index_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom_plot <- agg_index_trend_plot(riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+
+```
+
+
+The Riverside accommodations patterns are more mixed. Employment growth for the improvement corridor is more robust and consistent after construction compared to the control corridor. The trend analysis here implies a potential positive effect of the infrastructure construction but given the control corridor's positive trends it is not clear that the infrastructure development itself has an independent effect.
+
+##3.2 Franklin Ave
 
 ![Frankline Avenue Corridor](images/minneapolis_franklin_corridor_blkgrp.png)
+
+###3.2.1 Corridor Employment Counts
 
 The Franklin Avenue corridors are both within the top 10% of areas in the city with respect total and retail employment, though the Franklin treatment corridor is in the 90th percentile of total employment compared to the 95th percentile of the Franklin control corridor. The Franklin Avenue control corridor is also in the top 5% of areas of the city in accommodations employment while the improvement corridor has no accommodations employment.
 
@@ -229,12 +251,36 @@ t.test(franklin$busi_perc2, minnehaha$busi_perc2)
 
 Table 2: Franklin Ave. Corridors Employment Percentiles
 
+###3.2.2 Corridor Average Employment Comparisons
+
+
 In terms of the t-tests both corridors have statistically non-significant differences in "business" employment and their business employment share categories. Thus these corridors are appropriate comparators for further study.
 
-##Central Avenue
+###3.2.3 Employment Trend Comparisons
+Retail employment does show consistent, though moderate, growth for the improvement corridor though the control corridor has a dramatic spike in employment between 2014 and 2015. In terms of overall trends, the control corridor has consistently higher year over year growth compared to the treatment corridor. 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
+
+franklin_agg_retail_plot <- agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
+
+
+franklin_agg_accom_plot <- agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
+
+plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot)
+
+```
+
+
+In terms of accommodations employment the trend analysis is relatively ambiguous. In the post-construction period both the improvement and control corridor employment remained flat to slightly negative while the improvement corridor sees dramatic growth in the last year to year period. Given the timing and dramatic change in growth it is unlikely the construction itself is responsible for the spike. 
+
+##3.3 Central Avenue
 
 ![Central Avenue Corridor](images/minneapolis_central_ave_corridor_blkgrp.png)
 
+###3.3.1 Corridor Employment Counts
 
 
 Both the Central and University Avenue corridors have total and retail employment in the top 5% of blocks in the city. Central Avenue also has accommodations employment equal to the top 5% of blocks in the city.
@@ -282,15 +328,38 @@ t.test(central$busi_perc2, university$busi_perc2)
 
 Table 3: Central and University Avenue Corridors Employment Percentiles
 
-All t-tests came back non-significant at the .05 level meaning that the two corridors are appropriate comparators. 
+###3.3.2 Corridor Average Employment Comparisons
 
-##Lyndale Avenue South
+All t-tests came back non-significant at the .05 level meaning that the two corridors are appropriate comparators.
+
+###3.3.3 Employment Trend Comparisons
+
+Central Avenue shows a clear positive retail employment trend post-construction for the treatment corridor that eventually overtakes the control corridor in the latest period. Note that both corridors have positive employment trends post-construction though the control corridor has its most dramatic year to year growth during the construction period. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+central_agg <- agg_index_trend_table(minn_corridor, group = 3, construct_year = 2012)
+
+central_agg_retail_plot <- agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+
+central_agg_accom_plot <- agg_index_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+
+plot_grid(central_agg_retail_plot, central_agg_accom_plot)
+
+```
+
+The accommodations employment trend is more ambiguous. The treatment corridor saw a huge jump in employment immediately post construction but given the largely pre-construction negative trend, the shorter post-construction period, and the extreme growth this is probably due to the entry of some large employer as opposed to a response to new infrastructure.  
+
+##3.4 Lyndale Avenue South
 
 ![Lyndale Avenue South Corridor](images/minneapolis_lyndale_corridor_blkgrp.png)
 
+###3.4.1 Corridor Employment Counts
+
+Lyndale and Grand Avenue diverge in terms of their total employment numbers but are both in the 95th percentile of retail employment when compared to the rest of the city.
 
 
-Lyndale and Grand Avenue diverge in terms of their total employment numbers but are both in the 95th percentile of retail employment when compared to the rest of the city. 
+ 
 
 
 
@@ -337,12 +406,35 @@ t.test(lyndale$busi_perc2, grand$busi_perc2)
 
 Table 4: Lyndale and Grand Avenue Corridors Employment Percentiles
 
+###3.4.2 Corridor Average Employment Comparisons
+
 All t-tests came back non-significant meaning that the corridors are acceptable comparators. 
 
-##North 2nd Street
+###3.4.3 Employment Trend Comparisons
+
+Retail employment on the Lyndale Avenue corridor looks to only have just recovered its employment since the recession though its growth pattern has been much more consistent than its comparison corridor. Interestingly, both the improved and control corridors saw a spike in retail employment in 2015. This is generally good news for the corridors though we the trend analysis does not show any real impact of the street improvement itself on retail employment. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+lyndale_trend <- agg_index_trend_table(minn_corridor, group = 4, construct_year = 2008)
+
+lyndale_retail_trend <- agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+
+lyndale_accom_trend <- agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+
+plot_grid(lyndale_retail_trend, lyndale_accom_trend)
+
+```
+
+In terms of accommodations employment, the treatment corridor shows no real effect due to construction showing only modest overall employment growth since 2008. 
+
+
+
+##3.5 North 2nd Street
 
 ![North 2nd Street Corridor](images/minneapolis_north_2ndstreet_corridor_blkgrp.png)
 
+###3.5.1 Corridor Employment Counts
 
 North 2nd Street and Broadway Avenue both have total and retail employment in the 95th percentile while Broadway also is in the 95th percentile for the city in accommodations employment, though that translates to only 2 accommodations jobs for the corridor. 
 
@@ -390,110 +482,29 @@ t.test(second$busi_perc2, broadway$busi_perc2)
 
 Table 5: North 2nd Street and Broadway Corridors Employment Profile
 
+###3.5.2 Corridor Average Employment Comparisons
+
+
 All t-tests came back non-significant meaning that the corridors are acceptable comparators. 
 
-#Aggregated Trend Analysis
+###3.5.3 Employment Trend Comparisons
 
-##Riverside Avenue
-
-Riverside retail employment trends seem to suggest a possible positive effect of the bike infrastructure installation with a major jump in employment in the two years immediately after construction and positively trending employment growth since the initial jumps. The comparison corridor's (Cedar Avenue) employment remains basically unchanged except for a minor bump between 2010 and 2011 where employment returns to 2009 levels. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-riverside_agg <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
-riverside_agg_plot <- agg_index_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
-
-
-```
-
-The Riverside accommodations patterns are more mixed. Employment growth for the improvement corridor is more robust and consistent after construction compared to the control corridor. The trend analysis here implies a potential positive effect of the infrastructure construction but given the control corridor's positive trends it is not clear that the infrastructure development itself has an independent effect.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-
-riverside_agg_plot <- agg_index_trend_plot(riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
-
-
-```
-
-##Franklin Avenue
-
-Retail employment does show consistent, though moderate, growth for the improvement corridor though the control corridor has a dramatic spike in employment between 2014 and 2015. In terms of overall trends, the control corridor has consistently higher year over year growth compared to the treatment corridor. 
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
-franklin_agg_plot <- agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
-
-
-```
-
-
-In terms of accommodations employment the trend analysis is relatively ambiguous. In the post-construction period both the improvement and control corridor employment remained flat to slightly negative while the improvement corridor sees dramatic growth in the last year to year period. Given the timing and dramatic change in growth it is unlikely the construction itself is responsible for the spike. 
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-franklin_agg_plot <- agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
-
-```
-
-##Central Avenue
-
-Central Avenue shows a clear positive retail employment trend post-construction for the treatment corridor that eventually overtakes the control corridor in the latest period. Note that both corridors have positive employment trends post-construction though the control corridor has its most dramatic year to year growth during the construction period. 
-
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-central_agg <- agg_index_trend_table(minn_corridor, group = 3, construct_year = 2012)
-central_agg_plot <- agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
-
-```
-
-The accommodations employment trend is more ambiguous. The treatment corridor saw a huge jump in employment immediately post construction but given the largely pre-construction negative trend, the shorter post-construction period, and the extreme growth this is probably due to the entry of some large employer as opposed to a response to new infrastructure.  
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-agg_index_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
-
-```
-
-##Lyndale Avenue South
-
-Retail employment on the Lyndale Avenue corridor looks to only have just recovered its employment since the recession though its growth pattern has been much more consistent than its comparison corridor. Interestingly, both the improved and control corridors saw a spike in retail employment in 2015. This is generally good news for the corridors though we the trend analysis does not show any real impact of the street improvement itself on retail employment. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-lyndale_trend <- agg_index_trend_table(minn_corridor, group = 4, construct_year = 2008)
-
-agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
-```
-
-In terms of accommodations employment, the treatment corridor shows no real effect due to construction showing only modest overall employment growth since 2008. 
-
-```{r echo = FALSE, message=FALSE, warning=FALSE}
-
-agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
-```
-
-
-##North 2nd Street
 
 North 2nd Street's employment trends point towards a probable impact of street improvement as the overall trend was negative before construction, with a minor rebound immediately pre-construction, a dip during construction, and then rebound in all periods post-construction.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
 north_agg <- agg_index_trend_table(minn_corridor, group = 5, construct_year = 2011)
 
-agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+north_retail_trend <- agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+north_accom_trend <- agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+plot_grid(north_retail_trend, north_accom_trend)
 
 ```
 
 Accommodations employment growth is quite robust for the treatment corridor but its growth trend starts at the beginning of the construction period and continues afterwards. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
-
-```
 
 
 ##Conclusions
