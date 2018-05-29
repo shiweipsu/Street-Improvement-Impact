@@ -182,7 +182,7 @@ On all three metrics the t-test returned non-significant results meaning that th
 
 Riverside retail employment trends seem to suggest a possible positive effect of the bike infrastructure installation with a major jump in employment in the two years immediately after construction and positively trending employment growth since the initial jumps. The comparison corridor's (Cedar Avenue) employment remains basically unchanged except for a minor bump between 2010 and 2011 where employment returns to 2009 levels. 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
 riverside_agg <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
 
