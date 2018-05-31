@@ -548,6 +548,10 @@ Our difference-in-difference estimation shows a positive and significant effect 
 
 [insert d-i-d table]
 
+###3.5.5 ITS
+
+North 2nd Avenue also has mixed ITS results. The corrdior has a large, negative and significant drop in retail employment level, as well as a borderline significant drop in accommodations employment. But the corridor also has a significant and positive slope showing the vigorous rate of job growth post-construction. Assuming this job growth remains consistent North 2nd Avenue should ideally have sustained job growth. 
+
 
 
 ##3.6 Conclusions
