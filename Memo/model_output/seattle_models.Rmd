@@ -1,0 +1,54 @@
+---
+title: "seattle_models"
+author: "Wei Shi"
+date: "May 30, 2018"
+output: html_document
+---
+#seattle model outputs...DiD and ITS
+
+```{r, echo=FALSE, results='asis'}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr)
+source(here::here("Code/corridor_comparison_functions.R"))
+
+
+seattle_corridor <- st_read(here::here("Data/Seattle/seattle_corridor_lehd_wgs84.geojson"))
+seattle_corridor <- seattle_corridor %>% 
+  mutate(CNS07=ifelse(Corr_Name=="E Olive Way" & GEOID10==530330084003000 & year==2006, 5, CNS07))%>%  # might be a data input error, replace it with average of the previous and next year
+  rename(Name=Corr_Name,
+         Type=Study_Cont) 
+#add new colume of construct year as numeric
+
+seattle_corridor$Type <- as.character(seattle_corridor$Type)
+seattle_corridor[seattle_corridor$Name =="15th Ave E",]$Type <- "Control: 15th Ave E"
+seattle_corridor[seattle_corridor$Name=="E Olive Way",]$Type <- "Control: E Olive Way"
+seattle_corridor[seattle_corridor$Name=="University Way NE",]$Type <- "Control: University Way NE"
+seattle_corridor[seattle_corridor$Name=="NE 45th St",]$Type <- "Control: NE 45th St"
+seattle_corridor$Type <- as.factor(seattle_corridor$Type)
+
+# second ave
+
+secondave_did_agg <- did_agg_analysis(seattle_corridor,group = 1, 2014)
+stargazer(secondave_did_agg[[1]],secondave_did_agg[[2]],secondave_did_agg[[3]],type = "html", 
+          title = "Second Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+secondave_its_agg <- agg_its_analysis(seattle_corridor,group = 1, 2014)
+stargazer(secondave_its_agg[[1]],secondave_its_agg[[2]],secondave_its_agg[[3]],type = "html", 
+          title = "Second Avenue Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+# broadway
+broadway_did_agg <- did_agg_analysis(seattle_corridor,group = 2, 2013)
+stargazer(broadway_did_agg[[1]],broadway_did_agg[[2]],broadway_did_agg[[3]],type = "html", 
+          title = "Broadway Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+broadway_its_agg <- agg_its_analysis(seattle_corridor,group = 2, 2013)
+stargazer(broadway_its_agg[[1]],broadway_its_agg[[2]],broadway_its_agg[[3]],type = "html", 
+          title = "Broadway Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+ 
+
+```
