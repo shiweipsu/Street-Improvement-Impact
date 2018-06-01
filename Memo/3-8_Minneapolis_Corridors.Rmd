@@ -26,23 +26,29 @@ In order to make their cities more livable, policymakers and planning department
 
 #2. Data Sources/Methodology
 
-For this study we used the Longitudinal Employment Household Dynamics Dataset (LEHD). It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This dataset tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. 
+##2.1.  Data Sources
 
-##2.1  Methdology
+For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudical Origin-Destination Employment Statistics (LODES) dataset from the Longitudinal Employer-Household Dynamics Dataset (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This dataset tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. Some disadvantages of the LODES dataset are that in order to guarantee confidentiality block level data is "fuzzed" so the numbers are not exactly the number of jobs, but they are accurate estimates. Additionally, though we get industrial data, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate specific retail or service employment such as restaurant workers. That being said, the LODES dataset is comprehensive, offers unprecedented geographic detail, and longitudinal allowing for consistent comparisons over time.
+
+This report also takes advantage of establishment level Quarterly Census of Employment and Wages (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
+
+Finally, we also collected sales tax data. Sales tax data allows us to estimate a more sensitive measure of economic activity than employment (as the decision to hire or fire for a firm is often an expensive one we expect employment to be a delayed response). Some drawbacks of sales tax data is that some states do not have a sales tax or, in states or cities that do have one, the sales tax data is not broken down by specific industry and it is difficult to accurately parse out accurate figures. But the benefits of sales tax data largely outweigh these issues and do offer a more sensitive metric than employment. 
+
+##2.2  Methdology
 
 We have applied three methods in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an integrated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis. 
 
-###2.1.1  Corridor Comparison Selection
+###2.2.1  Corridor Comparison Selection
 
 In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed. Ideally, these corridors are made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and accommodations related jobs. Additionally, we will only use corridors where street improvements were installed between 2008 and 2013 in order to guarantee with have sufficient data to track pre and post-treatment employment trends. 
 
 Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
 
-###2.1.2  Aggregated Trend Comparison
+###2.2.2  Aggregated Trend Comparison
 
 This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
 
-###2.1.3  Difference-in-Difference
+###2.2.3  Difference-in-Difference
 
 The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between improved and comparison corridors within the same time period. This is known as a difference-in-difference (DID) approach. It is a designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved.  It requires data from pre/post intervention such as panel data (individual level data overtime) or cross-sectional data (individual or group level). The approach looks at the change in the variable of interest in the treatment group before and after it is treated. In this case this means looking at some time period before and after a street improvement. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods will give an unbiased estimate of the effect of the treatment. DID is a useful technique when randomization on the individual level is not possible. This approach removes biases in the second period comparisons between the treatment group and control group that could be result from permanent differences between those groups, as well as biases from comparisons over time in the treatment group that could be the result of trends. A key assumption of DID estimate is that the differences between control group and treatment group would have remained constant in the absence of treatment. 
 
@@ -57,7 +63,7 @@ $\beta_3$ is the DID estimate of the treatment effect
 
 If the DID estimate $\beta_3$  is significant and positive, then that indicates a positive effect of the street improvement. Conversely if the estimate is significant and negative that indicates a negative effect of the improvement. Finally, a non-significant result indicates the improvement had no statistically discernible effect. 
 
-###2.1.4  Interrupted Time Series
+###2.2.4  Interrupted Time Series
 
 Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. This approach tracks the treatment corridor over time and estimates the impact by the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.  
 
@@ -105,6 +111,8 @@ quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2007$C000, probs = p, na.r
                        probs = p)
 
 ```
+
+
 
 #3. Corridor Comparisons
 
