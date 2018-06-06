@@ -8,6 +8,7 @@ source(here::here("Code/corridor_comparison_functions.R"))
 
 minn_corridor <- st_read(here::here("Data/minneapolis/minn_corridor_lehd_wgs84.geojson"))
 
+#differe-in-difference estimates
 
 franklin_did <- did_agg_analysis(minn_corridor, group = 2,endyear = 2011)
 
@@ -51,6 +52,8 @@ ggsave(filename = "Memo/images/06-05_minn_franklin_DiD.png",
        width = 11, height = 8.5, units = "in", device = "png",
        scale = .6)
 
+
+#ITS estimates and plot
 franklin_retail_its <- agg_its_analysis(df_its = minn_corridor,
                                         group = 2, endyear = 2011)
 
@@ -92,9 +95,30 @@ ggsave(filename = "Memo/images/06-05_minn_franklin_accomITS.png",
        device = "png", scale = .6)
 
 
+#aggregate employment trends
+
+
+franklin_retail_tbl <- agg_trend_table(minn_corridor, 2) %>% 
+  filter(!is.na(year))
+
 franklin_retail_plot <- agg_trend_plot(franklin_retail_tbl,
                                        industry = "Retail", 
                                        corridor_name = "Franklin Ave.",
                                        industry_code = "CNS07",
                                        construct_year = 2011,
-                                       end_year = 2012)
+                                       end_year = 2012) +
+  theme(title = element_blank(), axis.title = element_blank(), legend.position = "none")
+
+franklin_accom_plot <- agg_trend_plot(franklin_retail_tbl,
+                                      industry = "Accommodations", 
+                                      corridor_name = "Franklin Ave.",
+                                      industry_code = "CNS18",
+                                      construct_year = 2011,
+                                      end_year = 2012) +
+  theme(title = element_blank(), axis.title = element_blank(), legend.position = "none")
+
+franklin_retail_accom_agg <- cowplot::plot_grid(franklin_retail_plot, franklin_accom_plot, 
+                   labels = c("Retail", "Accommodations"), align = "h")
+
+cowplot::save_plot("Memo/images/06-05_minn_franklin_agg_emp_grid.png",franklin_retail_accom_agg,
+                   base_aspect_ratio = 1.3)
