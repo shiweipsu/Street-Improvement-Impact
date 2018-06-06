@@ -7,6 +7,6 @@ target_place <- "Indianapolis city (balance)"
 
 indy_lehd <- nitc_lehd(years = years, target_state = target_state, target_county = target_county, 
                        target_place = target_place)
-st_write(indy_lehd, "Data/indy_lehd.geojson", delete_dsn = TRUE)
+st_write(indy_lehd, "Data/indy_lehd.shp", delete_dsn = TRUE)
 
 

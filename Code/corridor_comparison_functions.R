@@ -182,10 +182,13 @@ agg_index_trend_plot <- function(df_plot, industry, corridor_name,
 
   #making the plot
   
-  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                shape = Type, group = Type, colour = Type)) + 
     geom_line()  +
-    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
-              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
    
     geom_point(size = 3, fill="white") +
     scale_shape_manual(values=c(22,21,21,23))+
