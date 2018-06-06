@@ -132,16 +132,15 @@ Our first corridor group consists of the Riverside and Cedar Ave corridors. The 
 
 #comparisons-----
 
-riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", 
-                                      year == as.numeric(as.character(BuildStart))-1)
+riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)", year == as.numeric(as.character(BuildStart))-1)
+
 cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2008")
 
 riverside <- riverside %>% summarise(TotEmp = sum(C000)/nrow(riverside), RetailEmp = sum(CNS07)/nrow(riverside),
                                      AccomEmp = sum(CNS08)/nrow(riverside))
 # get employment at block level, divided by nrow()
 
-cedar <- cedar %>% summarise(TotEmp = sum(C000), RetailEmp = sum(CNS07),
-                             AccomEmp = sum(CNS08))
+cedar <- cedar %>% summarise(TotEmp = sum(C000)/nrow(cedar), RetailEmp = sum(CNS07)/nrow(cedar),AccomEmp = sum(CNS08)/nrow(cedar))
 
 #t-tests----
 
@@ -234,28 +233,29 @@ The Franklin Avenue corridors are both within the top 10% of areas in the city w
 franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2007")
 minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2007")
 
-franklin <- franklin %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                   accom_emp = sum(CNS08))
+franklin <- franklin %>% summarise(tot_emp = sum(C000)/nrow(franklin), retail_emp = sum(CNS07)/nrow(franklin), accom_emp = sum(CNS08)/nrow(franklin))
 
-minnehaha <- minnehaha %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                     accom_emp = sum(CNS08))
+minnehaha <- minnehaha %>% summarise(tot_emp = sum(C000)/nrow(minnehaha), retail_emp = sum(CNS07)/nrow(minnehaha), 
+accom_emp = sum(CNS08)/nrow(minnehaha))
 
 #t-tests
 
 franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2007")
 minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2007")
 
-franklin <- franklin %>% mutate(business = CNS07 + CNS18,
-                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
-                                  busi_perc1 = business/service1,
-                                  busi_perc2 = business/service2)
+franklin <- franklin %>% 
+  mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
+           CNS15 + CNS16 + CNS17 + CNS18 + CNS19, service2 = CNS07 + 
+           CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+           busi_perc1 = business/service1,
+           busi_perc2 = business/service2)
 
-minnehaha <- minnehaha %>% mutate(business = CNS07 + CNS18,
-                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
-                                  busi_perc1 = business/service1,
-                                  busi_perc2 = business/service2)
+minnehaha <- minnehaha %>% 
+  mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
+           CNS15 + CNS16 + CNS17 + CNS18 + CNS19, service2 = CNS07 + 
+           CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+          busi_perc1 = business/service1,
+          busi_perc2 = business/service2)
 
 
 t.test(franklin$business, minnehaha$business)
@@ -321,11 +321,14 @@ Both the Central and University Avenue corridors have total and retail employmen
 central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2007")
 university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2007")
 
-central <- central %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                   accom_emp = sum(CNS08))
+central <- central %>% summarise(tot_emp = sum(C000)/nrow(central), 
+                                 retail_emp = sum(CNS07)/nrow(central),
+                                   accom_emp = sum(CNS08)/nrow(central))
 
-university <- university %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                     accom_emp = sum(CNS08))
+university <- university %>% 
+  summarise(tot_emp = sum(C000)/nrow(university), 
+            retail_emp = sum(CNS07)/nrow(university), 
+            accom_emp = sum(CNS08)/nrow(university))
 
 #t-tests
 
@@ -401,28 +404,34 @@ Lyndale and Grand Avenue diverge in terms of their total employment numbers but 
 lyndale <- minn_corridor %>% filter(Name == "Lyndale Ave S (improvement)", year == "2007")
 grand <- minn_corridor %>% filter(Name == "Grand Ave (control)", year == "2007")
 
-lyndale <- lyndale %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                   accom_emp = sum(CNS08))
+lyndale <- lyndale %>% 
+  summarise(tot_emp = sum(C000)/nrow(lyndale), 
+            retail_emp = sum(CNS07)/nrow(lyndale),
+            accom_emp = sum(CNS08)/nrow(lyndale))
 
-grand <- grand %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                     accom_emp = sum(CNS08))
+grand <- grand %>% 
+  summarise(tot_emp = sum(C000)/nrow(grand), 
+           retail_emp = sum(CNS07)/nrow(grand),
+          accom_emp = sum(CNS08)/nrow(grand))
 
 #t-tests
 
 lyndale <- minn_corridor %>% filter(Name == "Lyndale Ave S (improvement)", year == "2007")
 grand <- minn_corridor %>% filter(Name == "Grand Ave (control)", year == "2007")
 
-lyndale <- lyndale %>% mutate(business = CNS07 + CNS18,
-                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
-                                  busi_perc1 = business/service1,
-                                  busi_perc2 = business/service2)
+lyndale <- lyndale %>% 
+  mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
+           CNS15 + CNS16 + CNS17 + CNS18 + CNS19, service2 = CNS07 + 
+           CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+           busi_perc1 = business/service1,
+          busi_perc2 = business/service2)
 
-grand <- grand %>% mutate(business = CNS07 + CNS18,
-                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
-                                  busi_perc1 = business/service1,
-                                  busi_perc2 = business/service2)
+grand <- grand %>% 
+  mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
+           CNS15 + CNS16 + CNS17 + CNS18 + CNS19, service2 = CNS07 + 
+           CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+           busi_perc1 = business/service1,
+           busi_perc2 = business/service2)
 
 
 t.test(lyndale$business, grand$business)
@@ -489,28 +498,35 @@ second <- minn_corridor %>% filter(Name == "North 2nd Street (improvement)", yea
   
 broadway <- minn_corridor %>% filter(Name == "Broadway Ave (control)", year == "2007")
 
-second <- second %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                   accom_emp = sum(CNS08))
+second <- second %>% summarise(tot_emp = sum(C000)/nrow(second), 
+                               retail_emp = sum(CNS07)/nrow(second),
+                               accom_emp = sum(CNS08)/nrow(second))
 
-broadway <- broadway %>% summarise(tot_emp = sum(C000), retail_emp = sum(CNS07),
-                                     accom_emp = sum(CNS08))
+broadway <- broadway %>% 
+  summarise(tot_emp = sum(C000)/nrow(broadway), 
+            retail_emp = sum(CNS07)/nrow(broadway),
+            accom_emp = sum(CNS08)/nrow(broadway))
 
 #t-tests
 
-second <- minn_corridor %>% filter(Name == "North 2nd Street (improvement)", year == "2007")
-broadway <- minn_corridor %>% filter(Name == "Broadway Ave (control)", year == "2007")
+second <- minn_corridor %>% 
+  filter(Name == "North 2nd Street (improvement)", year == "2007")
 
-second <- second %>% mutate(business = CNS07 + CNS18,
-                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
-                                  busi_perc1 = business/service1,
-                                  busi_perc2 = business/service2)
+broadway <- minn_corridor %>% 
+  filter(Name == "Broadway Ave (control)", year == "2007")
 
-broadway <- broadway %>% mutate(business = CNS07 + CNS18,
-                                  service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
-                                  service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
-                                  busi_perc1 = business/service1,
-                                  busi_perc2 = business/service2)
+second <- second %>% 
+  mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
+          CNS15 + CNS16 + CNS17 + CNS18 + CNS19, service2 = CNS07 + 
+           CNS12 + CNS14 + CNS17 + CNS18 + CNS19, 
+          busi_perc1 = business/service1, busi_perc2 = business/service2)
+
+broadway <- broadway %>% 
+  mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
+           CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
+          service2 = CNS07 + CNS12 + CNS14 + CNS17 + CNS18 + CNS19,
+          busi_perc1 = business/service1,
+          busi_perc2 = business/service2)
 
 
 t.test(second$business, broadway$business)
