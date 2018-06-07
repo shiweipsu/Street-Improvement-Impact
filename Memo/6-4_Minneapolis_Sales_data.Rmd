@@ -15,6 +15,8 @@ knitr::opts_chunk$set(echo = TRUE)
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
 p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr,tidyr)
 
+source(here::here("Code/corridor_comparison_functions.R"))
+
 minn_sale <- read.csv(here::here("Data/Minneapolis/BikeDataAggregated.csv"))
 
 minn_sale <- minn_sale %>% 
@@ -31,12 +33,16 @@ minn_sale <- minn_sale %>%
                          Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))
          ) %>% 
   filter(Group %in% c(1:5)) %>% 
-  select(-Establishments) %>% 
+  group_by(Street,Type,Group,Study,TaxYear) %>% 
+  summarise(TaxableSales = sum(TaxableSales, na.rm = TRUE))
+
+minn_sale <- minn_sale %>% 
   spread(Type,TaxableSales) %>% 
   mutate(year=TaxYear,
          Type=Study,
          CNS07=Retail,
-         CNS18=Restaurant)
+         CNS18=Restaurant,
+         geometry=1)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
@@ -121,7 +127,7 @@ lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18_sd,group=Type,c
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: lyndale Ave", x="Year",y="Sale Index",
+  labs(title = "Resturaunt Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
 # lyndale_agg_retail_plot <- agg_index_trend_plot(lyndale_agg, industry = "Retail", corridor_name = "lyndale Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
@@ -134,8 +140,9 @@ plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 second_agg <- agg_index_trend_table (minn_sale, group = 5,2011)
+second_agg <- agg_trend_table (minn_sale, group = 5)
 
-second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -143,9 +150,9 @@ second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07_sd,group=Type,co
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
   labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sale Index",
-       caption = "Sales tax is indexed to 2011 \n Shaded Area is Construction Period")
+       caption = "Shaded Area is Construction Period")
 
-second_agg_accom_plot <- ggplot(second_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+second_agg_accom_plot <- ggplot(second_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -153,7 +160,7 @@ second_agg_accom_plot <- ggplot(second_agg,aes(x=year, y=CNS18_sd,group=Type,col
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
   labs(title = "Resturaunt Sales Comparison: second Ave", x="Year",y="Sale Index",
-       caption = "Sales tax is indexed to 2011 \n Shaded Area is Construction Period")
+       caption = "Shaded Area is Construction Period")
 
 # second_agg_retail_plot <- agg_index_trend_plot(second_agg, industry = "Retail", corridor_name = "second Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 
