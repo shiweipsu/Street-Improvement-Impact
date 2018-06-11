@@ -16,18 +16,32 @@ source(here::here("Code/corridor_comparison_functions.R"))
 
 minn_corridor <- st_read(here::here("Data/minneapolis/minn_corridor_lehd_wgs84.geojson"))
 
-#difference in difference
+#riverside
 
 riverside_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
 stargazer(riverside_agg_did[[1]], riverside_agg_did[[2]], riverside_agg_did[[3]], 
           title = "Riverside Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
 
+riverside_agg_its <- agg_its_analysis(df_its = minn_corridor, group = 1, endyear = 2009)
+stargazer(riverside_agg_its[[1]], riverside_agg_its[[2]], riverside_agg_its[[3]], type = "html", 
+          title = "Interrupted Time Series- Riverside Ave.", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+#franklin
 franklin_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 2, endyear = 2011)
 stargazer(franklin_agg_did[[1]], franklin_agg_did[[2]],franklin_agg_did[[3]],         title = "Franklin Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = 
             c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), 
           type = "html")
+
+
+franklin_its <- agg_its_analysis(df_its = minn_corridor,  group = 2, endyear = 2011)
+stargazer(franklin_its[[1]], franklin_its[[2]], franklin_its[[3]], 
+          type = "html", title = "Interrupted Time Series- Franklin Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
+
+#central
  
 
 central_did <- did_agg_analysis(df_did = minn_corridor, group = 3, endyear = 2012)
@@ -35,42 +49,30 @@ stargazer(central_did[[1]], central_did[[2]], central_did[[3]],
           title = "Central Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
 
+central_its <- agg_its_analysis(df_its = minn_corridor, group = 3, endyear = 2012)
+stargazer(central_its[[1]], central_its[[2]], central_its[[3]], 
+          type = "html", title = "Interrupted Time Series- Central Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
+
+#lyndale
 
 lyndale_did <- did_agg_analysis(df_did = minn_corridor, group = 4, endyear = 2009)
 stargazer(lyndale_did[[1]], lyndale_did[[2]], lyndale_did[[3]], 
           title = "Lyndale Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
 
+lyndale_its <- agg_its_analysis(minn_corridor, group = 4, endyear = 2009)
+stargazer(lyndale_its[[1]], lyndale_its[[2]], lyndale_its[[3]], 
+          type = "html", title = "Interrupted Time Series- Lyndale Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
+
+#north 2nd
+
 
 north_did <- did_agg_analysis(df_did = minn_corridor, group = 5, endyear = 2011)
 stargazer(north_did[[1]], north_did[[2]], north_did[[3]], 
           title = "North Second St.Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
-
-
-#ITS
-
-riverside_agg_its <- agg_its_analysis(df_its = minn_corridor, group = 1, endyear = 2009)
-stargazer(riverside_agg_its[[1]], riverside_agg_its[[2]], riverside_agg_its[[3]], type = "html", 
-          title = "Interrupted Time Series- Riverside Ave.", 
-          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
-
-franklin_its <- agg_its_analysis(df_its = minn_corridor,  group = 2, endyear = 2011)
-stargazer(franklin_its[[1]], franklin_its[[2]], franklin_its[[3]], 
-          type = "html", title = "Interrupted Time Series- Franklin Ave.", 
-          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
-
-
-central_its <- agg_its_analysis(df_its = minn_corridor, group = 3, endyear = 2012)
-stargazer(central_its[[1]], central_its[[2]], central_its[[3]], 
-          type = "html", title = "Interrupted Time Series- Central Ave.", 
-          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
-
-
-lyndale_its <- agg_its_analysis(minn_corridor, group = 4, endyear = 2009)
-stargazer(lyndale_its[[1]], lyndale_its[[2]], lyndale_its[[3]], 
-          type = "html", title = "Interrupted Time Series- Lyndale Ave.", 
-          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."))
 
 north_its <- agg_its_analysis( minn_corridor, group = 5, endyear = 2011)
 stargazer(north_its[[1]], north_its[[2]], north_its[[3]], type = "html",
