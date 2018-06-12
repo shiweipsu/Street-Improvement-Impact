@@ -277,3 +277,77 @@ agg_its_analysis <- function(df_its, group, endyear){
   return(its_final)
   
 }
+
+
+# city index table and plot -----------------------------------------------------
+
+agg_index_trend_table_city <- function(df, construct_year) {
+  
+  #prepare tables for plotting
+  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  
+  df <- df %>% mutate(business = CNS07 + CNS18)
+  
+  
+  df_agg <- df %>% group_by(year) %>%
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business)) %>% 
+    mutate(Type = "city")
+  
+  base_year <-  df_agg %>% filter(year == as.character(construct_year)) %>% 
+    select(CNS07_base = CNS07, CNS18_base = CNS18, business_base = business,  Type)
+  
+  df_plot <- df_agg %>%  
+    left_join(base_year,by="Type") %>%
+    mutate(CNS07_sd = CNS07/CNS07_base*100,
+           CNS18_sd = CNS18/CNS18_base*100,
+           business_sd = business/business_base*100,
+           Type = "city") %>%
+    select(Type, year, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+  
+  return(df_plot)
+  
+}
+
+agg_index_trend_plot_city <- function(df_plot, industry, corridor_name, 
+                                 industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                 construct_year, end_year) {
+  
+  # df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_shape_discrete(breaks=c("improvement","control","city"))+
+    scale_colour_discrete(breaks=c("improvement","control","city"))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to {construct_year}\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type") 
+  
+  return(ats_df)
+}
