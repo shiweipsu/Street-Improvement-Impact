@@ -86,7 +86,7 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr)
+p_load(here, stargazer, sf, tidyr, ggplot2, ggthemes, cowplot, dplyr)
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
@@ -204,13 +204,78 @@ plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
 
 The Riverside accommodations patterns are more mixed. Employment growth for the improvement corridor is more robust and consistent after construction compared to the control corridor. The trend analysis here implies a potential positive effect of the infrastructure construction but given the control corridor's positive trends it is not clear that the infrastructure development itself has an independent effect.
 
-###3.1.4 Difference-in-Difference
+###3.1.4 Sales Tax Comparisons
+
+In order to have a fuller understanding of the impact of new cycle infrastructure we also collected sales tax data for the corridors from the state of Minnesota. As mentioned in the introduction, sales taxes are a more sensitive measure of economic impact than employment and is measured more frequently. As such, we have a more sensitive measure of economic impact.
+
+Comparing the trends for the Riverside corridor it is not immediately apparent that the construction had an impact on retail or restaurant sales. In both cases, the treatment and control corridors largely follow each other in terms of growth, except for a dramatic drop and recovery in retail sales between 2013 and 2014. Given the sensitivity of sales tax as a measure it is unlikely that drop, and subsequent recovery, are a reaction to construction completed years before. In the case of restaurant sales both corridors experienced dramatic growth, though the improved corridor's rate of growth is more modest, both corridors have significantly more restaurant sales post construction. 
+
+```{r riverside_sales, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+
+#prep corridor sales tax df from Wei---------------
+minn_sale <- read.csv(here::here("Data/Minneapolis/BikeDataAggregated.csv"))
+
+minn_sale <- minn_sale %>% 
+  filter(!is.na(Street)) %>%
+  mutate(Group= case_when(Street %in% c("RIVERSIDE AVE","CEDAR AVE S") ~ 1,
+                          Street=="FRANKLIN AVE E" ~ 2,
+                          Street %in% c("CENTRAL AVE NE","UNIVERSITY AVE NE") ~3,
+                          Street %in% c("LYNDALE AVE S","GRAND AVE S") ~4,
+                          Street %in% c("2ND ST N","WEST BROADWAY") ~5),
+         Study= case_when(Group==1 ~ ifelse(Street=="RIVERSIDE AVE"," Improvement","Control"),
+                          Group==2 ~ ifelse(Street=="FRANKLIN AVE E"," Improvement","Control"),
+                         Group==3 ~ ifelse(Street=="CENTRAL AVE NE"," Improvement","Control"),
+                         Group==4 ~ ifelse(Street=="LYNDALE AVE S"," Improvement","Control"),
+                         Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))
+         ) %>% 
+  filter(Group %in% c(1:5)) %>% 
+  group_by(Street,Type,Group,Study,TaxYear) %>% 
+  summarise(TaxableSales = sum(TaxableSales, na.rm = TRUE))
+
+minn_sale <- minn_sale %>% 
+  spread(Type,TaxableSales) %>% 
+  mutate(year=TaxYear,
+         Type=Study,
+         CNS07=Retail,
+         CNS18=Restaurant,
+         geometry=1)
+
+#riverside graphs-------------
+
+riverside_agg <- agg_index_trend_table (minn_sale, group = 1,2009)
+
+riverside_agg_retail_plot <- ggplot(riverside_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
+
+riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
+
+plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+
+
+```
+
+###3.1.5 Difference-in-Difference
 
 The Riverside/Cedar Avenue treatment corridor exhibits a statistically significant and positive effect of infrastructure construction on the number of retail jobs and a positive, but non-significant, effect on accommodations employment. According to our model, Riverside Avenue grew by more than 285 jobs compared to the control corridor. 
 
 [insert riverside d-i-d table]
 
-###3.1.5 ITS
+###3.1.6 ITS
 
 The Riverside Ave corridor does not exhibit a level or slope change from the pre-treatment trend patterns in our current specification of the model. While the ts_year coefficient for retail is positive and significant this only tells us that the growth trend of retail employment for the corridor is itself positive. The non-significant **prepost** and **ts_year:pre_post** indicate that there was neither a level or slope change attributable to the treatment.
 
@@ -295,6 +360,40 @@ plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot)
 
 
 In terms of accommodations employment the trend analysis is relatively ambiguous. In the post-construction period both the improvement and control corridor employment remained flat to slightly negative while the improvement corridor sees dramatic growth in the last year to year period. Given the timing and dramatic change in growth it is unlikely the construction itself is responsible for the spike. 
+
+###3.2.4 Sales Tax Comparisons
+
+[Fix error]
+
+
+```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+franklin_agg <- agg_index_trend_table(minn_sale, group = 2,2011)
+
+franklin_agg_retail_plot <- ggplot(franklin_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Franklin Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
+
+franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Franklin Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
+
+plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
+
+
+```
 
 ###3.2.4 Difference-in-Difference
 
@@ -383,11 +482,42 @@ plot_grid(central_agg_retail_plot, central_agg_accom_plot)
 
 The accommodations employment trend is more ambiguous. The treatment corridor saw a huge jump in employment immediately post construction but given the largely pre-construction negative trend, the shorter post-construction period, and the extreme growth this is probably due to the entry of some large employer as opposed to a response to new infrastructure.
 
-###3.3.4 Difference-in-Difference
+###3.3.4 Sales Tax Comparison
+
+Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or another. While Central has received more receipts, indexed to 2012, from both retail and restaurants there does not seem to be a clear relationship to the construction date. The LEHD employment data cannot give us a better idea here as it is not possible to pull out restaurants or detailed retail sectors directly. But looking at these trends it does not seem construction of the lane had an immediate impact on sales tax for Central Ave for either industry. 
+
+```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+central_agg <- agg_index_trend_table (minn_sale, group = 3,2012)
+
+central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Central Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
+
+central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Central Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
+
+plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "h")
+
+```
+
+###3.3.5 Difference-in-Difference
 
 Central Avenue's difference term is significant and highly negative. For Central Avenue, therefore, the installation of the new infrastructure is responsible for the loss of approximately 203 accommodations jobs compared to the control corridor. This result can be intuited if you revisit the aggregate employment graph for the Central Avenue corridors and you can see there is a large gap in the overall number of accommodations jobs between the treatment and control corridor. Additionally, the control corridor has more robust growth over time compared to the treatment.
 
-###3.3.5 ITS
+###3.3.6 ITS
 
 Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slop for the accomodations employment term.
 
@@ -470,13 +600,45 @@ plot_grid(lyndale_retail_trend, lyndale_accom_trend)
 
 In terms of accommodations employment, the treatment corridor shows no real effect due to construction showing only modest overall employment growth since 2008. 
 
-###3.4.4 Difference-in-Difference
+###3.4.4 Sales Tax Comparison
+
+The Lyndale Ave corridor also displays ambiguous impacts of new cycling infrastructure on retail and restaurant demand. There is a  minor bump post construction for retail that results in increased growth over time signaling a possible effect of construction. Restaurant sales tax growth, though, is clearly tied to some major increase in demand nearly a decade after construction. Additionally, the growth in restuarant sales tax receipts wasless than that of its control corridor both in absolute and relative terms. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+lyndale_agg <- agg_index_trend_table (minn_sale, group = 4,2008)
+
+lyndale_agg_retail_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
+
+lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
+
+plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
+
+
+```
+
+###3.4.5 Difference-in-Difference
 
 For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment. Again, the interpretation of the difference term is that "but for" the installation of the infrastructure Lyndale Avenue would have nearly 109 additional accommodations jobs. 
 
 [insert d-i-d]
 
-###3.4.5 ITS
+###3.4.6 ITS
 
 
 Lyndale exhibits a similar pattern to Central but with the construction completed in 2009 we have enough data post-treatment to have more valid results. In this case, there is a negative, statistically significant drop in the level of accommodations employment for the corridor but a postivive, significant slope. Again, when examining the aggregate employment trend graphs we see a clear drop in employment in 2009 and 2010 and a seeming return to the pre-treatment level with a positive slope. The positive growth trend continues through 2015 but it is unclear if we will see a leveling off of new employment at a higher level or if employment will collapse again.
@@ -552,7 +714,7 @@ All t-tests came back non-significant meaning that the corridors are acceptable 
 
 North 2nd Street's employment trends point towards a probable impact of street improvement as the overall trend was negative before construction, with a minor rebound immediately pre-construction, a dip during construction, and then rebound in all periods post-construction.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
 
 north_agg <- agg_index_trend_table(minn_corridor, group = 5, construct_year = 2011)
 
@@ -565,6 +727,41 @@ plot_grid(north_retail_trend, north_accom_trend)
 ```
 
 Accommodations employment growth is quite robust for the treatment corridor but its growth trend starts at the beginning of the construction period and continues afterwards. 
+
+###3.5.4 Sales Tax Comparison
+
+North 2nd offers an example of a potentially positive affect of construction, at least for retail sales taxes. There is an initial drop in retail receipts during the construction period, as one would hypothesize during a disruptive construction process on a commercial corridor, with an immediate rebound in the following year. Additionally, the corridor sees consistent growth in receipts followed by a spike in receipts around 2014. 
+
+[fix error]
+
+```{r eval=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE, include=FALSE}
+
+second_agg <- agg_index_trend_table (minn_sale, group = 5,2011)
+
+second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sale Index",
+       caption = "Shaded Area is Construction Period")
+
+second_agg_accom_plot <- ggplot(second_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: second Ave", x="Year",y="Sale Index",
+       caption = "Shaded Area is Construction Period")
+
+plot_grid(second_agg_retail_plot, second_agg_accom_plot, align = "h")
+
+
+```
 
 ###3.5.4 Difference-in-Difference
 
