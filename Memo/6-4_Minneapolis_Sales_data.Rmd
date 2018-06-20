@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 # Sales
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
 p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr,tidyr)
 
