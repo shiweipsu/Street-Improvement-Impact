@@ -99,7 +99,7 @@ indy_corridor <- indy_corridor %>%
 #add new colume of construct year as numeric
 
 indy_corridor$Type <- as.character(indy_corridor$Type)
-indy_corridor[indy_corridor$Name =="Virginia Ave Comp. Corridor 1\n",]$Type <- "Control: Meridian Ave"
+indy_corridor[indy_corridor$Name =="Virginia Ave Comp. Corridor 1\n",]$Type <- "Control: Meridian"
 indy_corridor[indy_corridor$Name=="Virginia Ave Comp. Corridor 2\n",]$Type <- "Control: Prospect"
 indy_corridor[indy_corridor$Name=="Virginia Ave Comp. Corridor 3\n",]$Type <- "Control: Shelby"
 indy_corridor[indy_corridor$Name=="Mass Ave Comp. Corridor 1\n",]$Type <- "Control: Mass Ave"
@@ -120,9 +120,9 @@ Our first test in corridor comparability is comparing the count of the total num
 
 ## 3.1 Virginia Avenue
 
-![Virginia Avenue Corridor](images/seattle_2nd_ave.png)
+![Virginia Avenue Corridor]
 
-Our first corridor group consists of the 2nd and 4th Ave corridors in downtown Seattle. The other control corridor, 1st Ave, is exclueded because half of the blocks overlap with the treatment corridor, which would cause serious assumption violation for later data analysis.
+Our first treatment corridor is Virginia Avenue. The control corridors are Meridian Street, Prospect Street, and Shelby Street.
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
@@ -135,7 +135,7 @@ conyear <- first(filter(indy_corridor,Group==1, Type=="Treatment")$BuildStart)-1
 indy_lehd_2010 <- indy_lehd %>% filter(year == conyear, CNS07+CNS18 > 0)
 
 virginia <- indy_corridor %>% filter(Group==1, Type=="Treatment", year==conyear) %>% employ_ratio_test(.)
-meridian <- indy_corridor %>% filter(Group==1, Type=="Control: Meridian Ave", year==conyear) %>% employ_ratio_test(.)
+meridian <- indy_corridor %>% filter(Group==1, Type=="Control: Meridian", year==conyear) %>% employ_ratio_test(.)
 prospect <- indy_corridor %>% filter(Group==1, Type=="Control: Prospect", year==conyear) %>% employ_ratio_test(.)
 shelby <- indy_corridor %>% filter(Group==1, Type=="Control: Shelby", year==conyear) %>% employ_ratio_test(.)
 
@@ -209,20 +209,19 @@ t.test(virginia_growth$food_accom_growth,shelby_growth$food_accom_growth)
 
 
 ### 3.1.1 Corridor employment amount
-The following table shows total, retail, and accommodations employment for 2nd and 4th Ave. and the city based percentile rank of the corridors. Both corridors are in the top 5% of the city in terms of the number of total employment. In terms of retail, they also have similary employment numbers, and both in top 25%. There is slight difference in food and accomodation sector, the improvement corridor 2nd Ave. is in top 15%, while the comparison corridor is in top 10%.   
 
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
-| 2nd Ave.       | 1135    | 14         | 42        | 95-100  | 75-80      | 85-90     |
-| 4th Ave.       | 771     | 14         | 57        | 95-100  | 75-80      | 90-95     |
+| Virginia Ave.  | 18      | 1          | 4         | 35-40   | 40-45      | 60-65     |
+| Meridian Ave.  | 538     | 32         | 75        | 90-95   | 85-90      | 95-100    |
+| Prospect Ave.  | 32      | 6          | 4         | 45-50   | 65-70      | 60-65     |
+| Shelby Ave.    | 26      | 6          | 4         | 45-50   | 65-70      | 60-65     |
 
-Table 1: 2nd and 4th Avenue Corridor Employment Percentiles
+Table 1: Virginia Avenue Corridor and Control Corridors Employment Percentiles
 
 ### 3.1.2 Employment number comparison
-We performed t-tests on two types metrics of employment number at the census block level: employment number, for retail, food and accommodations, and sum of the two, named business; "business share" metric that is the share of employment in a census block of business employment over the sum of other services industries. Two definition of all service industies are applied: ones is the sum of professional/scientific services, public administration and educational services, and another is a smaller share of services employment including professional/scientific services, administrative/waste management services and arts/accommodation services (check appendix for variable definitions).
 
-On all metrics the t-test returned non-significant results meaning that there is not a statistically significant difference in the mean employment levels between the two corridors. This means that the corridors are comparable and are appropriate for continued testing. 
 
 ### 3.1.3 Employment trend comparison
 
@@ -237,9 +236,9 @@ plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 
 ## 3.2 Mass Avenue
 
-![Mass Avenue Corridor](images/seattle_2nd_ave.png)
+![Mass Avenue Corridor]
 
-Our first corridor group consists of the 2nd and 4th Ave corridors in downtown Seattle. The other control corridor, 1st Ave, is exclueded because half of the blocks overlap with the treatment corridor, which would cause serious assumption violation for later data analysis.
+Intro of corridors
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
@@ -298,20 +297,13 @@ t.test(mass_growth$food_accom_growth,mass_con_growth$food_accom_growth)
 
 
 ### 3.1.1 Corridor employment amount
-The following table shows total, retail, and accommodations employment for 2nd and 4th Ave. and the city based percentile rank of the corridors. Both corridors are in the top 5% of the city in terms of the number of total employment. In terms of retail, they also have similary employment numbers, and both in top 25%. There is slight difference in food and accomodation sector, the improvement corridor 2nd Ave. is in top 15%, while the comparison corridor is in top 10%.   
 
 
-| Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
-|----------------|---------|------------|-----------|---------|------------|-----------|
-| 2nd Ave.       | 1135    | 14         | 42        | 95-100  | 75-80      | 85-90     |
-| 4th Ave.       | 771     | 14         | 57        | 95-100  | 75-80      | 90-95     |
 
-Table 1: 2nd and 4th Avenue Corridor Employment Percentiles
+Table 2: Mass Avenue Corridor and Control Corridor Employment Percentiles
 
 ### 3.1.2 Employment number comparison
-We performed t-tests on two types metrics of employment number at the census block level: employment number, for retail, food and accommodations, and sum of the two, named business; "business share" metric that is the share of employment in a census block of business employment over the sum of other services industries. Two definition of all service industies are applied: ones is the sum of professional/scientific services, public administration and educational services, and another is a smaller share of services employment including professional/scientific services, administrative/waste management services and arts/accommodation services (check appendix for variable definitions).
 
-On all metrics the t-test returned non-significant results meaning that there is not a statistically significant difference in the mean employment levels between the two corridors. This means that the corridors are comparable and are appropriate for continued testing. 
 
 ### 3.1.3 Employment trend comparison
 
