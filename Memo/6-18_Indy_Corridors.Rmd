@@ -298,7 +298,10 @@ t.test(mass_growth$food_accom_growth,mass_con_growth$food_accom_growth)
 
 ### 3.1.1 Corridor employment amount
 
-
+| Corridor          | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|-------------------|---------|------------|-----------|---------|------------|-----------|
+| Mass Ave.         | 44      | 1          | 17        | 50-55   | 30-35      | 75-80     |
+| Mass Ave.(Control)| 73      | 2          | 24        | 60-65   | 40-45      | 80-85     |
 
 Table 2: Mass Avenue Corridor and Control Corridor Employment Percentiles
 
