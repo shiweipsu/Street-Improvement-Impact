@@ -93,7 +93,8 @@ source(here::here("Code/corridor_comparison_functions.R"))
 minn_corridor <- st_read(here::here("Data/minneapolis/minn_corridor_lehd_wgs84.geojson"))
 #add new colume of construct year as numeric
 
-minn_lehd <- st_read(here::here("Data/Minneapolis/minn_lehd.geojson")) %>% as.data.frame()
+minn_lehd <- st_read(here::here("Data/Minneapolis/minn_lehd.geojson")) %>% as.data.frame() %>% 
+  select(-geometry)
 
 minn_emp_ratio <- employ_ratio_test(minn_corridor)
 
@@ -191,13 +192,25 @@ Riverside retail employment trends seem to suggest a possible positive effect of
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
-riverside_agg <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
+#riverside absolute table and plot
+riverside_agg <- agg_trend_table(minn_corridor, group = 1)
 
-riverside_agg_retail_plot <- agg_index_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+riverside_agg_retail <- agg_trend_plot(df_plot = riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07", construct_year = 2009,end_year = 2010)
 
-riverside_agg_accom_plot <- agg_index_trend_plot(riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+riverside_agg_accom <- agg_trend_plot(df_plot = riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18", construct_year = 2009,end_year = 2010)
+
+#riverside index table and plot
+riverside_agg_idx <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
+
+riverside_agg_retail_idx_plot <- agg_index_trend_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom_idx_plot <- agg_index_trend_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
 plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+
+#city agg plots
+
+minn_agg <- city_agg_trend_table(minn_lehd)
 
 ```
 
