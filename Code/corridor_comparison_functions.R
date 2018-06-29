@@ -283,8 +283,13 @@ agg_its_analysis <- function(df_its, group, endyear){
 
 city_agg_index_trend_table <- function(df, construct_year) {
   
-  #prepare tables for plotting
-  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  df <- if(class(df) == "sf") {
+    
+    df <-as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  } else {
+    
+    df
+  }
   
   df <- df %>% mutate(business = CNS07 + CNS18)
   
@@ -375,7 +380,8 @@ city_agg_trend_table <- function(df) {
               business = sum(business))
   
   df_plot <- df_plot %>% mutate(Type = "city") %>% 
-    filter(!is.na(year))
+    filter(!is.na(year)) %>% 
+    select(Type, year, CNS07, CNS18, business)
   
   return(df_plot)
   
@@ -385,7 +391,8 @@ city_agg_trend_plot <- function(df_plot, industry, corridor_name,
                            industry_code = c("CNS07", "CNS18", "business"), 
                            construct_year, end_year) {
   
-  df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  df_plot$Type <- factor(df_plot$Type, 
+                         levels = c("improvement", "control", "city"))
   
   #convert year to proper date
   
@@ -413,10 +420,8 @@ city_agg_trend_plot <- function(df_plot, industry, corridor_name,
     geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
               fill = "#adff2f",linetype=0,alpha = 0.03) +
     geom_point(size = 3, fill="white") +
-    scale_shape_discrete(breaks=c("improvement","control","city"))+
-    scale_colour_discrete(breaks=c("improvement","control","city")) +
-    scale_shape_manual(values=c(22,21,21,23))+
-    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    scale_shape_manual(values=c(22,21, 23))+
+    scale_x_discrete(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
     theme_minimal() +
     labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
          caption = "Shaded area represents the construction period") +
