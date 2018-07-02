@@ -10,7 +10,7 @@ output: html_document
 ```{r, echo=FALSE, results='asis'}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr)
+p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr)
 source(here::here("Code/corridor_comparison_functions.R"))
 
 
@@ -78,5 +78,128 @@ north_its <- agg_its_analysis( minn_corridor, group = 5, endyear = 2011)
 stargazer(north_its[[1]], north_its[[2]], north_its[[3]], type = "html",
          title = "Interrupted Time Series- North 2nd Ave.", 
           column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp.") )
+
+
+# sales tax models-----------------------------------
+
+minn_sale <- read.csv(here::here("Data/Minneapolis/BikeDataAggregated.csv"))
+
+minn_sale <- minn_sale %>% 
+  filter(!is.na(Street)) %>%
+  mutate(Group= case_when(Street %in% c("RIVERSIDE AVE","CEDAR AVE S") ~ 1,
+                          Street=="FRANKLIN AVE E" ~ 2,
+                          Street %in% c("CENTRAL AVE NE","UNIVERSITY AVE NE") ~3,
+                          Street %in% c("LYNDALE AVE S","GRAND AVE S") ~4,
+                          Street %in% c("2ND ST N","WEST BROADWAY") ~5),
+         Study= case_when(Group==1 ~ ifelse(Street=="RIVERSIDE AVE"," Improvement","Control"),
+                          Group==2 ~ ifelse(Street=="FRANKLIN AVE E"," Improvement","Control"),
+                         Group==3 ~ ifelse(Street=="CENTRAL AVE NE"," Improvement","Control"),
+                         Group==4 ~ ifelse(Street=="LYNDALE AVE S"," Improvement","Control"),
+                         Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))
+         ) %>% 
+  filter(Group %in% c(1:5)) %>% 
+  group_by(Street,Type,Group,Study,TaxYear) %>% 
+  summarise(TaxableSales = sum(TaxableSales, na.rm = TRUE))
+
+minn_sale <- minn_sale %>% 
+  spread(Type,TaxableSales) %>% 
+  mutate(year=TaxYear,
+         Type=Study,
+         CNS07=Retail,
+         CNS18=Restaurant,
+         geometry=1)
+
+minn_sale$Type <- stringr::str_trim(minn_sale$Type, side = "both")
+
+#riverside
+
+riverside_sale <- minn_sale %>% filter(Group == 1) %>% 
+  mutate(pre_post = if_else(year >= 2009, 1, 0))
+
+riverside_did_rest <- lm(Restaurant ~ Type + pre_post + Type*pre_post, data = riverside_sale)
+riverside_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = riverside_sale)
+
+stargazer(riverside_did_rest, riverside_did_retail, type = "html",
+         title = "Riverside Ave. Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales") )
+
+riverside_its <- riverside_sale %>% filter(Type == "Improvement") %>% 
+  mutate(ts_year = year - 2003)
+
+riverside_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = riverside_its)
+riverside_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = riverside_its)
+
+stargazer(riverside_its_rest, riverside_its_retail, type = "html",
+         title = "Riverside Ave. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"))
+
+#franklin...only doing ITS
+
+franklin_its <- minn_sale %>% filter(Group == 2, Type == "Improvement") %>% 
+  mutate(pre_post = if_else(year >= 2011, 1, 0), ts_year = year - 2003)
+
+franklin_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = franklin_its)
+franklin_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = franklin_its)
+
+stargazer(franklin_its_rest, franklin_its_retail, type = "html",
+         title = "Franklin Ave. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"))
+  
+
+#central
+
+central_sale <- minn_sale %>% filter(Group == 3) %>% 
+  mutate(pre_post = if_else(year >= 2012, 1, 0))
+
+central_did_rest <- lm(Restaurant ~ Type + pre_post + Type*pre_post, data = central_sale)
+central_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = central_sale)
+
+stargazer(central_did_rest, central_did_retail, type = "html",
+         title = "Central Ave. Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales") )
+
+central_its <- central_sale %>% filter(Type == "Improvement") %>% 
+  mutate(ts_year = year - 2003)
+
+central_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = central_its)
+central_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = central_its)
+
+stargazer(central_its_rest, central_its_retail, type = "html",
+         title = "Central Ave. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"))
+
+#lyndale
+
+lyndale_sale <- minn_sale %>% filter(Group == 4) %>% 
+  mutate(pre_post = if_else(year >= 2009, 1, 0))
+
+lyndale_did_rest <- lm(Restaurant ~ Type + pre_post + Type*pre_post, data = lyndale_sale)
+lyndale_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = lyndale_sale)
+
+stargazer(lyndale_did_rest, lyndale_did_retail, type = "html",
+         title = "Lyndale Ave. S. Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales") )
+
+lyndale_its <- lyndale_sale %>% filter(Type == "Improvement") %>% 
+  mutate(ts_year = year - 2003)
+
+lyndale_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_its)
+lyndale_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_its)
+
+stargazer(lyndale_its_rest, lyndale_its_retail, type = "html",
+         title = "Lyndale Ave. S. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales")) 
+
+#2nd street....ITS only for restaurant because too many missing DID terms
+
+second_sale <- minn_sale %>% filter(Group == 5, Type == "Improvement") %>% 
+  mutate(pre_post = if_else(year >= 2011, 1, 0), ts_year = year - 2003)
+  
+
+second_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = second_sale)
+
+stargazer(second_its_retail, type = "html",
+         title = "North 2nd Sales Tax ITS Estimates", 
+          column.labels = c("Retail Sales"))  
 
 ```
