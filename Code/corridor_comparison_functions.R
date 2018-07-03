@@ -281,10 +281,15 @@ agg_its_analysis <- function(df_its, group, endyear){
 
 # city index table and plot -----------------------------------------------------
 
-agg_index_trend_table_city <- function(df, construct_year) {
+city_agg_index_trend_table <- function(df, construct_year) {
   
-  #prepare tables for plotting
-  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  df <- if(class(df) == "sf") {
+    
+    df <-as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  } else {
+    
+    df
+  }
   
   df <- df %>% mutate(business = CNS07 + CNS18)
   
@@ -310,7 +315,7 @@ agg_index_trend_table_city <- function(df, construct_year) {
   
 }
 
-agg_index_trend_plot_city <- function(df_plot, industry, corridor_name, 
+city_agg_index_trend_plot <- function(df_plot, industry, corridor_name, 
                                  industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
                                  construct_year, end_year) {
   
@@ -351,3 +356,79 @@ agg_index_trend_plot_city <- function(df_plot, industry, corridor_name,
   
   return(ats_df)
 }
+
+#city aggregate employment growth table and chart--------------------
+
+city_agg_trend_table <- function(df) {
+  
+  #prepare tables for plotting
+  
+  df <- if(class(df) == "sf") {
+    
+    df <-as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  } else {
+    
+    df
+  }
+  
+  df <- df %>% mutate(business = CNS07 + CNS18)
+  
+  
+  df_plot <- df %>% group_by(year) %>%
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business))
+  
+  df_plot <- df_plot %>% mutate(Type = "city") %>% 
+    filter(!is.na(year)) %>% 
+    select(Type, year, CNS07, CNS18, business)
+  
+  return(df_plot)
+  
+}
+
+city_agg_trend_plot <- function(df_plot, industry, corridor_name, 
+                           industry_code = c("CNS07", "CNS18", "business"), 
+                           construct_year, end_year) {
+  
+  df_plot$Type <- factor(df_plot$Type, 
+                         levels = c("improvement", "control", "city"))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  #df_plot$year <- year(df_plot$year)
+  
+  #prepare construct_year and end_year as a date
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  #construct_date <- year(construct_year)
+  
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  #end_date <- year(end_year)
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(size = 3, fill="white") +
+    scale_shape_manual(values=c(22,21, 23))+
+    scale_x_discrete(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+    theme_minimal() +
+    labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
+         caption = "Shaded area represents the construction period") +
+    guides(title = "Employment Scale")
+  
+  
+  return(ats_df)
+}
+
+
