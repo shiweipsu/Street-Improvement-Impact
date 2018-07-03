@@ -93,7 +93,8 @@ source(here::here("Code/corridor_comparison_functions.R"))
 minn_corridor <- st_read(here::here("Data/minneapolis/minn_corridor_lehd_wgs84.geojson"))
 #add new colume of construct year as numeric
 
-minn_lehd <- st_read(here::here("Data/Minneapolis/minn_lehd.geojson")) %>% as.data.frame()
+minn_lehd <- st_read(here::here("Data/Minneapolis/minn_lehd.geojson")) %>% as.data.frame() %>% 
+  select(-geometry)
 
 minn_emp_ratio <- employ_ratio_test(minn_corridor)
 
@@ -191,13 +192,34 @@ Riverside retail employment trends seem to suggest a possible positive effect of
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
-riverside_agg <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
+#riverside absolute table and plot
+# riverside_agg <- agg_trend_table(minn_corridor, group = 1)
+# 
+# riverside_agg_retail <- agg_trend_plot(df_plot = riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07", construct_year = 2009,end_year = 2010)
+# 
+# riverside_agg_accom <- agg_trend_plot(df_plot = riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18", construct_year = 2009,end_year = 2010)
 
-riverside_agg_retail_plot <- agg_index_trend_plot(riverside_agg, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+#riverside index table and plot
+riverside_agg_idx <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
 
-riverside_agg_accom_plot <- agg_index_trend_plot(riverside_agg, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+# riverside_agg_retail_idx_plot <- agg_index_trend_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+# 
+# riverside_agg_accom_idx_plot <- agg_index_trend_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+# 
+# plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
 
-plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+#city agg plots
+
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2009)
+
+riverside_agg_idx <- bind_rows(riverside_agg_idx, minn_agg)
+riverside_agg_idx <- riverside_agg_idx %>% filter(!is.na(year))
+
+riverside_agg_retail <- city_agg_index_trend_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom <- city_agg_index_trend_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+plot_grid(riverside_agg_retail, riverside_agg_accom, align = "h")
 
 ```
 
@@ -348,13 +370,20 @@ Retail employment does show consistent, though moderate, growth for the improvem
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
 franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
 
-franklin_agg_retail_plot <- agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
+# franklin_agg_retail_plot <- agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
+# 
+# 
+# franklin_agg_accom_plot <- agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
 
+franklin_agg <- bind_rows(franklin_agg, minn_agg)
 
-franklin_agg_accom_plot <- agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
+franklin_idx_retail <- city_agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
 
-plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot)
+franklin_idx_accom <- city_agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
+
+plot_grid(franklin_idx_retail, franklin_idx_accom, align = "h")
 
 ```
 
@@ -471,12 +500,19 @@ Central Avenue shows a clear positive retail employment trend post-construction 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
 central_agg <- agg_index_trend_table(minn_corridor, group = 3, construct_year = 2012)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2012)
 
-central_agg_retail_plot <- agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+central_agg <- bind_rows(central_agg, minn_agg)
 
-central_agg_accom_plot <- agg_index_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+# central_agg_retail_plot <- agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+# 
+# central_agg_accom_plot <- agg_index_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
-plot_grid(central_agg_retail_plot, central_agg_accom_plot)
+central_agg_idx_retail <- city_agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+
+central_agg_idx_accom <- city_agg_index_trend_plot(central_agg, industry = "Accommodations", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+
+plot_grid(central_agg_idx_retail, central_agg_idx_accom, align = "h")
 
 ```
 
@@ -589,12 +625,19 @@ Retail employment on the Lyndale Avenue corridor looks to only have just recover
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
 lyndale_trend <- agg_index_trend_table(minn_corridor, group = 4, construct_year = 2008)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2008)
 
-lyndale_retail_trend <- agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+lyndale_trend <- bind_rows(lyndale_trend, minn_agg)
 
-lyndale_accom_trend <- agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+# lyndale_retail_trend <- agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+# 
+# lyndale_accom_trend <- agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 
-plot_grid(lyndale_retail_trend, lyndale_accom_trend)
+lyndale_idx_retail <- city_agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+
+lyndale_idx_accom <- city_agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+
+plot_grid(lyndale_idx_retail, lyndale_idx_accom, align = "h")
 
 ```
 
@@ -717,12 +760,19 @@ North 2nd Street's employment trends point towards a probable impact of street i
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
 
 north_agg <- agg_index_trend_table(minn_corridor, group = 5, construct_year = 2011)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
 
-north_retail_trend <- agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+north_agg <- bind_rows(north_agg, minn_agg)
 
-north_accom_trend <- agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+# north_retail_trend <- agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+# 
+# north_accom_trend <- agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
-plot_grid(north_retail_trend, north_accom_trend)
+north_retail_idx <- city_agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+north_accom_idx <- city_agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+plot_grid(north_retail_idx, north_accom_idx, align = "h")
 
 ```
 
