@@ -426,7 +426,7 @@ plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
 
 ###3.2.4 Difference-in-Difference
 
-The Franklin Avenue corridor difference term is also significant with an estimate that the infrastructure treatment is responsible . According to our estimates, the infrastructure placement on Franklin Avenue is responsible for an additional 120 retail jobs with no statistically significant effect for accommodations jobs.
+The Franklin Avenue corridor difference term is also significant with an estimate that the infrastructure treatment is responsible. According to our estimates, the infrastructure placement on Franklin Avenue is responsible for an additional 120 retail jobs with no statistically significant effect for accommodations jobs.
 
 [insert d-i-d table]
 
@@ -827,12 +827,17 @@ North 2nd Avenue also has mixed ITS results. The corrdior has a large, negative 
 
 ##3.6 Conclusions
 
-The aggregated trend analyses presented here show  some potentially interesting effects of street improvement for a select set of corridors, but there do not seem to be any clear patterns running in any given direction. At best, we may be able to conclude that the descriptive data offered here does not show any *negative* effect of street improvement on retail or accommodations employment, and, in some cases, may have a positive effect on employment growth. The trend analysis does offer some tantalizing potential of positive employment effects that the difference-in-difference or time series regression can more accurately tease out. 
+###3.6.1 Aggregated Trend Analyses
 
-#Difference-in-Difference
+The aggregated trend analyses presented here show  some potentially interesting effects of street improvement for a select set of corridors, but there do not seem to be any clear patterns running in any given direction. At best, we may be able to conclude that the descriptive data offered here does not show any *negative* effect of street improvement on retail or accommodations employment, and, in some cases, may have a positive effect on employment growth. 
 
-As mentioned in the introduction, difference-in-difference (DiD) is a linear modeling approach designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved. The approach looks at the change in the variable of interest in the treatment group before and after it is treated compared to the change in the variable of interest in the control group. This section presents the DiD results for each of the corridors. While they may appear overwhelming, the Typeimprovement:prepost coefficient is the value that matters for our DiD model. If that therm is significant, then we have evidence that the infrastructure treatment did have a casusal effect on our variables of interest. 
+A similarly mixed conclusion can be drawn from the sales tax data. In most cases, there is positive sales tax growth post-infrastructure placement, but it is not definitive that the infrastructure itself was responsible for the growth as many corridors were growing before installation. In other words, sales taxes were already trending upwards before, or during, infrastructure conclusion so the effect of the infrastructure is ambiguous. Again, we can probably say with some confidence, though, that the infrastructure placement did not have any major *negative* effects on retail and restaurant sales receipts.
 
+###DiD and ITS Results
+
+Before delving into the overall results of the econometric models it is important to revisit the assumptions that underly the models and the difficulty in guaranteeing messy observational data adheres to them. For DiD estimates there are two primary assumptions that should be met in order for the conclusions to be valid: first, the paralell trends assumption, this assumption requires that your treatment and control group have similar growth trends before the treatment; and second, the independence assumption, this assumption requires that the treatment and control corridor observations be independent of one another meaning that a change in one corridor does not affect the other. For ITS, having an adequate sample size of observations both pre and post-treatment are necessary for the calculation of proper estimates. This means that for some corridors with only a couple of observations post-treatment likely have biased estimates. Most of the study corridors presented here violate at least one of these assumptions, so the model results should be read critically and as suggestive of infrastructure's real impact even though the exact estimates may be off. That being said, these modeling approaches are some of the best tools researchers have to estimate different policy impacts and offer us better approximations of what's going on than simply aggregate trends analyses.
+
+The DiD results showed a mix, but largely positive, effect of new bike infrastructure on retail and accommodations employment. Two notable corridors showing positive employment growth- Riverside and Franklin Ave- show positive employment growth in either retail or accommodations and each corridor is responsible for greater than 100 additional jobs compared to their control corridors, according to their DiD estimates. Unfortunately, both the Riverside and Franklin Ave corridor ITS estimates were less impressive than their DiD estimates. Riverside's ITS results were non-significant and Franklin's IT results showed a large, negative level change for accommodations employment, but a positive, significant change in the accommodations employment growth rate. 
 
 
 
@@ -844,12 +849,7 @@ Overall, there are mixed effects of infrastructure improvement on retail and acc
 More importantly, while these results are interesting they should be taken with a heavy grain of salt. Difference-in-difference requires a certain set of assumptions in order for its results to be valid, and, unfortunately, many of the corridors tested do not fit. Two of the main assumptions, the parallel trend assumption, and the independence assumption, are violated in most of these models. The parallel trends assumption dictates that in order for a DiD estimate to be valid the trend in your variable of interest must be similar between your two groups before treatment. In plain terms, the growth trajectory of the two groups should be similar before a policy is enacted. This is not the case for a few of the corridors where it is clear that either the treatment or the control corridor had a dramatically different growth trajectory before treatment even began. The independence assumption basically states that the two groups should not be able to affect each other. A clear violation of this assumption is seen for the Frnaklin Avenue corridor where the control and treatment corridors are the same stretch road. It is unlikely that a change from one corridor will not affect the other as they are touching. As such, while interesting, these DiD estimates are not appropriate. 
 
 
-
-#Interrupted Time Series
-
-As described earlier, interrupted time series (ITS) is an econometric technique that estimates the impact of an intervention over time. This approach allows us to track the treatment corridor over time and estimate the impact of the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.
-
-While ITS is a useful technique it does require much more available data than a difference-in-difference approach or even an aggregated trend analysis. In particular, ITS requires enough pre-treatment data in order to accurately represent any underlying trends in the data. While post-treatment does not necessarily require as many data points as pre-treatment, analysts still need enough post-treatment data to reasonably estimate the impact of the treatment. This limit imposes two costs on researchers. First, as mentioned, you need more data, overall, to run a proper ITS compared to other techniques. Second, you need a sufficient amount of data *post-treatment* to truly ascertain the impact. This means that depending on the data available infrastructure improvements has to have been concluded probably no later than 2012. But even recognizing these limits, ITS offers a powerful alternative technique for estimating the causal impact of improved infrastructure. 
+ 
 
 
 
