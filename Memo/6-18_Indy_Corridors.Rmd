@@ -122,7 +122,7 @@ Our first test in corridor comparability is comparing the count of the total num
 
 ![Virginia Avenue Corridor]
 
-Our first treatment corridor is Virginia Avenue, which installed seperate bike lane in 2011. The control corridors are Meridian Street, Prospect Street, and Shelby Street. Prospect Street and Shelby Street are close to the treatment corridor in southeast of downtown Indianapolis, Virginia Ave, while Meridian Street is locate in central downtown area.
+Our first treatment corridor is Virginia Avenue, which installed seperate bike lane in 2011. The control corridors are Meridian Street, Prospect Street, and Shelby Street. Prospect Street and Shelby Street are close to the treatment corridor in southeast of downtown Indianapolis, Virginia Ave, while Meridian Street is located in central downtown area.
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
@@ -210,7 +210,7 @@ t.test(virginia_growth$food_accom_growth,shelby_growth$food_accom_growth)
 
 ### 3.1.1 Corridor employment amount
 
-We firstly compare business related industry employment among thoses corridors. We find Meridian St Corridor has much more employment amount than treatment Virginia Ave corridor. Other two comparison corridors have similar business employment amount in average. However, Virginia Ave corridor has relatively less retail employment. 
+Comparing 'business' related employment, we find the Meridian St Corridor has much more 'business' employment than the Virginia Ave corridor. The other two comparison corridors have similar levels of business employment amount, though, the Virginia Ave corridor has relatively less retail employment. 
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
@@ -222,11 +222,12 @@ We firstly compare business related industry employment among thoses corridors. 
 Table 1: Virginia Avenue Corridor and Control Corridors Employment Percentiles
 
 ### 3.1.2 Employment number comparison
-According to t-test of employment amount per block between treatment and comparison corridors, we find additional evidences showing diaparity of employment between Meridian corridor and treatment corridor in terms of business employment and food employment. In addition, we test whether business/service ratio similarity using t-test among corridors. All of the comparison corridors have similar ratio to treatment corridor indicating the corridors have similar structur of business versus service jobs.
+
+We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Meridian corridor mean 'business' and food employment per block is significantly different than the Virginia corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
 
 ### 3.1.3 Employment trend comparison
 
-We compare the trend of business job growth among treatment corridor and comparison corridors before the construction year 2011. In terms of retail performance, treatment corridor has relatively smooth trend over years, howerver, Meridian corridor experience an increase trend with spike in 2007 and other two comparison corridors experience a significant drop after recession in 2008. In terms of food/accommodation sector, treatment corridor has similar growth trend with Propspect and Shelby corridor in general. Meridian corridor shows more fluctuation during the years.
+In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Meridian corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Propspect and Shelby corridors while the Meridian corridor shows much more volatility over the study period.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
