@@ -25,6 +25,9 @@ indy_lehd <- nitc_lehd(years = years, target_state = target_state, target_county
 
 names(indy_lehd) <- tolower(names(indy_lehd))
 
+indy_lehd <- indy_lehd %>% rename(geom = geometry)
+
 st_write(dsn = con, indy_lehd, overwrite = TRUE)
 
+dbDisconnect(con)
 
