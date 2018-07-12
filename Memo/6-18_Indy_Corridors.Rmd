@@ -25,7 +25,7 @@ In order to make their cities more livable, policymakers and planning department
 
 DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
-![Seattle Corridor](images/seattle_corridors.png)
+![Indianapolis Corridor](images/Indianapolis_corridors.png)
 
 
 #2. Data Sources/Methodology
@@ -89,21 +89,43 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, sf, ggplot2, ggthemes, dplyr, stargazer,cowplot)
+p_load(here, RPostgreSQL, sf, ggplot2, ggthemes, dplyr, dbplyr, stargazer,cowplot)
+
+#query the corridors from bike_lanes
+user <- "jamgreen"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
-indy_corridor <- st_read(here::here("Data/Indianapolis/indy_corridor_lehd_NAD83.shp"))
+indy_corridor <- st_read_db(conn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.grouptype as grouptype,  a.year as year, a.geom
+FROM indy_lehd a, indy_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geom);")
+
+#indy_corridor <- st_read(here::here("Data/Indianapolis/indy_corridor_lehd_NAD83.shp"))
 indy_corridor <- indy_corridor %>% 
-   rename(Type=GroupType) 
+   rename(Type = grouptype) 
 #add new colume of construct year as numeric
 
 indy_corridor$Type <- as.character(indy_corridor$Type)
-indy_corridor[indy_corridor$Name =="Virginia Ave Comp. Corridor 1\n",]$Type <- "Control: Meridian"
-indy_corridor[indy_corridor$Name=="Virginia Ave Comp. Corridor 2\n",]$Type <- "Control: Prospect"
-indy_corridor[indy_corridor$Name=="Virginia Ave Comp. Corridor 3\n",]$Type <- "Control: Shelby"
-indy_corridor[indy_corridor$Name=="Mass Ave Comp. Corridor 1\n",]$Type <- "Control: Mass Ave"
+indy_corridor[indy_corridor$name =="Virginia Ave Comp. Corridor 1\n",]$Type <- "Control: Meridian"
+indy_corridor[indy_corridor$name=="Virginia Ave Comp. Corridor 2\n",]$Type <- "Control: Prospect"
+indy_corridor[indy_corridor$name=="Virginia Ave Comp. Corridor 3\n",]$Type <- "Control: Shelby"
+indy_corridor[indy_corridor$name=="Mass Ave Comp. Corridor 1\n",]$Type <- "Control: Mass Ave"
 indy_corridor$Type <- as.factor(indy_corridor$Type)
+
+indy_corridor <- indy_corridor %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group,
+         BuildStart = buildstart, BuildEnd = buildend, Name = name)
 
 indy_lehd <- st_read(here::here("Data/Indianapolis/indy_lehd.geojson")) %>% as.data.frame()
 
@@ -111,12 +133,15 @@ indy_emp_ratio <- employ_ratio_test(indy_corridor)
 
 indy_growth <- growth_rate(indy_corridor)
 
+dbDisconnect(con)
+
+
 ```
 
 
 #3. Corridor Comparisons
 
-Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Seattle as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
+Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Indianapolis as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
 
 ## 3.1 Virginia Avenue
 
