@@ -94,7 +94,7 @@ p_load(here, RPostgreSQL, sf, ggplot2, ggthemes, dplyr, dbplyr, stargazer,cowplo
 #query the corridors from bike_lanes
 user <- "jamgreen"
 host <- "pgsql102.rc.pdx.edu"
-pw <- scan(here("batteries.pgpss"), what = "")
+pw <- scan(here::here("batteries.pgpss"), what = "")
 dbname <- "bike_lanes"
 
 con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
@@ -102,7 +102,7 @@ con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname,
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
-indy_corridor <- st_read_db(conn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+indy_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
 a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
 a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
 b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
@@ -147,7 +147,7 @@ Our first test in corridor comparability is comparing the count of the total num
 
 ![Virginia Avenue Corridor]
 
-Our first treatment corridor is Virginia Avenue, which installed seperate bike lane in 2011. The control corridors are Meridian Street, Prospect Street, and Shelby Street. Prospect Street and Shelby Street are close to the treatment corridor in southeast of downtown Indianapolis, Virginia Ave, while Meridian Street is located in central downtown area.
+Our first treatment corridor is Virginia Avenue, which installed separate bike lane in 2011. The control corridors are Meridian Street, Prospect Street, and Shelby Street. Prospect Street and Shelby Street are close to the treatment corridor in southeast downtown Indianapolis while Meridian Street is located in central downtown area.
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
@@ -262,6 +262,18 @@ agg_food_trend_plot <- agg_trend_plot(virginia_agg, industry = "Food/Accommodata
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
 
+###3.1.4 Sales Tax Comparisons
+
+
+###3.1.5 Difference-in-Difference
+
+The difference terms for the Virginia Ave corridors are all non-significant, except for the Shelby corridor accommodations employment that is borderline significant but does not meet our preferred significance level. The lack of statistically significant terms here lends us to believe there is not a causal relationship between the installation of the new bike lane and change in retail or accommodations employment for Virginia Ave. 
+
+[insert d-i-d table]
+
+###3.1.6 ITS
+
+Across all three models both the prepost term (the term that signals a potential level change in your unit of interest) and the time series-prepost term (the term that signals a potential slope change in your unit of interest) are non-significant. The time series alone term for accommodations and the combined 'business' variable are significant and positive signaling a general growth pattern over time, but such growth cannot be attributed to the consutrction of the new cycling infrastructure given our current model specification. 
 
 ## 3.2 Mass Avenue
 
@@ -319,13 +331,13 @@ mass_con_growth <- indy_growth %>%
 
 
 t.test(mass_growth$biz_growth,mass_con_growth$biz_growth,finite=T)
-t.test(mass_growth$retail_growth,mass_con_growth$retail_growth, ,finite=T)
+t.test(mass_growth$retail_growth,mass_con_growth$retail_growth, finite=T)
 t.test(mass_growth$food_accom_growth,mass_con_growth$food_accom_growth)
 
 ```
 
 
-### 3.1.1 Corridor employment amount
+### 3.2.1 Corridor employment amount
 
 Treatment corridor and control corridor have relatively similar amount of employment before the street improvement has taken place. THe total employment is around 50-55 percentile for treatment corridor, and 60-65 percentile for control corridor. They both have less retail activities along the corridors, but have a lot of food/accommodation stores along the corridors.
 
@@ -336,10 +348,10 @@ Treatment corridor and control corridor have relatively similar amount of employ
 
 Table 2: Mass Avenue Corridor and Control Corridor Employment Percentiles
 
-### 3.1.2 Employment number comparison
+### 3.2.2 Employment number comparison
 According to t-test, the two corridors are very comparable in terms of business acitivity level and business/service structure. The t-test for difference are all non-significant.
 
-### 3.1.3 Employment trend comparison
+### 3.2.3 Employment trend comparison
 
 The trend graphs of two corridors are presented below. In terms of retail employment, the two corridors both experienced significant employment drop around 2007 due to recession. In terms of food/accommodation sector, there are apprarent decrease trend for both corrdiros. In general, the before contruction business employment trends are similar for both corridors, and the t-test also proves this.
 
@@ -350,6 +362,23 @@ agg_retail_trend_plot <- agg_trend_plot(mass_agg, industry = "Retail", industry_
 agg_food_trend_plot <- agg_trend_plot(mass_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "2nd Ave.", construct_year = 2008, end_year = 2009)
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
+
+
+###3.2.4 Sales tax comparison
+
+
+
+###3.2.5 Difference in Difference
+
+We did not run a DiD model for the Massachusetts Ave corridor because it violated too many assumptions of the model and its resuts would therefore be meaningless.
+
+###3.2.6 ITS
+
+The Massachusetts Ave corridor shows mixed results in its ITS specification. The prepost term (the term that estimates the change in the level of your unit of interest) is significant and negative for accommodations and the comdined 'business' employment variables. This means there was a sharp loss in jobs at the construction point in time. But the time series-prepost term (the term that estimates the change in the slope un the level of interest) is positive and significant for all employment sectors. This means that the growth in employment in our sectors of interest is greater post-construction than it was before. This means that while construction may have temporarily resulted in employment loss (due to establishments closing during construction or releasing workers due to lower sales during construction) the corridors are now growing at a healthier rate than before. 
+
+This is a mixed result, but considering the construction of the corridor was still during the Great Recession, the fact that there was still robust growth five years after suggests that overall economic conditions have improved and that the construction of the lane may have had a positive effect on this new growth trajectory.
+
+
 
 ## 3.3 Corridor Comparison Summary
 Prospect and Shelby corridors are more comparable to treatment Virginia corridor. The two Mass corridor are comparable for testing the improvement on one section of Mass Ave.
