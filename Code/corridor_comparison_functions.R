@@ -259,7 +259,7 @@ its_analysis <- function(df_its, group, endyear){
 
 
 agg_its_analysis <- function(df_its, group, endyear){
-  df_its <- df_its %>% filter(group==Group,Type=="Study" | Type == "improvement") %>% 
+  df_its <- df_its %>% filter(group==Group,Type=="Study" | Type == "improvement" | Type == "Treatment") %>% 
     mutate(business=CNS07+CNS18) %>% 
     group_by(year) %>%
     summarise(CNS07 = sum(CNS07),
