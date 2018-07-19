@@ -265,15 +265,28 @@ plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ###3.1.4 Sales Tax Comparisons
 
 
-###3.1.5 Difference-in-Difference
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-The difference terms for the Virginia Ave corridors are all non-significant, except for the Shelby corridor accommodations employment that is borderline significant but does not meet our preferred significance level. The lack of statistically significant terms here lends us to believe there is not a causal relationship between the installation of the new bike lane and change in retail or accommodations employment for Virginia Ave. 
+#query the sales tax from bike_lanes
+user <- "jamgreen"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
 
-[insert d-i-d table]
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
 
-###3.1.6 ITS
+indy_sales <- dbReadTable(conn = con, name = "indy_sales_tax")
 
-Across all three models both the prepost term (the term that signals a potential level change in your unit of interest) and the time series-prepost term (the term that signals a potential slope change in your unit of interest) are non-significant. The time series alone term for accommodations and the combined 'business' variable are significant and positive signaling a general growth pattern over time, but such growth cannot be attributed to the consutrction of the new cycling infrastructure given our current model specification. 
+names(indy_sales) <- tolower(names(indy_sales))
+indy_sales <- indy_sales %>% mutate(group = if_else(grepl("Mass*", .$corridor), 1, 2))
+
+
+
+```
+
+
+
 
 ## 3.2 Mass Avenue
 
@@ -368,18 +381,38 @@ plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 
 
 
-###3.2.5 Difference in Difference
-
-We did not run a DiD model for the Massachusetts Ave corridor because it violated too many assumptions of the model and its resuts would therefore be meaningless.
-
-###3.2.6 ITS
-
-The Massachusetts Ave corridor shows mixed results in its ITS specification. The prepost term (the term that estimates the change in the level of your unit of interest) is significant and negative for accommodations and the comdined 'business' employment variables. This means there was a sharp loss in jobs at the construction point in time. But the time series-prepost term (the term that estimates the change in the slope un the level of interest) is positive and significant for all employment sectors. This means that the growth in employment in our sectors of interest is greater post-construction than it was before. This means that while construction may have temporarily resulted in employment loss (due to establishments closing during construction or releasing workers due to lower sales during construction) the corridors are now growing at a healthier rate than before. 
-
-This is a mixed result, but considering the construction of the corridor was still during the Great Recession, the fact that there was still robust growth five years after suggests that overall economic conditions have improved and that the construction of the lane may have had a positive effect on this new growth trajectory.
-
 
 
 ## 3.3 Corridor Comparison Summary
 Prospect and Shelby corridors are more comparable to treatment Virginia corridor. The two Mass corridor are comparable for testing the improvement on one section of Mass Ave.
 [Comparison table to be added]
+
+
+
+#4. Analysis
+
+This section presents the results of the econometric models for the appropriate corridors. To recap, we ran two different models, a difference-in-difference and interrupted time series. The difference-in-difference (DiD) approach aims to estimate the difference between the control and treatment corridors at two points in time (pre and post-treatment). The "difference" term is the interaction between the pre/post and treatment/control indicator variables. The interrupted time series (ITS) model tracks the change in our outcome of interest only for the treatment corridor. The main variables in the model are a time series variable that gives an estimate of the general trend of our outcome variable, a pre/post-treatment indicator variable that signals the change in the *level* of our outcome variable attributable to the treatment, and the interaction term between the time series and pre/post-treatment term that gives an estimate of the *slope*, or rate of change, of our outcome after treatment. 
+
+##4.1. Virginia Avenue
+
+###4.1.1 Difference-in-Difference
+
+The difference terms for the Virginia Ave corridors are all non-significant, except for the Shelby corridor accommodations employment that is borderline significant but does not meet our preferred significance level. The lack of statistically significant terms here lends us to believe there is not a causal relationship between the installation of the new bike lane and change in retail or accommodations employment for Virginia Ave. 
+
+[insert d-i-d table]
+
+###4.1.2 ITS
+
+Across all three models both the prepost term (the term that signals a potential level change in your unit of interest) and the time series-prepost term (the term that signals a potential slope change in your unit of interest) are non-significant. The time series alone term for accommodations and the combined 'business' variable are significant and positive signaling a general growth pattern over time, but such growth cannot be attributed to the consutrction of the new cycling infrastructure given our current model specification. 
+
+##4.2 Massachusetts Avenue
+
+###4.2.1 Difference in Difference
+
+We did not run a DiD model for the Massachusetts Ave corridor because it violated too many assumptions of the model and its resuts would therefore be meaningless.
+
+###4.2.2 ITS
+
+The Massachusetts Ave corridor shows mixed results in its ITS specification. The prepost term (the term that estimates the change in the level of your unit of interest) is significant and negative for accommodations and the comdined 'business' employment variables. This means there was a sharp loss in jobs at the construction point in time. But the time series-prepost term (the term that estimates the change in the slope un the level of interest) is positive and significant for all employment sectors. This means that the growth in employment in our sectors of interest is greater post-construction than it was before. This means that while construction may have temporarily resulted in employment loss (due to establishments closing during construction or releasing workers due to lower sales during construction) the corridors are now growing at a healthier rate than before. 
+
+This is a mixed result, but considering the construction of the corridor was still during the Great Recession, the fact that there was still robust growth five years after suggests that overall economic conditions have improved and that the construction of the lane may have had a positive effect on this new growth trajectory.
