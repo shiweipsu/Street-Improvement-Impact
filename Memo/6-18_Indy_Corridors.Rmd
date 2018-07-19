@@ -278,8 +278,8 @@ con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname,
 
 indy_sales <- dbReadTable(conn = con, name = "indy_sales_tax")
 
-names(indy_sales) <- tolower(names(indy_sales))
-indy_sales <- indy_sales %>% mutate(group = if_else(grepl("Mass*", .$corridor), 1, 2))
+
+
 
 
 
