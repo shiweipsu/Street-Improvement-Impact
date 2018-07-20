@@ -19,6 +19,7 @@ corridor_t <- corridor_df %>% mutate(Retail=CNS07,
 return(corridor_t)  
 }
 
+
 # Definition of Service is from EPA Smart Location Database, 5-tier employment classification scheme, adding retail, service, and entertainment
 
 growth_rate <- function(corridor_df) {
@@ -64,8 +65,14 @@ return(corridor_grouped_df)
 
 agg_trend_table <- function(df, group) {
   
-  #prepare tables for plotting
-  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+  df <- if(class(df) == "sf") {
+    
+    df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-starts_with("geom"))
+    
+  } else {
+    
+    df
+  }
   
   df <- df %>% filter(Group == group) %>%
     mutate(business = CNS07 + CNS18)
@@ -283,9 +290,10 @@ agg_its_analysis <- function(df_its, group, endyear){
 
 city_agg_index_trend_table <- function(df, construct_year) {
   
-  df <- if(class(df) == "sf") {
+  if(class(df) == "sf") {
     
-    df <-as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+    df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+    
   } else {
     
     df

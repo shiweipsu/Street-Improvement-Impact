@@ -110,6 +110,8 @@ b.grouptype as grouptype,  a.year as year, a.geom
 FROM indy_lehd a, indy_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geom);")
 
+
+
 #indy_corridor <- st_read(here::here("Data/Indianapolis/indy_corridor_lehd_NAD83.shp"))
 indy_corridor <- indy_corridor %>% 
    rename(Type = grouptype) 
@@ -122,12 +124,14 @@ indy_corridor[indy_corridor$name=="Virginia Ave Comp. Corridor 3\n",]$Type <- "C
 indy_corridor[indy_corridor$name=="Mass Ave Comp. Corridor 1\n",]$Type <- "Control: Mass Ave"
 indy_corridor$Type <- as.factor(indy_corridor$Type)
 
-indy_corridor <- indy_corridor %>% 
+indy_corridor <- indy_corridor %>%
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group,
          BuildStart = buildstart, BuildEnd = buildend, Name = name)
 
-indy_lehd <- st_read(here::here("Data/Indianapolis/indy_lehd.geojson")) %>% as.data.frame()
+indy_lehd <- st_read(dsn = con, query = "SELECT * FROM indy_lehd") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
 
 indy_emp_ratio <- employ_ratio_test(indy_corridor)
 
@@ -154,15 +158,22 @@ Our first treatment corridor is Virginia Avenue, which installed separate bike l
 #comparisons-----
 
 # prepare city level data & block level corridor data at the year before construction
-conyear <- first(filter(indy_corridor,Group==1, Type=="Treatment")$BuildStart)-1 
+conyear <- first(filter(indy_corridor, Group== 1, Type== "Treatment")$BuildStart)-1 
 # find the year before construction
 
-indy_lehd_2010 <- indy_lehd %>% filter(year == conyear, CNS07+CNS18 > 0)
 
-virginia <- indy_corridor %>% filter(Group==1, Type=="Treatment", year==conyear) %>% employ_ratio_test(.)
-meridian <- indy_corridor %>% filter(Group==1, Type=="Control: Meridian", year==conyear) %>% employ_ratio_test(.)
-prospect <- indy_corridor %>% filter(Group==1, Type=="Control: Prospect", year==conyear) %>% employ_ratio_test(.)
-shelby <- indy_corridor %>% filter(Group==1, Type=="Control: Shelby", year==conyear) %>% employ_ratio_test(.)
+indy_lehd_2010 <- indy_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+
+virginia <- indy_corridor %>% filter(Group ==1, Type =="Treatment", year==conyear) %>% 
+employ_ratio_test(.)
+
+meridian <- indy_corridor %>% filter(Group ==1, Type =="Control: Meridian", year ==conyear) %>% employ_ratio_test(.)
+
+prospect <- indy_corridor %>% filter(Group ==1, Type =="Control: Prospect", year ==conyear) %>% employ_ratio_test(.)
+
+shelby <- indy_corridor %>% filter(Group ==1, Type =="Control: Shelby", year ==conyear) %>% 
+employ_ratio_test(.)
 
 # find quantile dataframe 
 
@@ -257,8 +268,11 @@ In terms of retail performance, the treatment corridor's retail employment remai
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
 virginia_agg <- agg_trend_table(indy_corridor, group = 1)
+
 agg_retail_trend_plot <- agg_trend_plot(virginia_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "2nd Ave.", construct_year = 2011, end_year = 2013)
+
 agg_food_trend_plot <- agg_trend_plot(virginia_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "2nd Ave.", construct_year = 2011, end_year = 2013)
+
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
 
