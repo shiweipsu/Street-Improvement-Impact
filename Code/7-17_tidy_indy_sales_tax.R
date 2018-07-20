@@ -28,7 +28,7 @@ indy_tidy <- indy_tidy %>%
   mutate(type = if_else(grepl("Mass Ave$|Virginia Ave", .$corridor), "treatment", "control"))
 
 
-dbWriteTable(conn = con, name = "indy_sales_tax", value = indy_tidy, overwrite = TRUE)
+dbWriteTable(conn = con, name = "indy_sales_tax", value = indy_tidy, overwrite = TRUE, row.names = FALSE)
 
 
 dbDisconnect(con)
