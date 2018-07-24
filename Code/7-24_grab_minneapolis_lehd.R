@@ -24,6 +24,6 @@ names(minn_lehd) <- tolower(names(minn_lehd))
 
 minn_lehd <- minn_lehd %>% filter(!is.na(state))
 
-st_write(minn_lehd, dsn = con, overwrite = TRUE, "minneapolis_lehd")
+st_write(minn_lehd, dsn = con, overwrite = TRUE, "minneapolis_lehd", geom_column = "geometry")
 
 dbDisconnect(con)
