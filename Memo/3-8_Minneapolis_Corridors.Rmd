@@ -236,8 +236,7 @@ minn_sale <- minn_sale %>%
                           Group==2 ~ ifelse(Street=="FRANKLIN AVE E"," Improvement","Control"),
                          Group==3 ~ ifelse(Street=="CENTRAL AVE NE"," Improvement","Control"),
                          Group==4 ~ ifelse(Street=="LYNDALE AVE S"," Improvement","Control"),
-                         Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))
-         ) %>% 
+                         Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))) %>% 
   filter(Group %in% c(1:5)) %>% 
   group_by(Street,Type,Group,Study,TaxYear) %>% 
   summarise(TaxableSales = sum(TaxableSales, na.rm = TRUE))
