@@ -200,4 +200,6 @@ stargazer(second_its_retail, type = "html",
          title = "North 2nd Sales Tax ITS Estimates", 
           column.labels = c("Retail Sales"))  
 
+dbDisconnect(con)
+
 ```
