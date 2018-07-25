@@ -28,7 +28,7 @@ In order to make their cities more livable, policymakers and planning department
 
 ##2.1.  Data Sources
 
-For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudical Origin-Destination Employment Statistics (LODES) dataset from the Longitudinal Employer-Household Dynamics Dataset (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This dataset tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. Some disadvantages of the LODES dataset are that in order to guarantee confidentiality block level data is "fuzzed" so the numbers are not exactly the number of jobs, but they are accurate estimates. Additionally, though we get industrial data, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate specific retail or service employment such as restaurant workers. That being said, the LODES dataset is comprehensive, offers unprecedented geographic detail, and longitudinal allowing for consistent comparisons over time.
+For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the Longitudinal Employer-Household Dynamics Dataset (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This data set tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. Some disadvantages of the LODES data set are that in order to guarantee confidentiality block level data is "fuzzed" so the numbers are not exactly the number of jobs, but they are accurate estimates. Additionally, though we get industrial data, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate specific retail or service employment such as restaurant workers. That being said, the LODES data set is comprehensive, offers unprecedented geographic detail, and longitudinal allowing for consistent comparisons over time.
 
 This report also takes advantage of establishment level Quarterly Census of Employment and Wages (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
 
@@ -284,11 +284,15 @@ The Riverside/Cedar Avenue treatment corridor exhibits a statistically significa
 
 [insert riverside d-i-d table]
 
+In terms of sales tax, the corridor shows some mixed results. The *pre_post* construction term is positive and significant for both restaurant and retail showing positive sales tax receipt growth post-construction, but the difference term is negative and significant for retail sales signaling a negative impact of the new construction on retail sales tax receipts. This result largely mirrors what we saw in the visual trend analysis with that dramatic drop in sales in 2013/2014. Given that drop is well after construction there are likely additional reasons for the drop than just the placement of new infrastructure.
+
 ###3.1.6 ITS
 
 The Riverside Ave corridor does not exhibit a level or slope change from the pre-treatment trend patterns in our current specification of the model. While the ts_year coefficient for retail is positive and significant this only tells us that the growth trend of retail employment for the corridor is itself positive. The non-significant **prepost** and **ts_year:pre_post** indicate that there was neither a level or slope change attributable to the treatment.
 
 [insert riverside its table]
+
+The non-significant results from the *ts_year:pre_post* term gives some support evidence that the construction was not directly responsible for the drop in sales tax receipts for the corridor that the DiD highlighted. Overall, it seems unlikely there is a clear causal relationship between the corridor construction and employment or sales tax effects.
 
 ##3.2 Franklin Ave
 
@@ -413,13 +417,16 @@ plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
 
 ###3.2.4 Difference-in-Difference
 
-The Franklin Avenue corridor difference term is also significant with an estimate that the infrastructure treatment is responsible. According to our estimates, the infrastructure placement on Franklin Avenue is responsible for an additional 120 retail jobs with no statistically significant effect for accommodations jobs.
+We did not perform a difference-in-difference estimate for Franklin as it violated too many assumptions of the model, principally, the independence assumption between groups. In short, because Franklin covers the same stretch of road we cannot easily parse out the changes between the two groups neatly.
 
-[insert d-i-d table]
 
 ###3.2.5 ITS
 
 Franklin Avenue exhibits mixed results. For accommodations employment the corridor lost a significant number of jobs, thus the large, negative and statistically significant change in level seen in the **prepost** term, but also there is a positive shift in the *slope*. This is seen visually in the aggregate employment chart for accommodations employment for the corridor where there is a clear drop in employment after construction and then a massive jump in employment between 2014 and 2015. Due to a lack of data it is unclear whether this rise will taper off creating a new, higher level of employment, but it does seem like the corridor potentially has a positive shift in accommodations employment.
+
+[insert ITS table]
+
+The mixed results are also echoed when looking at the sales tax receipts. While there is a marginally significant and positive result for the *pre_post* term showing positive receipt growth post-construction, the *ts_year:pre_post* term is negative and significant for restaurant sales tax receipts. While retail sales do not seem to have been harmed restaurants given this model specification, there is some stronger evidence that the construction had a negative influence on restaurant sales.
 
 ##3.3 Central Avenue
 
@@ -507,7 +514,7 @@ The accommodations employment trend is more ambiguous. The treatment corridor sa
 
 ###3.3.4 Sales Tax Comparison
 
-Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or another. While Central has received more receipts, indexed to 2012, from both retail and restaurants there does not seem to be a clear relationship to the construction date. The LEHD employment data cannot give us a better idea here as it is not possible to pull out restaurants or detailed retail sectors directly. But looking at these trends it does not seem construction of the lane had an immediate impact on sales tax for Central Ave for either industry. 
+Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or the other. While Central has received more receipts, indexed to 2012, from both retail and restaurants there does not seem to be a clear relationship to the construction date. The LEHD employment data cannot give us a better idea here as it is not possible to pull out restaurants or detailed retail sectors directly. But looking at these trends it does not seem construction of the lane had an immediate impact on sales tax for Central Ave for either industry. 
 
 ```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 central_agg <- agg_index_trend_table (minn_sale, group = 3,2012)
@@ -542,11 +549,15 @@ Central Avenue's difference term is significant and highly negative. For Central
 
 [inset did table]
 
+In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
+
 ###3.3.6 ITS
 
-Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accomodations employment term.
+Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accommodations employment term.
 
 [insert its table]
+
+The sales tax ITS analysis only reinforces the ambiguous results of the corridor with the *ts_year:pre_post* term being significant and positive for restaurant sales but non-significant for retail. Also note the large, negative and significant *pre-post* term for restaurant, signaling some kind of massive shock to the corridor, but with stronger growth post construction. The overall ambiguity here makes it difficult to definitively give a clear causal influence of the construction on employment or sales tax receipts in the corridor.
 
 ##3.4 Lyndale Avenue South
 
@@ -636,7 +647,7 @@ In terms of accommodations employment, the treatment corridor shows no real effe
 
 ###3.4.4 Sales Tax Comparison
 
-The Lyndale Ave corridor also displays ambiguous impacts of new cycling infrastructure on retail and restaurant demand. There is a  minor bump post construction for retail that results in increased growth over time signaling a possible effect of construction. Restaurant sales tax growth, though, is clearly tied to some major increase in demand nearly a decade after construction. Additionally, the growth in restuarant sales tax receipts wasless than that of its control corridor both in absolute and relative terms. 
+The Lyndale Ave corridor also displays ambiguous impacts of new cycling infrastructure on retail and restaurant demand. There is a  minor bump post construction for retail that results in increased growth over time signaling a possible effect of construction. Restaurant sales tax growth, though, is clearly tied to some major increase in demand nearly a decade after construction. Additionally, the growth in restaurant sales tax receipts was less than that of its control corridor both in absolute and relative terms. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 lyndale_agg <- agg_index_trend_table (minn_sale, group = 4,2008)
@@ -672,11 +683,15 @@ For Lyndale Avenue we find a statistically significant and negative effect of in
 
 [insert d-i-d]
 
+The DiD specification for sales tax for Lyndale shows a non-significant effect of construction on restaurant sales tax receipts but a positive and significant effect on retail sales. 
+
 ###3.4.6 ITS
 
 
-Lyndale exhibits a similar pattern to Central but with the construction completed in 2009 we have enough data post-treatment to have more valid results. In this case, there is a negative, statistically significant drop in the level of accommodations employment for the corridor but a postivive, significant slope. Again, when examining the aggregate employment trend graphs we see a clear drop in employment in 2009 and 2010 and a seeming return to the pre-treatment level with a positive slope. The positive growth trend continues through 2015 but it is unclear if we will see a leveling off of new employment at a higher level or if employment will collapse again.
+Lyndale exhibits a similar pattern to Central but with the construction completed in 2009 we have enough data post-treatment to have more valid results. In this case, there is a negative, statistically significant drop in the level of accommodations employment for the corridor but a positive, significant slope. Again, when examining the aggregate employment trend graphs we see a clear drop in employment in 2009 and 2010 and a seeming return to the pre-treatment level with a positive slope. The positive growth trend continues through 2015 but it is unclear if we will see a leveling off of new employment at a higher level or if employment will collapse again.
 
+
+In terms of sales tax returns, Lyndale is similar to the other corridors in that there are statistically significant and negative effects on the *level* of receipts when comparing pre and post-construction periods but also positive and significant changes in the *slope*, or rate of growth, of receipts. While the initial level drop is worrisome, robust growth across both restaurant and retail sales signals a potential positive effect of the infrastructure placement.
 
 
 ##3.5 North 2nd Street
@@ -810,9 +825,13 @@ Our difference-in-difference estimation shows a positive and significant effect 
 
 [insert d-i-d table]
 
+We were unable to run a difference-in-difference estimate for sales tax on this corridor due to missing data.
+
 ###3.5.5 ITS
 
-North 2nd Avenue also has mixed ITS results. The corrdior has a large, negative and significant drop in retail employment level, as well as a borderline significant drop in accommodations employment. But the corridor also has a significant and positive slope showing the vigorous rate of job growth post-construction. Assuming this job growth remains consistent North 2nd Avenue should ideally have sustained job growth. 
+North 2nd Avenue also has mixed ITS results. The corridor has a large, negative and significant drop in retail employment level, as well as a borderline significant drop in accommodations employment. But the corridor also has a significant and positive slope showing the vigorous rate of job growth post-construction. Assuming this job growth remains consistent North 2nd Avenue should ideally have sustained job growth. 
+
+The mixed results are also reflected when looking at the corridor's sales tax receipts. There is a large, negative and significant drop in the level of receipts but a positive, and significant, change in the rate of growth of receipts post-construction. Assuming this rate of growth continues, the corridor should ultimately see more sales post-construction, but, again, it is hard to make a definitive statement on the causal nature of the relationship between the construction and the receipts.
 
 
 
@@ -826,7 +845,7 @@ A similarly mixed conclusion can be drawn from the sales tax data. In most cases
 
 ###DiD and ITS Results
 
-Before delving into the overall results of the econometric models it is important to revisit the assumptions that underly the models and the difficulty in guaranteeing messy observational data adheres to them. For DiD estimates there are two primary assumptions that should be met in order for the conclusions to be valid: first, the paralell trends assumption, this assumption requires that your treatment and control group have similar growth trends before the treatment; and second, the independence assumption, this assumption requires that the treatment and control corridor observations be independent of one another meaning that a change in one corridor does not affect the other. For ITS, having an adequate sample size of observations both pre and post-treatment are necessary for the calculation of proper estimates. This means that for some corridors with only a couple of observations post-treatment likely have biased estimates. Most of the study corridors presented here violate at least one of these assumptions, so the model results should be read critically and as suggestive of infrastructure's real impact even though the exact estimates may be off. That being said, these modeling approaches are some of the best tools researchers have to estimate different policy impacts and offer us better approximations of what's going on than simply aggregate trends analyses.
+Before delving into the overall results of the econometric models it is important to revisit the assumptions that underlie the models and the difficulty in guaranteeing messy observational data adheres to them. For DiD estimates there are two primary assumptions that should be met in order for the conclusions to be valid: first, the parallel trends assumption, this assumption requires that your treatment and control group have similar growth trends before the treatment; and second, the independence assumption, this assumption requires that the treatment and control corridor observations be independent of one another meaning that a change in one corridor does not affect the other. For ITS, having an adequate sample size of observations both pre and post-treatment are necessary for the calculation of proper estimates. This means that for some corridors with only a couple of observations post-treatment likely have biased estimates. Most of the study corridors presented here violate at least one of these assumptions, so the model results should be read critically and as suggestive of infrastructure's real impact even though the exact estimates may be off. That being said, these modeling approaches are some of the best tools researchers have to estimate different policy impacts and offer us better approximations of what's going on than simply aggregate trends analyses.
 
 The DiD results showed a mix, but largely positive, effect of new bike infrastructure on retail and accommodations employment. Two notable corridors showing positive employment growth- Riverside and Franklin Ave- show positive employment growth in either retail or accommodations and each corridor is responsible for greater than 100 additional jobs compared to their control corridors, according to their DiD estimates. Unfortunately, both the Riverside and Franklin Ave corridor ITS estimates were less impressive than their DiD estimates. Riverside's ITS results were non-significant and Franklin's IT results showed a large, negative level change for accommodations employment, but a positive, significant change in the accommodations employment growth rate. 
 
@@ -835,9 +854,9 @@ The DiD results showed a mix, but largely positive, effect of new bike infrastru
 
 ##Conclusion
 
-Overall, there are mixed effects of infrastructure improvement on retail and accommodations jobs. Three corridors- North Second, Franklin, and Riverside- show positive effects of new infrastructure placement but only for retail or accommadations employment. The negative results are also significant for only one of the industries. The mixed nature of the results in terms of significance and affected industries offer some preliminary evidence that the infrastructure does indeed have an effect, but it is unclear exactly what that effect is. 
+Overall, there are mixed effects of infrastructure improvement on retail and accommodations jobs. Three corridors- North Second, Franklin, and Riverside- show positive effects of new infrastructure placement but only for retail or accommodations employment. The negative results are also significant for only one of the industries. The mixed nature of the results in terms of significance and affected industries offer some preliminary evidence that the infrastructure does indeed have an effect, but it is unclear exactly what that effect is. 
 
-More importantly, while these results are interesting they should be taken with a heavy grain of salt. Difference-in-difference requires a certain set of assumptions in order for its results to be valid, and, unfortunately, many of the corridors tested do not fit. Two of the main assumptions, the parallel trend assumption, and the independence assumption, are violated in most of these models. The parallel trends assumption dictates that in order for a DiD estimate to be valid the trend in your variable of interest must be similar between your two groups before treatment. In plain terms, the growth trajectory of the two groups should be similar before a policy is enacted. This is not the case for a few of the corridors where it is clear that either the treatment or the control corridor had a dramatically different growth trajectory before treatment even began. The independence assumption basically states that the two groups should not be able to affect each other. A clear violation of this assumption is seen for the Frnaklin Avenue corridor where the control and treatment corridors are the same stretch road. It is unlikely that a change from one corridor will not affect the other as they are touching. As such, while interesting, these DiD estimates are not appropriate. 
+More importantly, while these results are interesting they should be taken with a heavy grain of salt. Difference-in-difference requires a certain set of assumptions in order for its results to be valid, and, unfortunately, many of the corridors tested do not fit. Two of the main assumptions, the parallel trend assumption, and the independence assumption, are violated in most of these models. The parallel trends assumption dictates that in order for a DiD estimate to be valid the trend in your variable of interest must be similar between your two groups before treatment. In plain terms, the growth trajectory of the two groups should be similar before a policy is enacted. This is not the case for a few of the corridors where it is clear that either the treatment or the control corridor had a dramatically different growth trajectory before treatment even began. The independence assumption basically states that the two groups should not be able to affect each other. A clear violation of this assumption is seen for the Franklin Avenue corridor where the control and treatment corridors are the same stretch road. It is unlikely that a change from one corridor will not affect the other as they are touching. As such, while interesting, these DiD estimates are not appropriate. 
 
 
  
