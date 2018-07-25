@@ -92,6 +92,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -130,7 +133,7 @@ $(document).ready(function () {
 <h1>minneapolis model outputs…DiD and ITS</h1>
 <pre><code>## Loading required package: pacman</code></pre>
 <pre><code>## Warning: package 'pacman' was built under R version 3.4.3</code></pre>
-<p>Reading layer <code>minn_corridor_lehd_wgs84' from data source</code>D:-Improvement-Impact_corridor_lehd_wgs84.geojson’ using driver `GeoJSON’ Simple feature collection with 3273 features and 36 fields geometry type: GEOMETRY dimension: XY bbox: xmin: 211080.7 ymin: 2437398 xmax: 218504.2 ymax: 2452276 epsg (SRID): 4326 proj4string: +proj=longlat +datum=WGS84 +no_defs</p>
+<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
 <table style="text-align:center">
 <caption>
 <strong>Riverside Corridor Difference-in-Difference Estimates</strong>
@@ -200,26 +203,26 @@ Accomodations Emp.
 Typeimprovement
 </td>
 <td>
-134.667<sup>***</sup>
+152.000<sup>***</sup>
 </td>
 <td>
-36.500<sup>*</sup>
+42.000<sup>*</sup>
 </td>
 <td>
-171.167<sup>***</sup>
+194.000<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(39.385)
+(38.980)
 </td>
 <td>
-(20.052)
+(20.441)
 </td>
 <td>
-(56.369)
+(56.464)
 </td>
 </tr>
 <tr>
@@ -250,13 +253,13 @@ prepost
 <td style="text-align:left">
 </td>
 <td>
-(39.385)
+(38.980)
 </td>
 <td>
-(20.052)
+(20.441)
 </td>
 <td>
-(56.369)
+(56.464)
 </td>
 </tr>
 <tr>
@@ -274,26 +277,26 @@ prepost
 Typeimprovement:prepost
 </td>
 <td>
-285.833<sup>***</sup>
+289.833<sup>***</sup>
 </td>
 <td>
-29.667
+33.500
 </td>
 <td>
-315.500<sup>***</sup>
+323.333<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(55.698)
+(55.125)
 </td>
 <td>
-(28.357)
+(28.908)
 </td>
 <td>
-(79.718)
+(79.852)
 </td>
 </tr>
 <tr>
@@ -324,13 +327,13 @@ Constant
 <td style="text-align:left">
 </td>
 <td>
-(27.849)
+(27.563)
 </td>
 <td>
-(14.179)
+(14.454)
 </td>
 <td>
-(39.859)
+(39.926)
 </td>
 </tr>
 <tr>
@@ -366,13 +369,13 @@ Observations
 R<sup>2</sup>
 </td>
 <td>
-0.887
+0.898
 </td>
 <td>
-0.575
+0.609
 </td>
 <td>
-0.847
+0.861
 </td>
 </tr>
 <tr>
@@ -380,13 +383,13 @@ R<sup>2</sup>
 Adjusted R<sup>2</sup>
 </td>
 <td>
-0.870
+0.883
 </td>
 <td>
-0.511
+0.551
 </td>
 <td>
-0.824
+0.840
 </td>
 </tr>
 <tr>
@@ -394,13 +397,13 @@ Adjusted R<sup>2</sup>
 Residual Std. Error (df = 20)
 </td>
 <td>
-68.216
+67.515
 </td>
 <td>
-34.731
+35.404
 </td>
 <td>
-97.634
+97.799
 </td>
 </tr>
 <tr>
@@ -408,13 +411,13 @@ Residual Std. Error (df = 20)
 F Statistic (df = 3; 20)
 </td>
 <td>
-52.254<sup>***</sup>
+58.746<sup>***</sup>
 </td>
 <td>
-9.019<sup>***</sup>
+10.395<sup>***</sup>
 </td>
 <td>
-36.831<sup>***</sup>
+41.138<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -499,26 +502,26 @@ Accomodations Emp.
 ts_year
 </td>
 <td>
-36.371<sup>***</sup>
+35.571<sup>***</sup>
 </td>
 <td>
-13.971
+16.457<sup>*</sup>
 </td>
 <td>
-50.343<sup>***</sup>
+52.029<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(10.307)
+(10.262)
 </td>
 <td>
-(7.555)
+(7.566)
 </td>
 <td>
-(14.741)
+(14.746)
 </td>
 </tr>
 <tr>
@@ -536,26 +539,26 @@ ts_year
 prepost
 </td>
 <td>
--96.762
+-91.762
 </td>
 <td>
--126.190
+-109.314
 </td>
 <td>
--222.952
+-201.076
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(107.283)
+(106.813)
 </td>
 <td>
-(78.634)
+(78.749)
 </td>
 <td>
-(153.428)
+(153.484)
 </td>
 </tr>
 <tr>
@@ -573,26 +576,26 @@ prepost
 ts_year:prepost
 </td>
 <td>
-18.600
+19.000
 </td>
 <td>
-11.371
+8.429
 </td>
 <td>
-29.971
+27.429
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(14.577)
+(14.513)
 </td>
 <td>
-(10.684)
+(10.700)
 </td>
 <td>
-(20.847)
+(20.854)
 </td>
 </tr>
 <tr>
@@ -610,26 +613,26 @@ ts_year:prepost
 Constant
 </td>
 <td>
-118.200<sup>**</sup>
+138.333<sup>***</sup>
 </td>
 <td>
-65.600<sup>*</sup>
+62.400<sup>*</sup>
 </td>
 <td>
-183.800<sup>**</sup>
+200.733<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(40.141)
+(39.966)
 </td>
 <td>
-(29.422)
+(29.465)
 </td>
 <td>
-(57.407)
+(57.428)
 </td>
 </tr>
 <tr>
@@ -665,13 +668,13 @@ Observations
 R<sup>2</sup>
 </td>
 <td>
-0.958
+0.959
 </td>
 <td>
-0.775
+0.790
 </td>
 <td>
-0.948
+0.949
 </td>
 </tr>
 <tr>
@@ -679,13 +682,13 @@ R<sup>2</sup>
 Adjusted R<sup>2</sup>
 </td>
 <td>
-0.943
+0.944
 </td>
 <td>
-0.691
+0.711
 </td>
 <td>
-0.928
+0.931
 </td>
 </tr>
 <tr>
@@ -693,13 +696,13 @@ Adjusted R<sup>2</sup>
 Residual Std. Error (df = 8)
 </td>
 <td>
-43.119
+42.930
 </td>
 <td>
-31.605
+31.651
 </td>
 <td>
-61.665
+61.688
 </td>
 </tr>
 <tr>
@@ -707,13 +710,13 @@ Residual Std. Error (df = 8)
 F Statistic (df = 3; 8)
 </td>
 <td>
-61.449<sup>***</sup>
+62.973<sup>***</sup>
 </td>
 <td>
-9.208<sup>***</sup>
+10.005<sup>***</sup>
 </td>
 <td>
-48.594<sup>***</sup>
+50.128<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -801,10 +804,10 @@ Typeimprovement
 139.250<sup>***</sup>
 </td>
 <td>
-73.250<sup>***</sup>
+31.500<sup>**</sup>
 </td>
 <td>
-212.500<sup>***</sup>
+170.750<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -814,10 +817,10 @@ Typeimprovement
 (17.327)
 </td>
 <td>
-(13.113)
+(12.501)
 </td>
 <td>
-(24.406)
+(23.910)
 </td>
 </tr>
 <tr>
@@ -838,10 +841,10 @@ prepost
 22.875
 </td>
 <td>
-12.750
+4.500
 </td>
 <td>
-35.625
+27.375
 </td>
 </tr>
 <tr>
@@ -851,10 +854,10 @@ prepost
 (21.221)
 </td>
 <td>
-(16.060)
+(15.311)
 </td>
 <td>
-(29.891)
+(29.283)
 </td>
 </tr>
 <tr>
@@ -875,10 +878,10 @@ Typeimprovement:prepost
 120.750<sup>***</sup>
 </td>
 <td>
-14.250
+22.500
 </td>
 <td>
-135.000<sup>***</sup>
+143.250<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -888,10 +891,10 @@ Typeimprovement:prepost
 (30.011)
 </td>
 <td>
-(22.713)
+(21.652)
 </td>
 <td>
-(42.272)
+(41.413)
 </td>
 </tr>
 <tr>
@@ -912,10 +915,10 @@ Constant
 27.375<sup>**</sup>
 </td>
 <td>
-63.750<sup>***</sup>
+105.500<sup>***</sup>
 </td>
 <td>
-91.125<sup>***</sup>
+132.875<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -925,10 +928,10 @@ Constant
 (12.252)
 </td>
 <td>
-(9.272)
+(8.840)
 </td>
 <td>
-(17.258)
+(16.907)
 </td>
 </tr>
 <tr>
@@ -967,10 +970,10 @@ R<sup>2</sup>
 0.912
 </td>
 <td>
-0.739
+0.471
 </td>
 <td>
-0.909
+0.889
 </td>
 </tr>
 <tr>
@@ -981,10 +984,10 @@ Adjusted R<sup>2</sup>
 0.899
 </td>
 <td>
-0.699
+0.391
 </td>
 <td>
-0.896
+0.872
 </td>
 </tr>
 <tr>
@@ -995,10 +998,10 @@ Residual Std. Error (df = 20)
 34.653
 </td>
 <td>
-26.226
+25.002
 </td>
 <td>
-48.812
+47.820
 </td>
 </tr>
 <tr>
@@ -1009,10 +1012,10 @@ F Statistic (df = 3; 20)
 69.318<sup>***</sup>
 </td>
 <td>
-18.843<sup>***</sup>
+5.932<sup>***</sup>
 </td>
 <td>
-66.993<sup>***</sup>
+53.364<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -2608,10 +2611,10 @@ Typeimprovement
 (56.039)
 </td>
 <td>
-(30.539)
+(30.500)
 </td>
 <td>
-(56.430)
+(56.304)
 </td>
 </tr>
 <tr>
@@ -2632,10 +2635,10 @@ prepost
 91.250
 </td>
 <td>
-124.875<sup>***</sup>
+133.875<sup>***</sup>
 </td>
 <td>
-216.125<sup>***</sup>
+225.125<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -2645,10 +2648,10 @@ prepost
 (68.633)
 </td>
 <td>
-(37.402)
+(37.355)
 </td>
 <td>
-(69.113)
+(68.958)
 </td>
 </tr>
 <tr>
@@ -2669,10 +2672,10 @@ Typeimprovement:prepost
 -125.125
 </td>
 <td>
-144.000<sup>**</sup>
+135.000<sup>**</sup>
 </td>
 <td>
-18.875
+9.875
 </td>
 </tr>
 <tr>
@@ -2682,10 +2685,10 @@ Typeimprovement:prepost
 (97.062)
 </td>
 <td>
-(52.895)
+(52.827)
 </td>
 <td>
-(97.740)
+(97.522)
 </td>
 </tr>
 <tr>
@@ -2719,10 +2722,10 @@ Constant
 (39.625)
 </td>
 <td>
-(21.594)
+(21.567)
 </td>
 <td>
-(39.902)
+(39.813)
 </td>
 </tr>
 <tr>
@@ -2764,7 +2767,7 @@ R<sup>2</sup>
 0.829
 </td>
 <td>
-0.645
+0.648
 </td>
 </tr>
 <tr>
@@ -2775,10 +2778,10 @@ Adjusted R<sup>2</sup>
 -0.020
 </td>
 <td>
-0.803
+0.804
 </td>
 <td>
-0.592
+0.596
 </td>
 </tr>
 <tr>
@@ -2789,10 +2792,10 @@ Residual Std. Error (df = 20)
 112.077
 </td>
 <td>
-61.078
+61.000
 </td>
 <td>
-112.861
+112.609
 </td>
 </tr>
 <tr>
@@ -2803,10 +2806,10 @@ F Statistic (df = 3; 20)
 0.851
 </td>
 <td>
-32.214<sup>***</sup>
+32.390<sup>***</sup>
 </td>
 <td>
-12.126<sup>***</sup>
+12.291<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -3117,6 +3120,1887 @@ F Statistic (df = 3; 8)
 <em>Note:</em>
 </td>
 <td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Riverside Ave. Sales Tax Difference-in-Difference Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeImprovement
+</td>
+<td>
+321,810.100
+</td>
+<td>
+-950,844.300<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(766,584.800)
+</td>
+<td>
+(167,910.400)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+2,857,108.000<sup>***</sup>
+</td>
+<td>
+1,698,041.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(733,949.100)
+</td>
+<td>
+(160,762.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeImprovement:pre_post
+</td>
+<td>
+-1,350,468.000
+</td>
+<td>
+-1,754,462.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,037,961.000)
+</td>
+<td>
+(227,351.800)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+6,629,566.000<sup>***</sup>
+</td>
+<td>
+5,376,522.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(542,057.300)
+</td>
+<td>
+(118,730.600)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+22
+</td>
+<td>
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.526
+</td>
+<td>
+0.956
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.448
+</td>
+<td>
+0.949
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 18)
+</td>
+<td>
+1,212,077.000
+</td>
+<td>
+265,489.600
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 18)
+</td>
+<td>
+6.671<sup>***</sup>
+</td>
+<td>
+131.902<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Riverside Ave. Sales Tax ITS Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+260,711.600<sup>***</sup>
+</td>
+<td>
+-139,625.600<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(62,588.900)
+</td>
+<td>
+(52,380.320)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+-1,721,165.000<sup>***</sup>
+</td>
+<td>
+92,509.850
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(377,737.000)
+</td>
+<td>
+(316,126.100)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:pre_post
+</td>
+<td>
+154,109.700<sup>*</sup>
+</td>
+<td>
+80,886.790
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(70,095.020)
+</td>
+<td>
+(58,662.150)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+6,169,241.000<sup>***</sup>
+</td>
+<td>
+4,844,555.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(207,583.900)
+</td>
+<td>
+(173,725.900)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+11
+</td>
+<td>
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.980
+</td>
+<td>
+0.639
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.972
+</td>
+<td>
+0.484
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 7)
+</td>
+<td>
+197,923.500
+</td>
+<td>
+165,641.100
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 7)
+</td>
+<td>
+116.055<sup>***</sup>
+</td>
+<td>
+4.123<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Franklin Ave. Sales Tax ITS Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+778,760.300<sup>**</sup>
+</td>
+<td>
+1,143,750.000<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(320,126.000)
+</td>
+<td>
+(477,430.900)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+15,338,651.000<sup>*</sup>
+</td>
+<td>
+6,955,883.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6,653,694.000)
+</td>
+<td>
+(9,923,216.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:pre_post
+</td>
+<td>
+-2,040,003.000<sup>**</sup>
+</td>
+<td>
+-1,058,863.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(656,063.100)
+</td>
+<td>
+(978,442.300)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+3,830,741.000<sup>**</sup>
+</td>
+<td>
+2,851,896.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,431,647.000)
+</td>
+<td>
+(2,135,136.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+11
+</td>
+<td>
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.670
+</td>
+<td>
+0.593
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.528
+</td>
+<td>
+0.418
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 7)
+</td>
+<td>
+1,693,948.000
+</td>
+<td>
+2,526,327.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 7)
+</td>
+<td>
+4.732<sup>**</sup>
+</td>
+<td>
+3.396<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Central Ave. Sales Tax Difference-in-Difference Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeImprovement
+</td>
+<td>
+-10,619,800.000<sup>***</sup>
+</td>
+<td>
+-18,768,572.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(649,782.100)
+</td>
+<td>
+(838,441.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+9,179,680.000<sup>***</sup>
+</td>
+<td>
+-2,866,845.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(761,937.100)
+</td>
+<td>
+(983,159.300)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeImprovement:pre_post
+</td>
+<td>
+-5,752,489.000<sup>***</sup>
+</td>
+<td>
+7,168,875.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,077,542.000)
+</td>
+<td>
+(1,390,397.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+13,453,798.000<sup>***</sup>
+</td>
+<td>
+30,588,644.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(459,465.300)
+</td>
+<td>
+(592,867.400)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+22
+</td>
+<td>
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.977
+</td>
+<td>
+0.971
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.973
+</td>
+<td>
+0.967
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 18)
+</td>
+<td>
+1,215,631.000
+</td>
+<td>
+1,568,580.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 18)
+</td>
+<td>
+255.593<sup>***</sup>
+</td>
+<td>
+203.843<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Central Ave. Sales Tax ITS Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+-81,086.390<sup>**</sup>
+</td>
+<td>
+791,191.500<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(24,587.040)
+</td>
+<td>
+(212,880.600)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+-10,816,427.000<sup>***</sup>
+</td>
+<td>
+1,015,786.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(511,032.100)
+</td>
+<td>
+(4,424,641.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:pre_post
+</td>
+<td>
+1,318,355.000<sup>***</sup>
+</td>
+<td>
+-217,768.500
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(50,388.440)
+</td>
+<td>
+(436,275.500)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+3,158,344.000<sup>***</sup>
+</td>
+<td>
+8,655,305.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(109,956.600)
+</td>
+<td>
+(952,031.200)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+11
+</td>
+<td>
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.997
+</td>
+<td>
+0.884
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.996
+</td>
+<td>
+0.834
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 7)
+</td>
+<td>
+130,102.400
+</td>
+<td>
+1,126,459.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 7)
+</td>
+<td>
+856.183<sup>***</sup>
+</td>
+<td>
+17.736<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Lyndale Ave. S. Sales Tax Difference-in-Difference Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeImprovement
+</td>
+<td>
+809,529.200
+</td>
+<td>
+11,811,766.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,510,326.000)
+</td>
+<td>
+(877,023.200)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+2,470,209.000
+</td>
+<td>
+-993,027.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,462,367.000)
+</td>
+<td>
+(839,685.800)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeImprovement:pre_post
+</td>
+<td>
+-2,420,510.000
+</td>
+<td>
+4,251,122.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,925,296.000)
+</td>
+<td>
+(1,187,495.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+2,805,993.000<sup>**</sup>
+</td>
+<td>
+2,319,934.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1,194,018.000)
+</td>
+<td>
+(620,149.100)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+20
+</td>
+<td>
+22
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.184
+</td>
+<td>
+0.970
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.031
+</td>
+<td>
+0.965
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+2,068,099.000 (df = 16)
+</td>
+<td>
+1,386,695.000 (df = 18)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+1.205 (df = 3; 16)
+</td>
+<td>
+195.854<sup>***</sup> (df = 3; 18)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Lyndale Ave. S. Sales Tax ITS Estimates</strong>
+</caption>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Restaurant Sales
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+-715,005.200
+</td>
+<td>
+221,626.100
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(682,128.400)
+</td>
+<td>
+(196,411.800)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+-9,198,013.000<sup>*</sup>
+</td>
+<td>
+-3,762,778.000<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(4,116,787.000)
+</td>
+<td>
+(1,185,386.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:pre_post
+</td>
+<td>
+1,449,767.000<sup>*</sup>
+</td>
+<td>
+573,451.600<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(763,934.300)
+</td>
+<td>
+(219,967.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+5,760,538.000<sup>**</sup>
+</td>
+<td>
+13,466,821.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(2,262,364.000)
+</td>
+<td>
+(651,424.400)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+11
+</td>
+<td>
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.447
+</td>
+<td>
+0.953
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.210
+</td>
+<td>
+0.932
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 7)
+</td>
+<td>
+2,157,079.000
+</td>
+<td>
+621,108.800
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 7)
+</td>
+<td>
+1.888
+</td>
+<td>
+46.924<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>North 2nd Sales Tax ITS Estimates</strong>
+</caption>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="1" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Retail
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Retail Sales
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+35,137.710
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(197,114.800)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pre_post
+</td>
+<td>
+-23,442,344.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(4,096,955.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:pre_post
+</td>
+<td>
+2,758,673.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(403,965.200)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+4,348,369.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(881,524.300)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.967
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.953
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+1,043,034.000 (df = 7)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+68.966<sup>***</sup> (df = 3; 7)
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td style="text-align:right">
 <sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
 </td>
 </tr>

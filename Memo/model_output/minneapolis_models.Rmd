@@ -104,30 +104,8 @@ stargazer(north_its[[1]], north_its[[2]], north_its[[3]], type = "html",
 
 minn_sale <- read.csv(here::here("Data/Minneapolis/BikeDataAggregated.csv"))
 
-minn_sale <- minn_sale %>% 
-  filter(!is.na(Street)) %>%
-  mutate(Group= case_when(Street %in% c("RIVERSIDE AVE","CEDAR AVE S") ~ 1,
-                          Street=="FRANKLIN AVE E" ~ 2,
-                          Street %in% c("CENTRAL AVE NE","UNIVERSITY AVE NE") ~3,
-                          Street %in% c("LYNDALE AVE S","GRAND AVE S") ~4,
-                          Street %in% c("2ND ST N","WEST BROADWAY") ~5),
-         Study= case_when(Group==1 ~ ifelse(Street=="RIVERSIDE AVE"," Improvement","Control"),
-                          Group==2 ~ ifelse(Street=="FRANKLIN AVE E"," Improvement","Control"),
-                         Group==3 ~ ifelse(Street=="CENTRAL AVE NE"," Improvement","Control"),
-                         Group==4 ~ ifelse(Street=="LYNDALE AVE S"," Improvement","Control"),
-                         Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))
-         ) %>% 
-  filter(Group %in% c(1:5)) %>% 
-  group_by(Street,Type,Group,Study,TaxYear) %>% 
-  summarise(TaxableSales = sum(TaxableSales, na.rm = TRUE))
-
-minn_sale <- minn_sale %>% 
-  spread(Type,TaxableSales) %>% 
-  mutate(year=TaxYear,
-         Type=Study,
-         CNS07=Retail,
-         CNS18=Restaurant,
-         geometry=1)
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
 
 minn_sale$Type <- stringr::str_trim(minn_sale$Type, side = "both")
 
