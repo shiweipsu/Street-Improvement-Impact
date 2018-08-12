@@ -190,7 +190,6 @@ agg_index_trend_plot <- function(df_plot, industry, corridor_name,
                   xmax = as.Date(end_date, "%Y"), 
                   ymin = -Inf, ymax = Inf),
                   fill = "#adff2f",linetype=0,alpha = 0.03) +
-   
     geom_point(size = 3, fill="white") +
     scale_shape_manual(values=c(22,21,21,23))+
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
