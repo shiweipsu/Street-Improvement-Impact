@@ -31,6 +31,8 @@ b.grouptype as grouptype,  a.year as year, a.geom
 FROM indy_lehd a, indy_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geom);")
 
+
+
 #indy_corridor <- st_read(here::here("Data/Indianapolis/indy_corridor_lehd_NAD83.shp"))
 indy_corridor <- indy_corridor %>% 
    rename(Type = grouptype) 
