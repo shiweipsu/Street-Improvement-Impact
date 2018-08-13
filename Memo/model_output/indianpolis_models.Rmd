@@ -88,6 +88,38 @@ stargazer(mass_agg_its[[1]], mass_agg_its[[2]], mass_agg_its[[3]],
           title = "Massachusetts Ave. Corridor Interrupted Time Series Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
 
-dbDisconnect(conn = con)
 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#sales tax DiD
+
+
+indy_sales <- tbl(con, "indy_sales_tax")
+indy_sales <- collect(indy_sales)
+
+va_ave <- indy_sales %>% filter(group == 2) %>% 
+  mutate(pre_post = if_else(lubridate::year(quarter) >= 2013, 1, 0),
+         treatment = if_else(corridor == "Virginia Ave", 1, 0))
+
+va_ave$corridor <- stringr::str_trim(va_ave$corridor, "both")
+
+va_ave <- va_ave %>% mutate(corridor = factor(corridor, 
+                                              levels = c("Virginia Ave", "Prospect",
+                                                         "Shelby", "Meridian")))
+
+va_diff_tax <- lm(tax_revenue ~ corridor + pre_post + pre_post*corridor, va_ave)
+
+#sales tax ITS
+
+va_ave_its <- indy_sales %>% filter(corridor == "Virginia Ave") %>% 
+  mutate(treatment = if_else(lubridate::year(quarter) >= 2013, 1, 0),
+         ts_term = seq_len(nrow(.)))
+
+va_its_tax <- lm(tax_revenue ~ ts_term + treatment + ts_term*treatment, va_ave_its)
+
+
+
+dbDisconnect(con)
 ```

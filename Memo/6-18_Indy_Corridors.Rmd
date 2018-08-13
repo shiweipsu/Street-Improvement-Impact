@@ -490,11 +490,14 @@ This section presents the results of the econometric models for the appropriate 
 
 ##4.1. Virginia Avenue
 
-###4.1.1 Difference-in-Difference
+###4.1.1 Difference-in-Difference (LEHD)
 
 The difference terms for the Virginia Ave corridors are all non-significant, except for the Shelby corridor accommodations employment that is borderline significant but does not meet our preferred significance level. The lack of statistically significant terms here leads us to believe there is not a causal relationship between the installation of the new bike lane and change in retail or accommodations employment for Virginia Ave. 
 
-[insert d-i-d table]
+###4.1.2 Difference-in-Difference (Sales Tax)
+
+
+
 
 ###4.1.2 ITS
 
