@@ -11,7 +11,6 @@ output: html_document
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
 p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, forcats, dplyr,dbplyr,RPostgreSQL)
-source(here::here("Code/corridor_comparison_functions.R"))
 
 user <- "jamgreen"
 host <- "pgsql102.rc.pdx.edu"
@@ -91,7 +90,7 @@ stargazer(mass_agg_its[[1]], mass_agg_its[[2]], mass_agg_its[[3]],
 
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
 #sales tax DiD
 
@@ -114,10 +113,28 @@ va_diff_tax <- lm(tax_revenue ~ corridor + pre_post + pre_post*corridor, va_ave)
 #sales tax ITS
 
 va_ave_its <- indy_sales %>% filter(corridor == "Virginia Ave") %>% 
-  mutate(treatment = if_else(lubridate::year(quarter) >= 2013, 1, 0),
+  mutate(pre_post = if_else(lubridate::year(quarter) >= 2013, 1, 0),
          ts_term = seq_len(nrow(.)))
 
-va_its_tax <- lm(tax_revenue ~ ts_term + treatment + ts_term*treatment, va_ave_its)
+va_its_tax <- lm(tax_revenue ~ ts_term + pre_post + ts_term*pre_post, va_ave_its)
+
+ma_ave_its <- indy_sales %>% filter(corridor == "Mass Ave") %>% 
+  mutate(pre_post = if_else(lubridate::year(quarter) >= 2010, 1, 0), 
+         ts_term = seq_len(nrow(.)))
+
+ma_ave_tax <- lm(tax_revenue ~ ts_term + pre_post + ts_term*pre_post, ma_ave_its)
+
+indy_sales_lm <- list(va_diff_tax, va_its_tax, ma_ave_tax)
+
+stargazer(indy_sales_lm[[1]], 
+          title = "Virginia Ave. Corridor Diffrence-in-Difference Estimates", 
+          column.labels  = c("Sales Tax Revenue"), type = "html")
+
+stargazer(indy_sales_lm[[2]], indy_sales_lm[[3]], 
+          title = "Virginia and Massachusetts Ave. Corridor ITS Estimates", 
+          column.labels  = c("Virginia Ave.", "Mass Ave."), type = "html")
+
+
 
 
 

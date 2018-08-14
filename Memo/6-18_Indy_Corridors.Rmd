@@ -496,12 +496,14 @@ The difference terms for the Virginia Ave corridors are all non-significant, exc
 
 ###4.1.2 Difference-in-Difference (Sales Tax)
 
-
+The difference terms for the three comparison corridors are all large, negative and significant signaling a negative causal relationship between the placement of new cycling infrastructure and sales tax receipts. With this specific model specification the introduction of new cycling infrastructure resulted in a loss of at least $116,000 if compared to Meridian or as much as \$215,000 in comparison to Shelby. 
 
 
 ###4.1.2 ITS
 
 Across all three models both the prepost term (the term that signals a potential level change in your unit of interest) and the time series-prepost term (the term that signals a potential slope change in your unit of interest) are non-significant. The time series alone term for accommodations and the combined 'business' variable are significant and positive signaling a general poitive growth trend over time that is not related to the installation of the new cycling infrastructure. 
+
+The sales tax ITS model was also non-significant given our specification with a marginally significant time series term signalling the effect of a general positive growth trend above and beyond the placement of new infrastructure. 
 
 ##4.2 Massachusetts Avenue
 
@@ -514,3 +516,5 @@ We did not run a DiD model for the Massachusetts Ave corridor because it violate
 The Massachusetts Ave corridor shows mixed results in its ITS specification. The prepost term (the term that estimates the change in the level of your unit of interest) is significant and negative for accommodations and the comdined 'business' employment variables. This means there was a sharp loss in jobs at the construction point in time. But the time series-prepost term (the term that estimates the change in the slope un the level of interest) is positive and significant for all employment sectors. This means that the growth in employment in our sectors of interest is greater post-construction than it was before. This means that while construction may have temporarily resulted in employment loss (due to establishments closing during construction or releasing workers due to lower sales during construction) the corridors are now growing at a healthier rate than before. 
 
 This is a mixed result, but considering the construction of the corridor was still during the Great Recession, the fact that there was still robust growth five years after suggests that overall economic conditions have improved and that the construction of the lane may have had a positive effect on this new growth trajectory.
+
+In terms of the sales tax model, the pre_post term is negative and significant signaling a change in level of sales tax receipts due to the intervention but the pre_post and time series interaction term is non-significant. The lack of a significant interaction term means that we cannot attribute change in the growth of sales tax on Massachusetts to the placement of new cycling infrastruture. It should be noted, though, that this sales tax data starts in 2008 so we do not necessarily have enough pre-intervention data points to make a strong statement either way using this technique. That being said, given our model specification, the ITS model does not signal a causal relationship between the change in sales tax receipts and new cycling infrastructure. 
