@@ -1,0 +1,112 @@
+---
+title: "6-18_Indy_Corridors"
+author: "Wei Shi"
+date: "June 18, 2018"
+output:
+  word_document: default
+  pdf_document:
+    includes:
+      in_header: header.tex
+    number_sections: true
+fig_width: 7
+fig_height: 5
+---
+```{r setup,include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+
+#knitr::opts_knit$set(root.dir = normalizePath(path = #"C:\\Users\\elmue\\Desktop\\Street-Improvement-Impact"))
+```
+
+
+#1. Introduction
+
+In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
+
+DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
+
+![Indianapolis Corridor](images/Indianapolis_corridors.png)
+
+
+#2. Data Sources/Methodology
+
+## 2.1 Data Sources
+
+For this study, we both used the Longitudinal Employment Household Dynamics Dataset (LEHD) and the retail sales tax data from the city. 
+
+The LEHD dataset is utilized for our analysis in all cities because it is a publicly available data source that exists for most cities and states across the country. It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This dataset tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. 
+
+Indiana has a general 7% sales tax for all businesses with a variety of additional taxes dependent upon use and the city/county a particular establishment is located. For example, Marion County, the home county of Indianapolis, has an additional 2% food and beverage tax as well as a 10% accommodations tax. This gives a range of 7-19% sales tax rates in the city. 
+
+## 2.2 Methodology
+
+We have applied three methods in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an integrated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis. 
+
+### 2.2.1 Corridor Comparison Selection
+
+In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed. Ideally, these corridors are made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and accommodations related jobs. Additionally, we will only use corridors where street improvements were installed between 2008 and 2013 in order to guarantee with have sufficient data to track pre and post-treatment employment trends. 
+
+Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
+
+### 2.2.2 Aggregated Trend Comparison
+
+This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
+
+### 2.2.3 Difference-in-Difference
+
+The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between improved and comparison corridors within the same time period. This is known as a difference-in-difference (DID) approach. It is a designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved.  It requires data from pre/post intervention such as panel data (individual level data overtime) or cross-sectional data (individual or group level). The approach looks at the change in the variable of interest in the treatment group before and after it is treated. In this case this means looking at some time period before and after a street improvement. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods will give an unbiased estimate of the effect of the treatment. DID is a useful technique when randomization on the individual level is not possible. This approach removes biases in the second period comparisons between the treatment group and control group that could be result from permanent differences between those groups, as well as biases from comparisons over time in the treatment group that could be the result of trends. A key assumption of DID estimate is that the differences between control group and treatment group would have remained constant in the absence of treatment. 
+
+DID is a linear modeling approach and its basic formula is expressed as:
+
+$$ Y_{it} = \beta_0 + \beta_1T_{it} + \beta_2A_{it} + \beta_3T_{it}A_{it} +\varepsilon_{it} $$
+
+$Y_{it}$ is the observed outcome in groups i and t (in this case change in employment or sales tax revenue)
+$T_{it}$ is a dummy variable set to 1 if the observation is from the treatment group
+$A_{it}$ is a dummy variable set to 1 if the observation is from the post treatment period i either groups
+$\beta_3$ is the DID estimate of the treatment effect
+
+If the DID estimate $\beta_3$  is significant and positive, then that indicates a positive effect of the street improvement. Conversely if the estimate is significant and negative that indicates a negative effect of the improvement. Finally, a non-significant result indicates the improvement had no statistically discernible effect. 
+
+### 2.2.4 Interrupted Time Series
+
+Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. This approach tracks the treatment corridor over time and estimates the impact by the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.  
+
+One advantage of ITS is that it allows for the statistical investigation of potential biases in the estimate of the effect of the intervention. Given the longitudinal nature of the test ITS requires a significantly larger amount of data in order to accurately estimate a real effect on the growth trend. 
+
+The interrupted time-series analysis equation can be expressed as: 
+
+$$ Y_t = \beta_0 + \beta_1T_1 + \beta_2X_1 + \beta_3T_1X_1 +\varepsilon_{it} $$
+
+$Y_t$ is the observed business outcome in time period t
+$T_t$ indicates the number of quarters from start to finish of the series
+$X_t$ is the treatment dummy variable taking values of 0 in the pre-intervention period and 1 in the post-intervention period
+$\beta_0$ is the model intercept or baseline level at T = 0
+$\beta_1$ represents the change in the outcome with a time unit increase (the pre-intervention trend)
+$\beta_2$ is the level change following the intervention
+$\beta_3$ indicates the slope change following the intervention 
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, dplyr, dbplyr, stargazer,cowplot)
+
+#query the corridors from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+memphis_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry as geom
+FROM memphis_lehd a, memhpis_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), geom);")
+
+```
