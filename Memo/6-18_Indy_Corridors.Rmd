@@ -89,7 +89,7 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, dplyr, dbplyr, stargazer,cowplot)
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo)
 
 #query the corridors from bike_lanes
 user <- "jamgreen"
@@ -340,7 +340,39 @@ plot(va_p1)
 
 ```
 
+###3.1.5 QCEW Comparisons
 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+indy_qcew <- tbl(con, "indy_qcew_modified")
+indy_qcew <- collect(indy_qcew)
+
+indy_qcew$corridor_name <- stringr::str_trim(indy_qcew$corridor_name, "both")
+
+indy_qcew$corridor_type <- factor(indy_qcew$corridor_type, levels = c("treatment", "control"))
+
+indy_qcew <- indy_qcew %>% 
+  mutate(year_quarter = paste0(year,"-",qtr), 
+          year_quarter = as.yearqtr(year_quarter)) %>% 
+  filter(naics_code != "suppressed") %>% 
+  mutate(naics_label = case_when(naics_code == "722" ~ "Food/Drinking Places",
+                                 naics_code == "448" ~ "Clothing Stores",
+                                 naics_code == "721" ~ "Accommodation"))
+
+
+va_qcew <- indy_qcew %>% filter(corridor_group == 1)
+
+#plot check 1
+
+qc1 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
+              aes(x = year_quarter, y = employment, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_type)) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+```
 
 
 ## 3.2 Mass Avenue
