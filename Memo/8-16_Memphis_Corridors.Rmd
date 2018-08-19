@@ -1,5 +1,5 @@
 ---
-title: "6-18_Indy_Corridors"
+title: "8-16_Memphis_Corridors"
 author: "Wei Shi"
 date: "June 18, 2018"
 output:
@@ -105,8 +105,274 @@ source(here::here("Code/corridor_comparison_functions.R"))
 memphis_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
 a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
 a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
-b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry as geom
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
 FROM memphis_lehd a, memhpis_corridors b
-WHERE ST_Intersects(ST_Buffer(b.geom, 20), geom);")
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
 
+memphis_corridor$Type <- ifelse(is.na(memphis_corridor$buildstart),"Control", "Treatment")
+memphis_corridor[memphis_corridor$name =="Central Avenue",]$Type <- "Control: Central"
+memphis_corridor[memphis_corridor$name=="Cooper Street",]$Type <- "Control: Cooper"
+memphis_corridor[memphis_corridor$name=="Highland Street",]$Type <- "Control: Highland"
+memphis_corridor[memphis_corridor$name=="Jackson Avenue",]$Type <- "Control: Jackson"
+memphis_corridor[memphis_corridor$name=="Union Avenue",]$Type <- "Control: Union"
+memphis_corridor$Type <- as.factor(memphis_corridor$Type)
+
+memphis_corridor <- memphis_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group,
+         BuildStart = buildstart, BuildEnd = buildend, Name = name)
+
+memphis_lehd <- st_read(dsn = con, query = "SELECT * FROM memphis_lehd") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
+
+memphis_emp_ratio <- employ_ratio_test(memphis_corridor)
+
+memphis_growth <- growth_rate(memphis_corridor)
+
+dbDisconnect(con)
+
+
+```
+
+#3. Corridor Comparisons
+
+Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Indianapolis as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
+
+## 3.1 Madison Avenue
+
+![Madison Avenue Corridor]
+
+Our first treatment corridor is Madison Avenue, which installed separate bike lane in 2011. The control corridors are Highland Street, Jackson Street, and Union Street. Jackson Street and Union Street are close to the treatment corridor in southeast downtown Indianapolis while Highland Street is located in central downtown area.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+#comparisons-----
+
+# prepare city level data & block level corridor data at the year before construction
+conyear <- first(filter(memphis_corridor, Group== 1, Type== "Treatment")$BuildStart)-1 
+# find the year before construction
+
+
+memphis_lehd_2010 <- memphis_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+
+madison <- memphis_corridor %>% filter(Group ==1, Type =="Treatment", year==conyear) %>% employ_ratio_test(.)
+
+highland <- memphis_corridor %>% filter(Group ==1, Type =="Control: Highland", year ==conyear) %>% employ_ratio_test(.)
+
+jackson <- memphis_corridor %>% filter(Group ==1, Type =="Control: Jackson", year ==conyear) %>% employ_ratio_test(.)
+
+union <- memphis_corridor %>% filter(Group ==1, Type =="Control: Union", year ==conyear) %>% employ_ratio_test(.)
+
+# find quantile dataframe 
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(memphis_lehd_2010$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(memphis_lehd_2010$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(memphis_lehd_2010$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
+
+madison %>% summarise(TotEmp = sum(C000)/nrow(madison), RetailEmp = sum(CNS07)/nrow(madison),
+                                     AccomEmp = sum(CNS18)/nrow(madison)) %>% as.data.frame()
+highland %>% summarise(TotEmp = sum(C000)/nrow(highland), RetailEmp = sum(CNS07)/nrow(highland),
+                                     AccomEmp = sum(CNS18)/nrow(highland)) %>% as.data.frame
+jackson %>% summarise(TotEmp = sum(C000)/nrow(jackson), RetailEmp = sum(CNS07)/nrow(jackson),
+                                     AccomEmp = sum(CNS18)/nrow(jackson)) %>% as.data.frame
+union %>% summarise(TotEmp = sum(C000)/nrow(union), RetailEmp = sum(CNS07)/nrow(union),
+                                     AccomEmp = sum(CNS18)/nrow(union)) %>% as.data.frame
+# get employment at block level, divided by nrow()
+ 
+
+# t-test: compare retail, food_accom, business amount---
+t.test(madison$Business, highland$Business)
+t.test(madison$Retail, highland$Retail)
+t.test(madison$Food_Accom, highland$Food_Accom)
+t.test(madison$ratio1, highland$ratio1)
+t.test(madison$ratio2, highland$ratio2)
+
+t.test(madison$Business, jackson$Business) # sig
+t.test(madison$Retail, jackson$Retail)
+t.test(madison$Food_Accom, jackson$Food_Accom) # sig
+t.test(madison$ratio1, jackson$ratio1)
+t.test(madison$ratio2, jackson$ratio2)
+
+t.test(madison$Business, union$Business)
+t.test(madison$Retail, union$Retail)
+t.test(madison$Food_Accom, union$Food_Accom)
+t.test(madison$ratio1, union$ratio1)
+t.test(madison$ratio2, union$ratio2)
+
+
+# t-tests: growth rate----
+
+madison_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Treatment", year<=conyear) 
+highland_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Control: Highland", year<=conyear) 
+jackson_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Control: Jackson", year<=conyear) 
+union_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Control: Union", year<=conyear) 
+
+t.test(madison_growth$biz_growth,highland_growth$biz_growth)
+t.test(madison_growth$retail_growth,highland_growth$retail_growth)
+t.test(madison_growth$food_accom_growth,highland_growth$food_accom_growth)
+
+t.test(madison_growth$biz_growth,jackson_growth$biz_growth)
+t.test(madison_growth$retail_growth,jackson_growth$retail_growth)
+t.test(madison_growth$food_accom_growth,jackson_growth$food_accom_growth)
+
+t.test(madison_growth$biz_growth,union_growth$biz_growth)
+t.test(madison_growth$retail_growth,union_growth$retail_growth)
+t.test(madison_growth$food_accom_growth,union_growth$food_accom_growth)
+```
+
+
+### 3.1.1 Corridor employment amount
+
+Comparing 'business' related employment, we find the Highland St Corridor has much more 'business' employment than the Madison Ave corridor. The other two comparison corridors have similar levels of business employment amount, though, the Madison Ave corridor has relatively less retail employment. 
+
+| Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------------|---------|------------|-----------|---------|------------|-----------|
+| Madison Ave.  | 68      | 16          | 17         | 65-70   | 80-85      | 80-85     |
+| Highland St.   | 77     | 10         | 25        | 70-75   | 70-75      | 85-90    |
+| Jackson St.   | 8      | 2          | 1         | 25-30   | 50-55      | 45-50     |
+| Union St.     | 140      | 12          | 16         | 95-100   | 75-80      | 80-85     |
+
+Table 1: Madison Avenue Corridor and Control Corridors Employment Percentiles
+
+### 3.1.2 Employment number comparison
+
+We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Highland corridor mean 'business' and food employment per block is significantly different than the Madison corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
+
+### 3.1.3 Employment trend comparison
+
+In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Highland corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Propspect and Union corridors while the Highland corridor shows much more volatility over the study period.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+madison_agg <- agg_trend_table(memphis_corridor, group = 1)
+
+agg_retail_trend_plot <- agg_trend_plot(madison_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012)
+
+agg_food_trend_plot <- agg_trend_plot(madison_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Madision Avenue .", construct_year = 2011, end_year = 2012)
+
+plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
+```
+
+
+## 3.2 Broad Avenue
+
+![Broad Avenue Corridor]
+
+Our first treatment corridor is Madison Avenue, which installed separate bike lane in 2011. The control corridors are Highland Street, Jackson Street, and Union Street. Jackson Street and Union Street are close to the treatment corridor in southeast downtown Indianapolis while Highland Street is located in central downtown area.
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+#comparisons-----
+
+# prepare city level data & block level corridor data at the year before construction
+conyear <- first(filter(memphis_corridor, Group== 2, Type== "Treatment")$BuildStart)-1 
+# find the year before construction
+
+
+memphis_lehd_2009 <- memphis_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+
+broad <- memphis_corridor %>% filter(Group ==2, Type =="Treatment", year==conyear) %>% employ_ratio_test(.)
+
+central <- memphis_corridor %>% filter(Group ==2, Type =="Control: Central", year ==conyear) %>% employ_ratio_test(.)
+
+cooper <- memphis_corridor %>% filter(Group ==2, Type =="Control: Cooper", year ==conyear) %>% employ_ratio_test(.)
+
+# find quantile dataframe 
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(memphis_lehd_2009$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(memphis_lehd_2009$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(memphis_lehd_2009$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
+
+broad %>% summarise(TotEmp = sum(C000)/nrow(broad), RetailEmp = sum(CNS07)/nrow(broad),
+                                     AccomEmp = sum(CNS18)/nrow(broad)) %>% as.data.frame()
+central %>% summarise(TotEmp = sum(C000)/nrow(central), RetailEmp = sum(CNS07)/nrow(central),
+                                     AccomEmp = sum(CNS18)/nrow(central)) %>% as.data.frame
+cooper %>% summarise(TotEmp = sum(C000)/nrow(cooper), RetailEmp = sum(CNS07)/nrow(cooper),
+                                     AccomEmp = sum(CNS18)/nrow(cooper)) %>% as.data.frame
+
+# get employment at block level, divided by nrow()
+ 
+
+# t-test: compare retail, food_accom, business amount---
+t.test(broad$Business, central$Business)
+t.test(broad$Retail, central$Retail)
+t.test(broad$Food_Accom, central$Food_Accom)
+t.test(broad$ratio1, central$ratio1) # sig
+t.test(broad$ratio2, central$ratio2)
+
+t.test(broad$Business, cooper$Business) 
+t.test(broad$Retail, cooper$Retail)
+t.test(broad$Food_Accom, cooper$Food_Accom) 
+t.test(broad$ratio1, cooper$ratio1) # sig
+t.test(broad$ratio2, cooper$ratio2) # sig
+
+
+# t-tests: growth rate----
+
+broad_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type=="Treatment", year<=conyear) 
+central_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type=="Control: Central", year<=conyear) 
+cooper_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type=="Control: Cooper", year<=conyear) 
+
+t.test(broad_growth$biz_growth,central_growth$biz_growth)
+t.test(broad_growth$retail_growth,central_growth$retail_growth)
+t.test(broad_growth$food_accom_growth,central_growth$food_accom_growth)
+
+t.test(broad_growth$biz_growth,cooper_growth$biz_growth)
+t.test(broad_growth$retail_growth,cooper_growth$retail_growth)
+t.test(broad_growth$food_accom_growth,cooper_growth$food_accom_growth)
+
+```
+
+
+### 3.1.1 Corridor employment amount
+
+Comparing 'business' related employment, we find the Central Avenue Corridor has much more 'business' employment than the Madison Ave corridor. The other two comparison corridors have similar levels of business employment amount, though, the Madison Ave corridor has relatively less retail employment. 
+
+| Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------------|---------|------------|-----------|---------|------------|-----------|
+| Broad Ave.  | 40      | 13          | 4         | 55-60   | 75-80      | 65-70     |
+| Central Ave.   | 53     | 6         | 5        | 60-65   | 65-70      | 70-75    |
+| Cooper St.   | 124      | 6          | 12         | 75-80   | 65-70      | 75-80     |
+
+Table 2: Broad Avenue Corridor and Control Corridors Employment Percentiles
+
+### 3.2.2 Employment number comparison
+
+We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Central corridor mean 'business' and food employment per block is significantly different than the Madison corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
+
+### 3.1.3 Employment trend comparison
+
+In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Central corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Propspect and Union corridors while the Central corridor shows much more volatility over the study period.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+broad_agg <- agg_trend_table(memphis_corridor, group = 2)
+
+agg_retail_trend_plot <- agg_trend_plot(broad_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011)
+
+agg_food_trend_plot <- agg_trend_plot(broad_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Broad Avenue .", construct_year = 2010, end_year = 2011)
+
+plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
