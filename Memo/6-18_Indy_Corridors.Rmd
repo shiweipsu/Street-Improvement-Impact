@@ -269,9 +269,9 @@ In terms of retail performance, the treatment corridor's retail employment remai
 
 virginia_agg <- agg_trend_table(indy_corridor, group = 1)
 
-agg_retail_trend_plot <- agg_trend_plot(virginia_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "2nd Ave.", construct_year = 2011, end_year = 2013)
+agg_retail_trend_plot <- agg_trend_plot(virginia_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Virginia Ave.", construct_year = 2011, end_year = 2013)
 
-agg_food_trend_plot <- agg_trend_plot(virginia_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "2nd Ave.", construct_year = 2011, end_year = 2013)
+agg_food_trend_plot <- agg_trend_plot(virginia_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Virginia Ave.", construct_year = 2011, end_year = 2013)
 
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
@@ -342,8 +342,9 @@ plot(va_p1)
 
 ###3.1.5 QCEW Comparisons
 
+As mentioned earlier, the advantage of using QCEW data is the ability to get greater industrial detail in addition to establishment counts and total wages. In the case of Virginia Avenue, the ability to isolate slightly more detailed industries, in this case food and drinking placs (NAICS code 722) gives us a clearer idea of the growth in our industries of interest. Note, for example, that the growth in food and drinking places employment is more dramatic for Virginia Avenue but the overall pattern remains similar between the LEHD and QCEW estimates. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
 indy_qcew <- tbl(con, "indy_qcew_modified")
 indy_qcew <- collect(indy_qcew)
@@ -363,15 +364,53 @@ indy_qcew <- indy_qcew %>%
 
 va_qcew <- indy_qcew %>% filter(corridor_group == 1)
 
-#plot check 1
+#plot check 1 for virginia
 
 qc1 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
               aes(x = year_quarter, y = employment, group = corridor_name, 
                            colour = corridor_name, shape = corridor_type)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size = 3, fill = "white") +
   scale_x_yearqtr() +
-  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Virginia Ave Food and Drinking Places\n Employment",
+       caption = "Data Source: QCEW data provided by the state of Indiana\n and Indiana Business Research Center") +
+  scale_shape_manual(name = "Corridor Type", labels = c("Treatment", "Control"), 
+                     values = c("triangle", "circle")) +
+  scale_color_manual(name = "Corridor Name", labels = c("Meridian", "Prospect", "Shelby", "Virginia"),
+                     values = c("#1b9e77", "#d96f02", "#7570b3", "#e7298a"))
+
+qc2 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
+              aes(x = year_quarter, y = qtr_wages, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_type)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Virginia Ave Food and Drinking Places\n Total Wages",
+       caption = "Data Source: QCEW data provided by the state of Indiana\n and Indiana Business Research Center") +
+  scale_shape_manual(name = "Corridor Type", labels = c("Treatment", "Control"), 
+                     values = c("triangle", "circle")) +
+  scale_color_manual(name = "Corridor Name", labels = c("Meridian", "Prospect", "Shelby", "Virginia"),
+                     values = c("#1b9e77", "#d96f02", "#7570b3", "#e7298a")) +
+  scale_y_continuous(labels = scales::dollar)
+
+plot_grid(qc1, qc2)
+#plot check for mass
+
+#mass_qcew <- indy_qcew %>% filter(corridor_group == 2)
+
+#qc2 <-
 ```
 
 
