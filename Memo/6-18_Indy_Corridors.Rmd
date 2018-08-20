@@ -137,7 +137,6 @@ indy_emp_ratio <- employ_ratio_test(indy_corridor)
 
 indy_growth <- growth_rate(indy_corridor)
 
-dbDisconnect(con)
 
 
 ```
@@ -346,6 +345,14 @@ As mentioned earlier, the advantage of using QCEW data is the ability to get gre
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
+user <- "jamgreen"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
 indy_qcew <- tbl(con, "indy_qcew_modified")
 indy_qcew <- collect(indy_qcew)
 
@@ -363,12 +370,17 @@ indy_qcew <- indy_qcew %>%
 
 
 va_qcew <- indy_qcew %>% filter(corridor_group == 1)
+va_qcew <- va_qcew %>% 
+  mutate(corridor_name = case_when(corridor_name == "shelby" ~ "Control: Shelby",
+                                   corridor_name == "virginia ave" ~ "Treatment: Virginia",
+                                   corridor_name == "prospect" ~ "Control: Prospect",
+                                   corridor_name == "meridian" ~ "Control: Meridian"))
 
 #plot check 1 for virginia
 
 qc1 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
               aes(x = year_quarter, y = employment, group = corridor_name, 
-                           colour = corridor_name, shape = corridor_type)) +
+                           colour = corridor_name, shape = corridor_name)) +
   geom_rect(aes(xmin = 2011, 
                   xmax = 2013, 
                   ymin = -Inf, ymax = Inf),
@@ -380,10 +392,11 @@ qc1 <- ggplot(va_qcew %>%  filter(naics_code == "722"),
   theme_minimal() +
   labs(x = "Quarter", y = "", title = "Virginia Ave Food and Drinking Places\n Employment",
        caption = "Data Source: QCEW data provided by the state of Indiana\n and Indiana Business Research Center") +
-  scale_shape_manual(name = "Corridor Type", labels = c("Treatment", "Control"), 
-                     values = c("triangle", "circle")) +
-  scale_color_manual(name = "Corridor Name", labels = c("Meridian", "Prospect", "Shelby", "Virginia"),
-                     values = c("#1b9e77", "#d96f02", "#7570b3", "#e7298a"))
+  scale_color_discrete(breaks = c("Control: Meridian", "Control: Prospect", "Control: Shelby", 
+                                  "Treatment: Virginia")) +
+  scale_shape_discrete(breaks = c("Control: Meridian", "Control: Prospect", "Control: Shelby", 
+                                  "Treatment: Virginia")) +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor"))
 
 qc2 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
               aes(x = year_quarter, y = qtr_wages, group = corridor_name, 
@@ -395,24 +408,33 @@ qc2 <- ggplot(va_qcew %>%  filter(naics_code == "722"),
   geom_line() + 
   geom_point(size = 3, fill = "white") +
   scale_x_yearqtr() +
-  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
   theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
   labs(x = "Quarter", y = "", title = "Virginia Ave Food and Drinking Places\n Total Wages",
        caption = "Data Source: QCEW data provided by the state of Indiana\n and Indiana Business Research Center") +
-  scale_shape_manual(name = "Corridor Type", labels = c("Treatment", "Control"), 
-                     values = c("triangle", "circle")) +
-  scale_color_manual(name = "Corridor Name", labels = c("Meridian", "Prospect", "Shelby", "Virginia"),
-                     values = c("#1b9e77", "#d96f02", "#7570b3", "#e7298a")) +
+  scale_color_discrete(breaks = c("Control: Meridian", "Control: Prospect", "Control: Shelby", 
+                                  "Treatment: Virginia")) +
+  scale_shape_discrete(breaks = c("Control: Meridian", "Control: Prospect", "Control: Shelby", 
+                                  "Treatment: Virginia")) +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::dollar)
 
 plot_grid(qc1, qc2)
-#plot check for mass
 
-#mass_qcew <- indy_qcew %>% filter(corridor_group == 2)
-
-#qc2 <-
 ```
 
+While the basic trend graphs give us an idea of the pattern of growth over time, in this case, consistent employment on Virginia compared to its comparison corridors, an indexed plot can give us a better idea of changes in growth with every corridor on the same scale. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=.5}
+
+va_qc_base <- va_qcew %>% filter(year_quarter == "2011 Q1", naics_code == "722") %>% 
+  select(corridor_name, year_quarter, naics_code ,base_employment = employment, base_wages = qtr_wages)
+
+va_qcew <- va_qcew %>% left_join(va_qc_base, by = c("corridor_name", "naics_code")) %>% 
+  filter(naics_code == 722)
+
+
+```
 
 ## 3.2 Mass Avenue
 
@@ -545,7 +567,41 @@ plot(ma_p1)
 
 ```
 
+###3.2.5 QCEW Comparisons
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=.5}
+
+
+
+mass_qcew <- indy_qcew %>% filter(corridor_group == 2)
+mass_qcew <- mass_qcew %>% 
+  mutate(corridor_name = case_when(corridor_name == "mass ave (control)" ~ "Control: Massachusetts",
+                                   corridor_name == "mass ave" ~ "Treatment: Massachusetts"))
+
+qc3 <- ggplot(mass_qcew, 
+              aes(x = year_quarter, y = employment, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Massachusetts Ave Food and Drinking Places\n Employment",
+       caption = "Data Source: QCEW data provided by the state of Indiana\n and Indiana Business Research Center") +
+  scale_color_discrete(breaks = c("Control: Massachusetts", "Treatment: Massachusetts")) +
+  scale_shape_discrete(breaks = c("Control: Massachusetts", "Treatment: Massachusetts")) +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor"))
+
+
+
+
+dbDisconnect(con)
+
+```
 
 ## 3.3 Corridor Comparison Summary
 
