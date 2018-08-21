@@ -10,7 +10,7 @@ output: html_document
 ```{r, echo=FALSE, results='asis'}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, forcats, dplyr,dbplyr,RPostgreSQL)
+p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, forcats, dplyr,dbplyr,RPostgreSQL, zoo)
 
 user <- "jamgreen"
 host <- "pgsql102.rc.pdx.edu"
@@ -104,9 +104,11 @@ va_ave <- indy_sales %>% filter(group == 2) %>%
 
 va_ave$corridor <- stringr::str_trim(va_ave$corridor, "both")
 
+va_ave <- va_ave %>% filter(corridor != "Meridian")
+
 va_ave <- va_ave %>% mutate(corridor = factor(corridor, 
                                               levels = c("Virginia Ave", "Prospect",
-                                                         "Shelby", "Meridian")))
+                                                         "Shelby")))
 
 va_diff_tax <- lm(tax_revenue ~ corridor + pre_post + pre_post*corridor, va_ave)
 
@@ -133,10 +135,62 @@ stargazer(indy_sales_lm[[1]],
 stargazer(indy_sales_lm[[2]], indy_sales_lm[[3]], 
           title = "Virginia and Massachusetts Ave. Corridor ITS Estimates", 
           column.labels  = c("Virginia Ave.", "Mass Ave."), type = "html")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+#qcew DID and ITS for VA avenue but not mass
+
+indy_qcew <- tbl(con, "indy_qcew_modified")
+indy_qcew <- collect(indy_qcew)
+
+indy_qcew$corridor_name <- stringr::str_trim(indy_qcew$corridor_name, "both")
+
+indy_qcew$corridor_type <- factor(indy_qcew$corridor_type, levels = c("treatment", "control"))
+
+indy_qcew <- indy_qcew %>% 
+  mutate(year_quarter = paste0(year,"-",qtr), 
+          year_quarter = as.yearqtr(year_quarter)) %>% 
+  filter(naics_code != "suppressed") %>% 
+  mutate(naics_label = case_when(naics_code == "722" ~ "Food/Drinking Places",
+                                 naics_code == "448" ~ "Clothing Stores",
+                                 naics_code == "721" ~ "Accommodation"))
 
 
+va_qcew <- indy_qcew %>% filter(corridor_group == 1)
+va_qcew <- va_qcew %>% filter(corridor_name != "meridian") %>% 
+  mutate(corridor_name = case_when(corridor_name == "shelby" ~ "Control: Shelby",
+                                   corridor_name == "virginia ave" ~ "Treatment: Virginia",
+                                   corridor_name == "prospect" ~ "Control: Prospect"),
+         pre_post = if_else(year_quarter >= 2013, 1, 0),
+         treatment = if_else(corridor_name == "Treatment: Virginia", 1, 0),
+         corridor = factor(corridor_name, levels = c("Treatment: Virginia", "Control: Prospect",
+                                                        "Control: Shelby"))) 
+  
 
 
+va_diff_emp_qcew <- lm(employment ~ corridor + pre_post + pre_post*corridor, va_qcew)
+va_diff_wages_qcew <- lm(qtr_wages ~ corridor + pre_post + pre_post*corridor, va_qcew)
+
+qcew_list <- list(va_diff_emp_qcew, va_diff_wages_qcew)
+
+stargazer(qcew_list[[1]], qcew_list[[2]], 
+          title = "Virginia Ave. Corridor DiD Estimates", 
+          column.labels  = c("Quarterly Emp.", "Quarterly Wages"), type = "html")
+
+#va qcew its
+
+va_qc_its <- va_qcew %>% filter(corridor_type == "treatment") %>% 
+  mutate(ts_term = seq_len(nrow(.)))
+
+va_its_emp <- lm(employment ~ ts_term + pre_post + pre_post*ts_term, va_qc_its)
+va_its_wages <- lm(qtr_wages ~ ts_term + pre_post + pre_post*ts_term, va_qc_its)
+
+qc_its_list <- list(va_its_emp, va_its_wages)
+
+stargazer(qc_its_list[[1]], qc_its_list[[2]], 
+          title = "Virginia Ave. Corridor ITS Estimates", 
+          column.labels  = c("Quarterly Emp.", "Quarterly Wages"), type = "html")
 
 dbDisconnect(con)
 ```
