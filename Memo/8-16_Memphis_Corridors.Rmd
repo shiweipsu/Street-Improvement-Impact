@@ -25,7 +25,7 @@ In order to make their cities more livable, policymakers and planning department
 
 DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
-![Indianapolis Corridor](images/Indianapolis_corridors.png)
+![Memphis Corridor](images/memphis_corridors.png)
 
 
 #2. Data Sources/Methodology
@@ -137,13 +137,13 @@ dbDisconnect(con)
 
 #3. Corridor Comparisons
 
-Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Indianapolis as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
+Our first test in corridor comparability is comparing the count of the total number, retail, and food&accommodation jobs within the corridors compared to block figures for the city of Memphis as a whole. This allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
 
 ## 3.1 Madison Avenue
 
-![Madison Avenue Corridor]
+![Madison Avenue Corridor](images/memphis_madison.png)
 
-Our first treatment corridor is Madison Avenue, which installed separate bike lane in 2011. The control corridors are Highland Street, Jackson Street, and Union Street. Jackson Street and Union Street are close to the treatment corridor in southeast downtown Indianapolis while Highland Street is located in central downtown area.
+Our first treatment corridor is Madison Avenue, which installed separate bike lane in 2011. The control corridors are Highland Street, Jackson Avenue, and Union Avenue. Jackson Avenue and Union Street are close to the treatment corridor in southeast downtown Indianapolis while Highland Street is located in central downtown area.
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
@@ -236,20 +236,20 @@ t.test(madison_growth$food_accom_growth,union_growth$food_accom_growth)
 
 ### 3.1.1 Corridor employment amount
 
-Comparing 'business' related employment, we find the Highland St Corridor has much more 'business' employment than the Madison Ave corridor. The other two comparison corridors have similar levels of business employment amount, though, the Madison Ave corridor has relatively less retail employment. 
+Comparing 'business' related employment, we find the Highland Street Corridor has very similar 'business' employment with Madison Ave corridor. While Union Avenue has much more total employment than Madison Avenue, it has similar retail and food & accommodation employment with the treatment corridor. Jackson Avenue is less comparable with treatment corridors, since it has much smaller amount of overall and 'business' related economic activities.
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
-| Madison Ave.  | 68      | 16          | 17         | 65-70   | 80-85      | 80-85     |
-| Highland St.   | 77     | 10         | 25        | 70-75   | 70-75      | 85-90    |
-| Jackson St.   | 8      | 2          | 1         | 25-30   | 50-55      | 45-50     |
-| Union St.     | 140      | 12          | 16         | 95-100   | 75-80      | 80-85     |
+| Madison Ave.   | 68      | 16         | 17        | 65-70   | 80-85      | 80-85     |
+| Highland St.   | 77      | 10         | 25        | 70-75   | 70-75      | 85-90     |
+| Jackson Ave.   | 8       | 2          | 1         | 25-30   | 50-55      | 45-50     |
+| Union Ave.     | 140     | 12         | 16        | 95-100  | 75-80      | 80-85     |
 
 Table 1: Madison Avenue Corridor and Control Corridors Employment Percentiles
 
 ### 3.1.2 Employment number comparison
 
-We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Highland corridor mean 'business' and food employment per block is significantly different than the Madison corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
+We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Jackson Avenue corridor mean 'business' and food employment per block is significantly different from the Madison corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
 
 ### 3.1.3 Employment trend comparison
 
@@ -269,9 +269,9 @@ plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 
 ## 3.2 Broad Avenue
 
-![Broad Avenue Corridor]
+![Broad Avenue Corridor](images/memphis_broad.png)
 
-Our first treatment corridor is Madison Avenue, which installed separate bike lane in 2011. The control corridors are Highland Street, Jackson Street, and Union Street. Jackson Street and Union Street are close to the treatment corridor in southeast downtown Indianapolis while Highland Street is located in central downtown area.
+Our first treatment corridor is Madison Avenue, which installed separate bike lane in 2010. The control corridors are Highland Street, Jackson Street, and Union Street. Jackson Street and Union Street are close to the treatment corridor in southeast downtown Indianapolis while Highland Street is located in central downtown area.
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 #comparisons-----
@@ -346,15 +346,15 @@ t.test(broad_growth$food_accom_growth,cooper_growth$food_accom_growth)
 ```
 
 
-### 3.1.1 Corridor employment amount
+### 3.2.1 Corridor employment amount
 
 Comparing 'business' related employment, we find the Central Avenue Corridor has much more 'business' employment than the Madison Ave corridor. The other two comparison corridors have similar levels of business employment amount, though, the Madison Ave corridor has relatively less retail employment. 
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
-| Broad Ave.  | 40      | 13          | 4         | 55-60   | 75-80      | 65-70     |
-| Central Ave.   | 53     | 6         | 5        | 60-65   | 65-70      | 70-75    |
-| Cooper St.   | 124      | 6          | 12         | 75-80   | 65-70      | 75-80     |
+| Broad Ave.     | 40      | 13         | 4         | 55-60   | 75-80      | 65-70     |
+| Central Ave.   | 53      | 6          | 5         | 60-65   | 65-70      | 70-75     |
+| Cooper St.     | 124     | 6          | 12        | 75-80   | 65-70      | 75-80     |
 
 Table 2: Broad Avenue Corridor and Control Corridors Employment Percentiles
 
@@ -362,7 +362,7 @@ Table 2: Broad Avenue Corridor and Control Corridors Employment Percentiles
 
 We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Central corridor mean 'business' and food employment per block is significantly different than the Madison corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
 
-### 3.1.3 Employment trend comparison
+### 3.2.3 Employment trend comparison
 
 In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Central corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Propspect and Union corridors while the Central corridor shows much more volatility over the study period.
 
@@ -376,3 +376,75 @@ agg_food_trend_plot <- agg_trend_plot(broad_agg, industry = "Food/Accommodataion
 
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
+
+**CORRIDOR COMPARISON SUMMARY TABLE**
+
+#4. Data Analysis
+## 4.1 Madison Avenue Corridor
+### 4.1.1 Trend Analysis
+Trend analysis is a descriptive approach compares the trends of treatment and control corridors, or even city-wide trends over the full time period, to identify the impact of street improvement corridor.
+
+#### LEHD Data
+The bike facility installation has taken place in 2011. Although there is a great increase of retail after bike lane installation on 2nd Ave, more recent year data are needed to justify the trend of the impact. Again, the food/accommodation employment increase after bike lane installation needs more validation according to recent data.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
+
+madison_agg <- agg_index_trend_table(memphis_corridor, group = 1, construct_year = 2011)
+madison_agg <- madison_agg[madison_agg$Type!="Control: Jackson",]
+madison_agg$Type <- as.character(madison_agg$Type)
+memphis <- memphis_lehd %>% group_by(year) %>%
+  summarise(CNS07 = sum(CNS07),
+            CNS18 = sum(CNS18),
+            business = CNS07 + CNS18) %>%
+  mutate(CNS07_sd = CNS07/400.22,
+         CNS18_sd = CNS18/291.02,
+         business_sd = business/691.24,
+         Type = "City") %>%
+  select(Type, year, CNS07_sd, CNS18_sd, business_sd)
+madison_agg <- rbind(as.data.frame(madison_agg), as.data.frame(memphis))
+madison_agg$Type <- as.factor(madison_agg$Type)
+
+madison_agg_retail_plot <- agg_index_trend_plot(madison_agg, industry = "Retail", corridor_name = "Madison Ave.",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+madison_agg_food_plot <- agg_index_trend_plot(madison_agg, industry = "Food/Accommodations", corridor_name = "Madison Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+plot_grid(madison_agg_retail_plot,madison_agg_food_plot)
+
+```
+
+### 4.1.2 Differences-in-Difference (DID) Analysis
+
+### 4.1.3 Interrupted Time Series (ITS) Analysis
+
+
+## 4.2 Madison Avenue Corridor
+### 4.2.1 Trend Analysis
+
+#### LEHD Data
+The bike facility installation has taken place in 2011. Although there is a great increase of retail after bike lane installation on 2nd Ave, more recent year data are needed to justify the trend of the impact. Again, the food/accommodation employment increase after bike lane installation needs more validation according to recent data.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
+
+broad_agg <- agg_index_trend_table(memphis_corridor, group = 2, construct_year = 2010)
+broad_agg$Type <- as.character(broad_agg$Type)
+memphis <- memphis_lehd %>% group_by(year) %>%
+  summarise(CNS07 = sum(CNS07),
+            CNS18 = sum(CNS18),
+            business = CNS07 + CNS18) %>%
+  mutate(CNS07_sd = CNS07/419.14,
+         CNS18_sd = CNS18/288.88,
+         business_sd = business/708.02,
+         Type = "City") %>%
+  select(Type, year, CNS07_sd, CNS18_sd, business_sd)
+broad_agg <- rbind(as.data.frame(broad_agg), as.data.frame(memphis))
+broad_agg$Type <- as.factor(broad_agg$Type)
+
+broad_agg_retail_plot <- agg_index_trend_plot(broad_agg, industry = "Retail", corridor_name = "Broad Ave.",industry_code = "CNS07_sd", construct_year = 2010, end_year = 2011)
+broad_agg_food_plot <- agg_index_trend_plot(broad_agg, industry = "Food/Accommodations", corridor_name = "Broad Ave.",industry_code = "CNS18_sd", construct_year = 2010, end_year = 2011)
+
+plot_grid(broad_agg_retail_plot,broad_agg_food_plot)
+
+```
+
+### 4.1.2 Differences-in-Difference (DID) Analysis
+
+### 4.1.3 Interrupted Time Series (ITS) Analysis
