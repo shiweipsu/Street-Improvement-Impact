@@ -45,6 +45,7 @@ memphis_corridor <- memphis_corridor %>%
 ```{r, echo=FALSE, results='asis'}
 # exclude Jackson corridor which is not comparable to treatment corridor
 memphis_corridor <- memphis_corridor[memphis_corridor$Name!="Jackson Avenue",]
+memphis_corridor$Type <- relevel(memphis_corridor$Type,ref = "Treatment")
 
 #madison ave
 
