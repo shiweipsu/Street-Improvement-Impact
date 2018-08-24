@@ -13,7 +13,7 @@ author: Jamaal
 	b.	Bold subgroup font
 	c.	Add frame outline		
 3.	City Boundary
-	a.	Gray fill: #d3d3d3
+	a.	Gray fill: #dcdcdc
 	b.	Black outline/border .26
 	c.	Add primary roads: #808080	
-	d.	City label: #d3d3d3
+	d.	City label: #dcdcdc
