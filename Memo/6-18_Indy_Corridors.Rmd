@@ -19,22 +19,24 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 
-#1. Introduction
+# 1. Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
 DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
-![Indianapolis Corridor](images/Indianapolis_corridors.png)
+![Indianapolis Corridor](images/indy_corridors_whole.png)
 
 
-#2. Data Sources/Methodology
+# 2. Data Sources/Methodology
 
 ## 2.1 Data Sources
 
-For this study, we both used the Longitudinal Employment Household Dynamics Dataset (LEHD) and the retail sales tax data from the city. 
+For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the **Longitudinal Employer-Household Dynamics Dataset** (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This data set tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. Some disadvantages of the LODES data set are that in order to guarantee confidentiality block level data is "fuzzed" so the numbers are not exactly the number of jobs, but they are accurate estimates. Additionally, though we get industrial data, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate specific retail or service employment such as restaurant workers. That being said, the LODES data set is comprehensive, offers unprecedented geographic detail, and longitudinal allowing for consistent comparisons over time.
 
-The LEHD dataset is utilized for our analysis in all cities because it is a publicly available data source that exists for most cities and states across the country. It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This dataset tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. 
+This report also takes advantage of establishment level **Quarterly Census of Employment and Wages** (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
+
+Finally, we also collected **sales tax data**. Sales tax data allows us to estimate a more sensitive measure of economic activity than employment (as the decision to hire or fire for a firm is often an expensive one we expect employment to be a delayed response). Some drawbacks of sales tax data is that some states do not have a sales tax or, in states or cities that do have one, the sales tax data is not broken down by specific industry and it is difficult to accurately parse out accurate figures. But the benefits of sales tax data largely outweigh these issues and do offer a more sensitive metric than employment. 
 
 Indiana has a general 7% sales tax for all businesses with a variety of additional taxes dependent upon use and the city/county a particular establishment is located. For example, Marion County, the home county of Indianapolis, has an additional 2% food and beverage tax as well as a 10% accommodations tax. This gives a range of 7-19% sales tax rates in the city. 
 
@@ -46,7 +48,7 @@ We have applied three methods in order to isolate the impact of street improveme
 
 In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed. Ideally, these corridors are made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and accommodations related jobs. Additionally, we will only use corridors where street improvements were installed between 2008 and 2013 in order to guarantee with have sufficient data to track pre and post-treatment employment trends. 
 
-Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
+Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment in the year before construction of our corridor of interest, by block, for each corridor is similar to the other.
 
 ### 2.2.2 Aggregated Trend Comparison
 
@@ -142,13 +144,13 @@ indy_growth <- growth_rate(indy_corridor)
 ```
 
 
-#3. Corridor Comparisons
+# 3. Corridor Comparisons
 
-Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Indianapolis as a whole. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
+Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Indianapolis as a whole for the year before construction. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
 
 ## 3.1 Virginia Avenue
 
-![Virginia Avenue Corridor]
+![Virginia Avenue Corridor](images/indy_va_corridors.png)
 
 Our first treatment corridor is Virginia Avenue, which installed separate bike lane in 2011. The control corridors are Meridian Street, Prospect Street, and Shelby Street. Prospect Street and Shelby Street are close to the treatment corridor in southeast downtown Indianapolis while Meridian Street is located in central downtown area.
 
@@ -491,7 +493,7 @@ plot_grid(qc_idx1, qc_idx2)
 
 ## 3.2 Mass Avenue
 
-![Mass Avenue Corridor]
+![Mass Avenue Corridor](images/indy_mass_corridors.png)
 
 Mass Avenue corridor has installed separated bike lane in 2008 with travel lane removal. The control corridor is another section on Mass Ave without any improvement.
 
@@ -702,13 +704,11 @@ The difference terms for the Virginia Ave corridors are all non-significant, exc
 
 ###4.1.2 Difference-in-Difference (Sales Tax)
 
-The difference terms for the the Shelby and Prospect corridors are all large, negative and significant signaling a negative causal relationship between the placement of new cycling infrastructure and sales tax receipts. With this specific model specification the introduction of new cycling infrastructure resulted in a loss of at least $210,000 if compared to Meridian or as much as \$215,000 in comparison to Shelby. 
+The difference terms for the the Shelby and Prospect corridors are all large, negative and significant. While the difference term is negative, this actual signals a *positive* causal relationship between the infrastructure and sales tax receipts as Virginia Ave is the reference group in this model specification. This means that when compared to Virginia Prospect lost approxiately \$210k compared to Virginia.  
 
 ###4.1.3 Difference-in-Difference QCEW
 
-The difference terms for Prospect and Shelby are large, negative and significant, signaling a negative effect of bike lane installation on both employment and quarterly wages. Specifically, Virginia Avenue lost nearly 193 and 176 jobs compared to Prospect and Shelby, respectively, due to the bike lane given our specification. Beyond the loss of those jobs, Virginia Ave also lost nearly 1 million dollars to both of the corridors. These results are puzzling given the fact that the corridor terms in the model are either non-significant or positive and significant meaning that Virginia Ave performs better compared to the other corridors alone, not taking the construction period into account. 
-
-Compared to the descriptive data these results are puzzling.
+The difference terms for Prospect and Shelby are large, negative and significant, signaling a positive effect of bike lane installation on both employment and quarterly wages. Again, Virginia Ave is the reference term for the difference variable meaning that the coefficient estimates what would happen if one were to move from Virginia to Prospect or Shelby. In this case, holding all other things equal, Prospect grew by nearly 200 jobs less with a loss of nearly a million dollars in quarterly wages.   
 
 
 ###4.1.4 ITS (LEHD)
@@ -722,7 +722,7 @@ The sales tax ITS model was also non-significant given our specification with a 
 
 ###4.1.6 ITS (QCEW)
 
-Contrary to the DiD model, our ITS model shows both a positive and significant effect of bike lane installation on Virginia Ave for both jobs and quarterly wages. This is primarily due to the overall positive time series term as the construction term is negative and significant. Recall that the pre_post term signals a potential level change in our unit of interest while the interaction time series and pre_post term estimates the change in slope, or rate of change, of our unit of interest over time. This result more cleanly follows our descriptive data that shows a clear positive growth of employment and wages over time before, during and after the construction period with accelerated growth post-construction.
+Our ITS model shows both a positive and significant effect of bike lane installation on Virginia Ave for both jobs and quarterly wages. This is primarily due to the overall positive time series term as the construction term is negative and significant. Recall that the pre_post term signals a potential level change in our unit of interest while the interaction time series and pre_post term estimates the change in slope, or rate of change, of our unit of interest over time. This result more cleanly follows our descriptive data that shows a clear positive growth of employment and wages over time before, during and after the construction period with accelerated growth post-construction.
 
 ##4.2 Massachusetts Avenue
 
@@ -742,10 +742,9 @@ In terms of the sales tax model, the pre_post term is negative and significant s
 
 #5 Summary and Conclusion
 
-Overall, the results show a rather mixed set of conclusions regarding the effect of new bike lane infrastructure placement on employment, wages and sales tax in Indianapolis. Descriptive data for both corridors, but particularly the Virginia Ave corridor shows a generally positive growth trend in all metrics over time. When modeling these effects using the DiD and ITS models we have mixed results. The DiD specifications are generally negative for both corridors, sometimes with surprisingly large numbers, but the ITS specifications are generally non-significant or actually positive signalling a positing effect of the new infrastructure. 
+Overall, the results show a rather mixed set of conclusions regarding the effect of new bike lane infrastructure placement on employment, wages and sales tax in Indianapolis. Descriptive data for both corridors, but particularly the Virginia Ave corridor shows a generally positive growth trend in all metrics over time. When modeling these effects using the DiD and ITS models we have mixed, though largely positive, results. The DiD specifications are generally positive for both corridors while the ITS specifications are non-significant or positive. Overall, this signals a positive causal effect of bike lane infrastructure placement in the city, at least for Virginia Ave. 
 
-Unfortunately, our models do not give us a definitive account of the effect new bike lane infrastructure has on these corridors. But while it is not definitive this study still offers some enlightenment. First, the lack of a definitive conclusion, while disappointing, still counters the generally negative opinion certain business leaders and policymakers have of new cycling infrastructure placement in commercial corridors. Both our descriptive data and ITS models show a not great effect of the new infrastructure on the growth of new jobs or wages, depending on the corridor, because most of the trends, whether positive or negative, pre-date and continue through the construction periods. There are a variety of reasons why this may be the case, the simplest one being that new cycling infrastructure construction was not so disruptive as to have a major impact in any given direction. Beyond that there are questions as to what are the overall impacts of new construction on traffic flow and other variables that we do not have data for that may be better predictors of commercial success or failure. 
+while this is an overall positive result, we should warn that the results are still mixed and our models are not perfect. First, while the results are a mix of positive and non-significant, no corridor shows a primarily *negative* result of new cycling infrastructure on employment, sales tax receipts or wages. This offers supportive evidence that such infrastructure is, at minimum, not harmful to local business, and in the case of Virginia Ave, we have evidence that the new bike lane has a positive causal effect on commercial growth. With these corridors and specifications, at least, there is simply not the evidence that cycling infrastructure harms local business. Second, while we have evidence of a positive causal relationship, our models are still relatively simple and do not account for all potential determinants of growth. Virginia Ave, in particular, has robust employment and wage growth starting before and during the construction period, though its growth accelerates afterwards. Further investigation into the corridors is warranted to account for any additional variables not covered in our model. Greater transportation data, for example, would help us determine whether corridors saw increased traffic, both auto and non-auto, and to see whether or not such flows had a noticeable effect on business.  
 
-On a more positive note, including different data sources, such as the LEHD and the QCEW, does give us a better, more rounded view of what is actually going on with these corridors and the story is generally positive. Most every corridor has positive employment, sales tax and wage growth and we see that reflected across all of our data sources. While additional economic data may be useful, we probably require more ancillary data regarding traffic, the built environment and other variables to truly isolate the effect of the new construction. As of right now, the data may be too noisy, or in the case of Massachusetts, too small to truly isolate plausible effects.
 
 #Technical Appendix
