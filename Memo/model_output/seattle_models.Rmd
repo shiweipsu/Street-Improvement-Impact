@@ -28,6 +28,8 @@ seattle_corridor[seattle_corridor$Name=="NE 45th St",]$Type <- "Control: NE 45th
 seattle_corridor$Type <- as.factor(seattle_corridor$Type)
 
 # second ave
+seattle_corridor <- seattle_corridor[seattle_corridor$Name!="1st Avenue",]
+seattle_corridor$Type <- relevel(seattle_corridor$Type,ref = "Study")
 
 secondave_did_agg <- did_agg_analysis(seattle_corridor,group = 1, 2014)
 stargazer(secondave_did_agg[[1]],secondave_did_agg[[2]],secondave_did_agg[[3]],type = "html", 
