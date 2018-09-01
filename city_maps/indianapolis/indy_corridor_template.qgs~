@@ -1,18 +1,18 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis projectname="" version="2.18.12">
+<qgis projectname="" version="2.18.9">
   <title></title>
   <autotransaction active="0"/>
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
     <customproperties/>
-    <layer-tree-group expanded="0" checked="Qt::Checked" name="corridor">
+    <layer-tree-group expanded="1" checked="Qt::Checked" name="corridor">
       <customproperties/>
       <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_corridors20180823222647073" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='id' srid=5070 type=MultiLineStringZ table=&quot;public&quot;.&quot;indy_corridors&quot; (geom) sql=" name="indy_corridors">
         <customproperties>
           <property key="legend/title-label" value="Corridors"/>
         </customproperties>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="lehd_corridors_220180823222204346" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xa;AND b.year = '2009') AS _subq_1_&#xd;&#xa;)&quot; (geom) sql=" name="lehd_corridors_2">
+      <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="lehd_corridors_220180823222204346" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype, a.name as name, &#xd;&#xa;a.group as group_name&#xd;&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;&#xa;AND b.year = '2009') AS _subq_1_&#xa;)&quot; (geom) sql=&quot;group_name&quot; = 1" name="lehd_corridors_2">
         <customproperties>
           <property key="legend/title-label" value="Census Block Groups"/>
         </customproperties>
@@ -20,20 +20,20 @@
     </layer-tree-group>
     <layer-tree-group expanded="0" checked="Qt::Unchecked" name="city_wide">
       <customproperties/>
-      <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Unchecked" id="lehd_corridors320180823231620899" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xa;AND b.year = '2011') AS _subq_1_&#xd;&#xa;)&quot; (geom) sql=" name="lehd_corridors3">
+      <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Unchecked" id="lehd_corridors320180823231620899" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;&#xa;AND b.year = '2011') AS _subq_1_&#xd;&#xd;&#xa;)&quot; (geom) sql=" name="lehd_corridors3">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Unchecked" id="primary_roads20180823232105797" source="D:\Street-Improvement-Impact\city_maps\indianapolis\primary_roads.shp" name="primary_roads">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Unchecked" id="primary_roads20180823232105797" source="C:/Users/Jamaal/Documents/Street-Improvement-Impact/city_maps/indianapolis/primary_roads.shp" name="primary_roads">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Unchecked" id="indy_boundary20180823231213437" source="D:\Street-Improvement-Impact\city_maps\indianapolis\indy_boundary.shp" name="indy_boundary">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Unchecked" id="indy_boundary20180823231213437" source="C:/Users/Jamaal/Documents/Street-Improvement-Impact/city_maps/indianapolis/indy_boundary.shp" name="indy_boundary">
         <customproperties/>
       </layer-tree-layer>
     </layer-tree-group>
-    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Unchecked" id="Stamen_Toner_OSM20180824111638501" source="&lt;GDAL_WMS>&#xa;  &lt;Service name=&quot;TMS&quot;>&#xa;    &lt;ServerUrl>http://tile.stamen.com/toner/${z}/${x}/${y}.png&lt;/ServerUrl>&#xa;  &lt;/Service>&#xa;  &lt;DataWindow>&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xa;  &lt;/DataWindow>&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xa;  &lt;Cache />&#xa;&lt;/GDAL_WMS>&#xa;" name="Stamen Toner/OSM">
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Unchecked" id="Stamen_Toner_OSM20180824111638501" source="&lt;GDAL_WMS>&#xd;&#xa;  &lt;Service name=&quot;TMS&quot;>&#xd;&#xa;    &lt;ServerUrl>http://tile.stamen.com/toner/${z}/${x}/${y}.png&lt;/ServerUrl>&#xd;&#xa;  &lt;/Service>&#xd;&#xa;  &lt;DataWindow>&#xd;&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xd;&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xd;&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xd;&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xd;&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xd;&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xd;&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xd;&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xd;&#xa;  &lt;/DataWindow>&#xd;&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xd;&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xd;&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xd;&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xd;&#xa;  &lt;Cache />&#xd;&#xa;&lt;/GDAL_WMS>&#xd;&#xa;" name="Stamen Toner/OSM">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="Stamen_Toner_Lite_OSM20180824111708951" source="&lt;GDAL_WMS>&#xa;  &lt;Service name=&quot;TMS&quot;>&#xa;    &lt;ServerUrl>http://tile.stamen.com/toner-lite/${z}/${x}/${y}.png&lt;/ServerUrl>&#xa;  &lt;/Service>&#xa;  &lt;DataWindow>&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xa;  &lt;/DataWindow>&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xa;  &lt;Cache />&#xa;&lt;/GDAL_WMS>&#xa;" name="Stamen Toner Lite/OSM">
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="Stamen_Toner_Lite_OSM20180824111708951" source="&lt;GDAL_WMS>&#xd;&#xa;  &lt;Service name=&quot;TMS&quot;>&#xd;&#xa;    &lt;ServerUrl>http://tile.stamen.com/toner-lite/${z}/${x}/${y}.png&lt;/ServerUrl>&#xd;&#xa;  &lt;/Service>&#xd;&#xa;  &lt;DataWindow>&#xd;&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xd;&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xd;&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xd;&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xd;&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xd;&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xd;&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xd;&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xd;&#xa;  &lt;/DataWindow>&#xd;&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xd;&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xd;&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xd;&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xd;&#xa;  &lt;Cache />&#xd;&#xa;&lt;/GDAL_WMS>&#xd;&#xa;" name="Stamen Toner Lite/OSM">
       <customproperties/>
     </layer-tree-layer>
   </layer-tree-group>
@@ -41,10 +41,10 @@
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>-9591673.35376333445310593</xmin>
-      <ymin>4827653.80542344227433205</ymin>
-      <xmax>-9587522.88036950305104256</xmax>
-      <ymax>4834305.95899123325943947</ymax>
+      <xmin>-9591679.89820852316915989</xmin>
+      <ymin>4827861.15637873485684395</ymin>
+      <xmax>-9587638.45427343808114529</xmax>
+      <ymax>4833482.49296057783067226</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -83,7 +83,7 @@
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <legendgroup open="false" checked="Qt::Checked" name="corridor">
+    <legendgroup open="true" checked="Qt::Checked" name="corridor">
       <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="indy_corridors" showFeatureCount="0">
         <filegroup open="true" hidden="false">
           <legendlayerfile isInOverview="0" layerid="indy_corridors20180823222647073" visible="1"/>
@@ -140,7 +140,7 @@
           <prop k="style" v="solid"/>
         </layer>
       </symbol>
-      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="14.9368" svgFillColor="0,0,0,255" svgBorderColor="0,0,0,255" northMode="0" file="C:/PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_04.svg" northOffset="0" pictureHeight="23.752" mapId="-1" anchorPoint="0">
+      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="14.9368" svgFillColor="0,0,0,255" svgBorderColor="0,0,0,255" northMode="0" file="../../../../../../PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_04.svg" northOffset="0" pictureHeight="23.752" mapId="-1" anchorPoint="0">
         <ComposerItem pagey="166.3" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="202.586" y="166.3" visibility="1" zValue="7" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="28.8643" outlineWidth="0.3" excludeFromExports="0" uuid="{a924d7da-a3e6-4245-90c7-c9b3c6a32344}" height="23.752" itemRotation="0" frame="false" pagex="202.586">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
@@ -180,11 +180,11 @@
         </ComposerItem>
       </ComposerShape>
       <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="true" followPresetName="" id="1" previewMode="Cache" drawCanvasItems="true">
-        <Extent ymin="4809855.64441140647977591" xmin="-9618771.59189241379499435" ymax="4858079.08819013833999634" xmax="-9557736.14935623854398727"/>
+        <Extent ymin="4809855.64441140647977591" xmin="-9618771.59189241379499435" ymax="4858079.12408752925693989" xmax="-9557736.14935623854398727"/>
         <LayerSet>
-          <Layer provider="postgres" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xa;AND b.year = '2011') AS _subq_1_&#xd;&#xa;)&quot; (geom) sql=" name="lehd_corridors3">lehd_corridors320180823231620899</Layer>
-          <Layer provider="ogr" source="D:\Street-Improvement-Impact\city_maps\indianapolis\primary_roads.shp" name="primary_roads">primary_roads20180823232105797</Layer>
-          <Layer provider="ogr" source="D:\Street-Improvement-Impact\city_maps\indianapolis\indy_boundary.shp" name="indy_boundary">indy_boundary20180823231213437</Layer>
+          <Layer provider="postgres" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;&#xa;AND b.year = '2011') AS _subq_1_&#xd;&#xd;&#xa;)&quot; (geom) sql=" name="lehd_corridors3">lehd_corridors320180823231620899</Layer>
+          <Layer provider="ogr" source="C:/Users/Jamaal/Documents/Street-Improvement-Impact/city_maps/indianapolis/primary_roads.shp" name="primary_roads">primary_roads20180823232105797</Layer>
+          <Layer provider="ogr" source="C:/Users/Jamaal/Documents/Street-Improvement-Impact/city_maps/indianapolis/indy_boundary.shp" name="indy_boundary">indy_boundary20180823231213437</Layer>
         </LayerSet>
         <Grid/>
         <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{45c9587c-65e9-4b28-9860-09919338ba40}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
@@ -253,7 +253,7 @@
           </symbol>
         </ComposerMapOverview>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="0" page="1" id="City Inset" lastValidViewScaleFactor="1.66295" positionMode="0" positionLock="false" x="202.184" y="0" visibility="1" zValue="4" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="94.8153" outlineWidth="0.3" excludeFromExports="0" uuid="{9240a35b-1d90-4932-894a-e127c265e5e0}" height="74.9126" itemRotation="0" frame="false" pagex="202.184">
+        <ComposerItem pagey="0" page="1" id="City Inset" lastValidViewScaleFactor="2.00475" positionMode="0" positionLock="false" x="202.184" y="0" visibility="1" zValue="4" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="94.8153" outlineWidth="0.3" excludeFromExports="0" uuid="{9240a35b-1d90-4932-894a-e127c265e5e0}" height="74.9126" itemRotation="0" frame="false" pagex="202.184">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="192" blue="192" green="192"/>
           <customproperties/>
@@ -265,13 +265,13 @@
         <fillColor2 alpha="255" red="255" blue="255" green="255"/>
         <strokeColor alpha="255" red="0" blue="0" green="0"/>
         <textColor alpha="255" red="0" blue="0" green="0"/>
-        <ComposerItem pagey="190.052" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="12.6029" y="190.052" visibility="1" zValue="3" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="83.7225" outlineWidth="0.3" excludeFromExports="0" uuid="{7111703b-ad39-4c78-95c3-a44ef215469e}" height="20" itemRotation="0" frame="false" pagex="12.6029">
+        <ComposerItem pagey="180.052" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="9.11119" y="180.052" visibility="1" zValue="3" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="83.7225" outlineWidth="0.3" excludeFromExports="0" uuid="{7111703b-ad39-4c78-95c3-a44ef215469e}" height="20" itemRotation="0" frame="false" pagex="9.11119">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
         </ComposerItem>
       </ComposerScaleBar>
-      <ComposerLegend symbolWidth="7" title="" rasterBorderWidth="0" titleAlignment="1" map="0" wmsLegendWidth="50" rasterBorderColor="0,0,0,255" wrapChar="" fontColor="#000000" legendFilterByAtlas="0" columnCount="1" wmsLegendHeight="25" columnSpace="2" symbolHeight="4" equalColumnWidth="0" resizeToContents="1" splitLayer="0" boxSpace="2" rasterBorder="1">
+      <ComposerLegend symbolWidth="7" title="" rasterBorderWidth="0" titleAlignment="1" map="0" wmsLegendWidth="50" rasterBorderColor="0,0,0,255" wrapChar="" fontColor="#000000" columnCount="1" wmsLegendHeight="25" columnSpace="2" symbolHeight="4" equalColumnWidth="0" resizeToContents="1" splitLayer="0" boxSpace="2" rasterBorder="1">
         <styles>
           <style marginBottom="2" name="title">
             <styleFont description="MS Shell Dlg 2,16,-1,5,50,0,0,0,0,0" style=""/>
@@ -296,7 +296,7 @@
               <property key="legend/title-label" value="Corridors"/>
             </customproperties>
           </layer-tree-layer>
-          <layer-tree-layer expanded="0" providerKey="postgres" checked="Qt::Checked" id="lehd_corridors_220180823222204346" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xa;AND b.year = '2009') AS _subq_1_&#xd;&#xa;)&quot; (geom) sql=" name="lehd_corridors_2">
+          <layer-tree-layer expanded="0" providerKey="postgres" checked="Qt::Checked" id="lehd_corridors_220180823222204346" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype, a.name as name, &#xd;&#xa;a.group as group_name&#xd;&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;&#xa;AND b.year = '2009') AS _subq_1_&#xa;)&quot; (geom) sql=&quot;group_name&quot; = 1" name="lehd_corridors_2">
             <customproperties>
               <property key="legend/title-label" value="Census Block Groups"/>
             </customproperties>
@@ -361,13 +361,126 @@
           <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
         </ComposerMapGrid>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="0" page="1" id="Corridor View" lastValidViewScaleFactor="1.66295" positionMode="0" positionLock="true" x="0" y="0" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="297" outlineWidth="0.3" excludeFromExports="0" uuid="{22167115-0970-4079-ac68-4da3c429116c}" height="210" itemRotation="0" frame="false" pagex="0">
+        <ComposerItem pagey="0" page="1" id="Corridor View" lastValidViewScaleFactor="2.00475" positionMode="0" positionLock="true" x="0" y="0" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="297" outlineWidth="0.3" excludeFromExports="0" uuid="{22167115-0970-4079-ac68-4da3c429116c}" height="210" itemRotation="0" frame="false" pagex="0">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
         </ComposerItem>
       </ComposerMap>
-      <customproperties/>
+      <customproperties>
+        <property key="imageCropMarginBottom" value="0"/>
+        <property key="imageCropMarginLeft" value="0"/>
+        <property key="imageCropMarginRight" value="0"/>
+        <property key="imageCropMarginTop" value="0"/>
+        <property key="imageCropToContents" value="false"/>
+      </customproperties>
+    </Composition>
+  </Composer>
+  <Composer title="Virginia Ave." visible="1">
+    <Composition resizeToContentsMarginLeft="0" snapping="0" showPages="1" guidesVisible="1" resizeToContentsMarginTop="0" worldFileMap="{cde3fd47-98f3-4e28-bae9-30d1a570478b}" alignmentSnap="1" printResolution="300" paperWidth="297" gridVisible="0" snapGridOffsetX="0" smartGuides="1" snapGridOffsetY="0" resizeToContentsMarginRight="0" snapTolerancePixels="5" printAsRaster="0" generateWorldFile="0" paperHeight="210" numPages="1" snapGridResolution="10" resizeToContentsMarginBottom="0">
+      <symbol alpha="1" clip_to_extent="1" type="fill" name="">
+        <layer pass="0" class="SimpleFill" locked="0">
+          <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
+          <prop k="color" v="255,255,255,255"/>
+          <prop k="joinstyle" v="miter"/>
+          <prop k="offset" v="0,0"/>
+          <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="outline_color" v="0,0,0,255"/>
+          <prop k="outline_style" v="no"/>
+          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="style" v="solid"/>
+        </layer>
+      </symbol>
+      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="14.9368" svgFillColor="0,0,0,255" svgBorderColor="0,0,0,255" northMode="0" file="../../../../../../PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_04.svg" northOffset="0" pictureHeight="23.752" mapId="-1" anchorPoint="0">
+        <ComposerItem pagey="111.736" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="261.762" y="111.736" visibility="1" zValue="10" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="20.0751" outlineWidth="0.3" excludeFromExports="0" uuid="{683f99a8-c74a-4bca-9f2d-d02c17716912}" height="23.752" itemRotation="0" frame="false" pagex="261.762">
+          <FrameColor alpha="255" red="0" blue="0" green="0"/>
+          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+          <dataDefinedSource expr="" field="" active="false" useExpr="true"/>
+          <customproperties/>
+        </ComposerItem>
+      </ComposerPicture>
+      <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Virgina Avenue Corridors" htmlState="0" halign="1">
+        <LabelFont description="MS Shell Dlg 2,26,-1,5,75,0,0,0,0,0" style=""/>
+        <FontColor red="0" blue="0" green="0"/>
+        <ComposerItem pagey="1" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="160.964" y="1" visibility="1" zValue="5" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="133.036" outlineWidth="0.3" excludeFromExports="0" uuid="{9ee88323-05d5-4a2b-9f94-53bd5f5903c3}" height="15.5808" itemRotation="0" frame="false" pagex="160.964">
+          <FrameColor alpha="255" red="0" blue="0" green="0"/>
+          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+          <customproperties/>
+        </ComposerItem>
+      </ComposerLabel>
+      <ComposerScaleBar lineCapStyle="square" style="Single Box" numMapUnitsPerScaleBarUnit="1" segmentSizeMode="0" alignment="0" numSegments="4" segmentMillimeters="22.0342" lineJoinStyle="miter" minBarWidth="50" numUnitsPerSegment="0.25" units="3" labelBarSpace="3" outlineWidth="0.3" numSegmentsLeft="0" maxBarWidth="150" height="3" boxContentSpace="1" mapId="0" unitLabel="Mi">
+        <scaleBarFont description="MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0" style=""/>
+        <fillColor alpha="255" red="0" blue="0" green="0"/>
+        <fillColor2 alpha="255" red="255" blue="255" green="255"/>
+        <strokeColor alpha="255" red="0" blue="0" green="0"/>
+        <textColor alpha="255" red="0" blue="0" green="0"/>
+        <ComposerItem pagey="182.176" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="2" y="182.176" visibility="1" zValue="3" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="98.5369" outlineWidth="0.3" excludeFromExports="0" uuid="{473e1ab1-da00-448a-a00f-1401167061d6}" height="20" itemRotation="0" frame="false" pagex="2">
+          <FrameColor alpha="255" red="0" blue="0" green="0"/>
+          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+          <customproperties/>
+        </ComposerItem>
+      </ComposerScaleBar>
+      <ComposerLegend symbolWidth="7" title="" rasterBorderWidth="0" titleAlignment="1" map="0" wmsLegendWidth="50" rasterBorderColor="0,0,0,255" wrapChar="" fontColor="#000000" columnCount="1" wmsLegendHeight="25" columnSpace="2" symbolHeight="4" equalColumnWidth="0" resizeToContents="1" splitLayer="0" boxSpace="2" rasterBorder="1">
+        <styles>
+          <style marginBottom="2" name="title">
+            <styleFont description="MS Shell Dlg 2,16,-1,5,50,0,0,0,0,0" style=""/>
+          </style>
+          <style marginTop="2" name="group">
+            <styleFont description="MS Shell Dlg 2,14,-1,5,50,0,0,0,0,0" style=""/>
+          </style>
+          <style marginTop="2" name="subgroup">
+            <styleFont description="MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0" style=""/>
+          </style>
+          <style marginTop="2" name="symbol">
+            <styleFont description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+          </style>
+          <style marginTop="2" marginLeft="2" name="symbolLabel">
+            <styleFont description="MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0" style=""/>
+          </style>
+        </styles>
+        <layer-tree-group expanded="1" checked="Qt::Checked" name="">
+          <customproperties/>
+          <layer-tree-group expanded="1" checked="Qt::Checked" name="">
+            <customproperties/>
+            <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_corridors20180823222647073" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='id' srid=5070 type=MultiLineStringZ table=&quot;public&quot;.&quot;indy_corridors&quot; (geom) sql=" name="indy_corridors">
+              <customproperties>
+                <property key="legend/node-order" value="2,3,4,5"/>
+                <property key="legend/title-label" value="Corridors"/>
+              </customproperties>
+            </layer-tree-layer>
+            <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="lehd_corridors_220180823222204346" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype, a.name as name, &#xd;&#xa;a.group as group_name&#xd;&#xd;&#xd;&#xa;from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;&#xa;where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;&#xa;AND b.year = '2009') AS _subq_1_&#xa;)&quot; (geom) sql=&quot;group_name&quot; = 1" name="lehd_corridors_2">
+              <customproperties>
+                <property key="legend/title-label" value="Block Groups"/>
+              </customproperties>
+            </layer-tree-layer>
+          </layer-tree-group>
+        </layer-tree-group>
+        <ComposerItem pagey="143.05" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="252.75" y="143.05" visibility="1" zValue="2" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="41.1" outlineWidth="0.3" excludeFromExports="0" uuid="{16f1844e-4aab-4ffe-916c-0e91e717c3f9}" height="63.8" itemRotation="0" frame="true" pagex="252.75">
+          <FrameColor alpha="255" red="0" blue="0" green="0"/>
+          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+          <customproperties/>
+        </ComposerItem>
+      </ComposerLegend>
+      <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="0" previewMode="Cache" drawCanvasItems="true">
+        <Extent ymin="4827861.15637873485684395" xmin="-9593643.23032325692474842" ymax="4833482.49296057783067226" xmax="-9585675.12215870432555676"/>
+        <LayerSet/>
+        <Grid/>
+        <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
+        <ComposerItem pagey="1" page="1" id="" lastValidViewScaleFactor="2.50308" positionMode="0" positionLock="false" x="2" y="1" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="292" outlineWidth="0.3" excludeFromExports="0" uuid="{cde3fd47-98f3-4e28-bae9-30d1a570478b}" height="206" itemRotation="0" frame="false" pagex="2">
+          <FrameColor alpha="255" red="0" blue="0" green="0"/>
+          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+          <customproperties/>
+        </ComposerItem>
+      </ComposerMap>
+      <customproperties>
+        <property key="imageCropMarginBottom" value="0"/>
+        <property key="imageCropMarginLeft" value="0"/>
+        <property key="imageCropMarginRight" value="0"/>
+        <property key="imageCropMarginTop" value="0"/>
+        <property key="imageCropToContents" value="false"/>
+      </customproperties>
     </Composition>
   </Composer>
   <projectlayers>
@@ -379,26 +492,26 @@
         <ymax>20037508.33999999985098839</ymax>
       </extent>
       <id>Stamen_Toner_Lite_OSM20180824111708951</id>
-      <datasource>&lt;GDAL_WMS>
-  &lt;Service name="TMS">
-    &lt;ServerUrl>http://tile.stamen.com/toner-lite/${z}/${x}/${y}.png&lt;/ServerUrl>
-  &lt;/Service>
-  &lt;DataWindow>
-    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>
-    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>
-    &lt;LowerRightX>20037508.34&lt;/LowerRightX>
-    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>
-    &lt;TileLevel>18&lt;/TileLevel>
-    &lt;TileCountX>1&lt;/TileCountX>
-    &lt;TileCountY>1&lt;/TileCountY>
-    &lt;YOrigin>top&lt;/YOrigin>
-  &lt;/DataWindow>
-  &lt;Projection>EPSG:3857&lt;/Projection>
-  &lt;BlockSizeX>256&lt;/BlockSizeX>
-  &lt;BlockSizeY>256&lt;/BlockSizeY>
-  &lt;BandsCount>3&lt;/BandsCount>
-  &lt;Cache />
-&lt;/GDAL_WMS>
+      <datasource>&lt;GDAL_WMS>&#xd;
+  &lt;Service name="TMS">&#xd;
+    &lt;ServerUrl>http://tile.stamen.com/toner-lite/${z}/${x}/${y}.png&lt;/ServerUrl>&#xd;
+  &lt;/Service>&#xd;
+  &lt;DataWindow>&#xd;
+    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xd;
+    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xd;
+    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xd;
+    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xd;
+    &lt;TileLevel>18&lt;/TileLevel>&#xd;
+    &lt;TileCountX>1&lt;/TileCountX>&#xd;
+    &lt;TileCountY>1&lt;/TileCountY>&#xd;
+    &lt;YOrigin>top&lt;/YOrigin>&#xd;
+  &lt;/DataWindow>&#xd;
+  &lt;Projection>EPSG:3857&lt;/Projection>&#xd;
+  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xd;
+  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xd;
+  &lt;BandsCount>3&lt;/BandsCount>&#xd;
+  &lt;Cache />&#xd;
+&lt;/GDAL_WMS>&#xd;
 </datasource>
       <keywordList>
         <value></value>
@@ -447,26 +560,26 @@
         <ymax>20037508.33999999985098839</ymax>
       </extent>
       <id>Stamen_Toner_OSM20180824111638501</id>
-      <datasource>&lt;GDAL_WMS>
-  &lt;Service name="TMS">
-    &lt;ServerUrl>http://tile.stamen.com/toner/${z}/${x}/${y}.png&lt;/ServerUrl>
-  &lt;/Service>
-  &lt;DataWindow>
-    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>
-    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>
-    &lt;LowerRightX>20037508.34&lt;/LowerRightX>
-    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>
-    &lt;TileLevel>18&lt;/TileLevel>
-    &lt;TileCountX>1&lt;/TileCountX>
-    &lt;TileCountY>1&lt;/TileCountY>
-    &lt;YOrigin>top&lt;/YOrigin>
-  &lt;/DataWindow>
-  &lt;Projection>EPSG:3857&lt;/Projection>
-  &lt;BlockSizeX>256&lt;/BlockSizeX>
-  &lt;BlockSizeY>256&lt;/BlockSizeY>
-  &lt;BandsCount>3&lt;/BandsCount>
-  &lt;Cache />
-&lt;/GDAL_WMS>
+      <datasource>&lt;GDAL_WMS>&#xd;
+  &lt;Service name="TMS">&#xd;
+    &lt;ServerUrl>http://tile.stamen.com/toner/${z}/${x}/${y}.png&lt;/ServerUrl>&#xd;
+  &lt;/Service>&#xd;
+  &lt;DataWindow>&#xd;
+    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xd;
+    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xd;
+    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xd;
+    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xd;
+    &lt;TileLevel>18&lt;/TileLevel>&#xd;
+    &lt;TileCountX>1&lt;/TileCountX>&#xd;
+    &lt;TileCountY>1&lt;/TileCountY>&#xd;
+    &lt;YOrigin>top&lt;/YOrigin>&#xd;
+  &lt;/DataWindow>&#xd;
+  &lt;Projection>EPSG:3857&lt;/Projection>&#xd;
+  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xd;
+  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xd;
+  &lt;BandsCount>3&lt;/BandsCount>&#xd;
+  &lt;Cache />&#xd;
+&lt;/GDAL_WMS>&#xd;
 </datasource>
       <keywordList>
         <value></value>
@@ -958,10 +1071,10 @@ def my_form_open(dialog, layer, feature):
         <categories>
           <category render="true" symbol="0" value="Mass Ave Comp. Corridor 1&#xa;" label="Massachusetts (comparison)"/>
           <category render="true" symbol="1" value="Mass Ave Improvement Corridor&#xa;" label="Massachusetts (treatment)"/>
-          <category render="true" symbol="2" value="Virginia Ave Comp. Corridor 1&#xa;" label="Meridian Street"/>
-          <category render="true" symbol="3" value="Virginia Ave Comp. Corridor 2&#xa;" label="Prospect Street"/>
-          <category render="true" symbol="4" value="Virginia Ave Comp. Corridor 3&#xa;" label="Shelby Street"/>
-          <category render="true" symbol="5" value="Virginia Ave Improvement Corridor&#xa;" label="Virginia Ave "/>
+          <category render="false" symbol="2" value="Virginia Ave Comp. Corridor 1&#xa;" label="Meridian Street"/>
+          <category render="false" symbol="3" value="Virginia Ave Comp. Corridor 2&#xa;" label="Prospect Street"/>
+          <category render="false" symbol="4" value="Virginia Ave Comp. Corridor 3&#xa;" label="Shelby Street"/>
+          <category render="false" symbol="5" value="Virginia Ave Improvement Corridor&#xa;" label="Virginia Ave "/>
         </categories>
         <symbols>
           <symbol alpha="1" clip_to_extent="1" type="line" name="0">
@@ -1363,7 +1476,7 @@ def my_form_open(dialog, layer, feature):
         <default field="group" expression=""/>
         <default field="grouptype" expression=""/>
       </defaults>
-      <previewExpression></previewExpression>
+      <previewExpression>COALESCE( "name", '&lt;NULL>' )</previewExpression>
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Polygon" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <extent>
@@ -1373,10 +1486,10 @@ def my_form_open(dialog, layer, feature):
         <ymax>1905827.548427389934659</ymax>
       </extent>
       <id>lehd_corridors320180823231620899</id>
-      <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='_uid_' table="(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;
-from indy_corridors a, indy_lehd b&#xd;&#xd;
-where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;
-AND b.year = '2011') AS _subq_1_&#xd;
+      <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='_uid_' table="(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;&#xd;
+from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;
+where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;
+AND b.year = '2011') AS _subq_1_&#xd;&#xd;
 )" (geom) sql=</datasource>
       <keywordList>
         <value></value>
@@ -1499,11 +1612,12 @@ AND b.year = '2011') AS _subq_1_&#xd;
         <ymax>1905827.548427389934659</ymax>
       </extent>
       <id>lehd_corridors_220180823222204346</id>
-      <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='_uid_' table="(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype&#xd;&#xd;
-from indy_corridors a, indy_lehd b&#xd;&#xd;
-where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;
-AND b.year = '2009') AS _subq_1_&#xd;
-)" (geom) sql=</datasource>
+      <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='_uid_' table="(SELECT row_number() over () AS _uid_,* FROM (select b.c000 as c000, b.geom as geom, a.grouptype as grouptype, a.name as name, &#xd;
+a.group as group_name&#xd;&#xd;&#xd;
+from indy_corridors a, indy_lehd b&#xd;&#xd;&#xd;
+where st_intersects(st_buffer(a.geom, 20), b.geom)&#xd;&#xd;&#xd;
+AND b.year = '2009') AS _subq_1_
+)" (geom) sql="group_name" = 1</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1535,6 +1649,12 @@ AND b.year = '2009') AS _subq_1_&#xd;
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="grouptype">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="name">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="group_name">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
       </edittypes>
@@ -1805,6 +1925,8 @@ AND b.year = '2009') AS _subq_1_&#xd;
         <alias field="_uid_" index="0" name=""/>
         <alias field="c000" index="1" name=""/>
         <alias field="grouptype" index="2" name=""/>
+        <alias field="name" index="3" name=""/>
+        <alias field="group_name" index="4" name=""/>
       </aliases>
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
@@ -1815,6 +1937,8 @@ AND b.year = '2009') AS _subq_1_&#xd;
           <column width="-1" hidden="0" type="field" name="c000"/>
           <column width="-1" hidden="0" type="field" name="grouptype"/>
           <column width="-1" hidden="1" type="actions"/>
+          <column width="-1" hidden="0" type="field" name="name"/>
+          <column width="-1" hidden="0" type="field" name="group_name"/>
         </columns>
       </attributetableconfig>
       <editform>.</editform>
@@ -1849,8 +1973,10 @@ def my_form_open(dialog, layer, feature):
         <default field="_uid_" expression=""/>
         <default field="c000" expression=""/>
         <default field="grouptype" expression=""/>
+        <default field="name" expression=""/>
+        <default field="group_name" expression=""/>
       </defaults>
-      <previewExpression></previewExpression>
+      <previewExpression>COALESCE( "_uid_", '&lt;NULL>' )</previewExpression>
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <id>primary_roads20180823232105797</id>
