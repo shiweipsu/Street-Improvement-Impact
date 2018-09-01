@@ -92,6 +92,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -129,7 +132,7 @@ $(document).ready(function () {
 <div id="seattle-model-outputsdid-and-its" class="section level1">
 <h1>seattle model outputs…DiD and ITS</h1>
 <pre><code>## Loading required package: pacman</code></pre>
-<pre><code>## Warning: package 'pacman' was built under R version 3.4.2</code></pre>
+<pre><code>## Warning: package 'pacman' was built under R version 3.4.4</code></pre>
 <p>Reading layer <code>seattle_corridor_lehd_wgs84' from data source</code>C:-Improvement-Impact_corridor_lehd_wgs84.geojson’ using driver `GeoJSON’ Simple feature collection with 2498 features and 36 fields geometry type: POLYGON dimension: XY bbox: xmin: -122.3422 ymin: 47.60083 xmax: -122.3113 ymax: 47.67658 epsg (SRID): 4326 proj4string: +proj=longlat +datum=WGS84 +no_defs</p>
 <pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
 <table style="text-align:center">
@@ -198,16 +201,16 @@ Accomodations Emp.
 </tr>
 <tr>
 <td style="text-align:left">
-TypeStudy
+TypeControl
 </td>
 <td>
--655.273<sup>***</sup>
+655.273<sup>***</sup>
 </td>
 <td>
--1,498.091<sup>***</sup>
+1,498.091<sup>***</sup>
 </td>
 <td>
--2,153.364<sup>***</sup>
+2,153.364<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -238,13 +241,13 @@ TypeStudy
 prepost
 </td>
 <td>
--85.727
+95.545
 </td>
 <td>
-770.273<sup>***</sup>
+-96.636
 </td>
 <td>
-684.545<sup>***</sup>
+-1.091
 </td>
 </tr>
 <tr>
@@ -272,16 +275,16 @@ prepost
 </tr>
 <tr>
 <td style="text-align:left">
-TypeStudy:prepost
+TypeControl:prepost
 </td>
 <td>
-181.273
+-181.273
 </td>
 <td>
--866.909<sup>***</sup>
+866.909<sup>***</sup>
 </td>
 <td>
--685.636<sup>**</sup>
+685.636<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -312,13 +315,13 @@ TypeStudy:prepost
 Constant
 </td>
 <td>
-902.727<sup>***</sup>
+247.455<sup>***</sup>
 </td>
 <td>
-2,587.727<sup>***</sup>
+1,089.636<sup>***</sup>
 </td>
 <td>
-3,490.455<sup>***</sup>
+1,337.091<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -790,16 +793,16 @@ Accomodations Emp.
 </tr>
 <tr>
 <td style="text-align:left">
-TypeControl: E Olive Way
+TypeControl: 15th Ave E
 </td>
 <td>
--150.600<sup>***</sup>
+-118.600<sup>***</sup>
 </td>
 <td>
--65.100<sup>***</sup>
+-147.900<sup>***</sup>
 </td>
 <td>
--215.700<sup>***</sup>
+-266.500<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -827,16 +830,16 @@ TypeControl: E Olive Way
 </tr>
 <tr>
 <td style="text-align:left">
-TypeStudy
+TypeControl: E Olive Way
 </td>
 <td>
-118.600<sup>***</sup>
+-269.200<sup>***</sup>
 </td>
 <td>
-147.900<sup>***</sup>
+-213.000<sup>***</sup>
 </td>
 <td>
-266.500<sup>***</sup>
+-482.200<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -867,13 +870,13 @@ TypeStudy
 prepost
 </td>
 <td>
-93.900<sup>*</sup>
+127.300<sup>**</sup>
 </td>
 <td>
-23.100
+293.700<sup>***</sup>
 </td>
 <td>
-117.000
+421.000<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -901,16 +904,16 @@ prepost
 </tr>
 <tr>
 <td style="text-align:left">
-TypeControl: E Olive Way:prepost
+TypeControl: 15th Ave E:prepost
 </td>
 <td>
--99.400
+-33.400
 </td>
 <td>
-5.100
+-270.600<sup>***</sup>
 </td>
 <td>
--94.300
+-304.000<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -938,16 +941,16 @@ TypeControl: E Olive Way:prepost
 </tr>
 <tr>
 <td style="text-align:left">
-TypeStudy:prepost
+TypeControl: E Olive Way:prepost
 </td>
 <td>
-33.400
+-132.800<sup>*</sup>
 </td>
 <td>
-270.600<sup>***</sup>
+-265.500<sup>***</sup>
 </td>
 <td>
-304.000<sup>***</sup>
+-398.300<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -978,13 +981,13 @@ TypeStudy:prepost
 Constant
 </td>
 <td>
-183.100<sup>***</sup>
+301.700<sup>***</sup>
 </td>
 <td>
-207.400<sup>***</sup>
+355.300<sup>***</sup>
 </td>
 <td>
-390.500<sup>***</sup>
+657.000<sup>***</sup>
 </td>
 </tr>
 <tr>
