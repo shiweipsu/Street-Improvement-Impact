@@ -1,0 +1,234 @@
+---
+title: "Portland_corridors"
+author: "Wei Shi"
+date: "August 30, 2018"
+output:
+  word_document: default
+  pdf_document:
+    includes:
+      in_header: header.tex
+    number_sections: true
+fig_width: 7
+fig_height: 5
+---
+
+```{r setup,include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## load data
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, dplyr, dbplyr, stargazer,cowplot)
+
+#query the corridors from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+portland_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01, a.cd01 as cd01, a.cd02 as cd02, a.cd02 as cd03, a.cd04 as cd04, b.streetname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+FROM portland_lehd a, portland_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
+portland_corridor[portland_corridor$name =="EVERETT",]$type <- "Control: Everett"
+portland_corridor[portland_corridor$name=="ALDER",]$type <- "Control: Alder"
+portland_corridor$type <- as.factor(portland_corridor$type)
+
+portland_corridor <- portland_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04, Group=corridor_group,
+         BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+
+portland_lehd <- st_read(dsn = con, query = "SELECT * FROM portland_lehd") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+portland_emp_ratio <- employ_ratio_test(portland_corridor)
+
+portland_growth <- growth_rate(portland_corridor)
+
+dbDisconnect(con)
+
+```
+
+
+# corridor comparison
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+#comparisons-----
+
+# prepare city level data & block level corridor data at the year before construction
+conyear <- first(filter(portland_corridor, Group== 1, Type== "Treatment")$BuildStart)-1 
+# find the year before construction
+
+portland_lehd_2008 <- portland_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+stark <- portland_corridor %>% filter(Group ==1, Type =="Treatment", year==conyear) %>% employ_ratio_test(.)
+
+alder <- portland_corridor %>% filter(Group ==1, Type =="Control: Alder", year ==conyear) %>% employ_ratio_test(.)
+
+everett <- portland_corridor %>% filter(Group ==1, Type =="Control: Everett", year ==conyear) %>% employ_ratio_test(.)
+
+
+# find quantile dataframe 
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(portland_lehd_2008$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(portland_lehd_2008$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(portland_lehd_2008$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
+
+stark %>% summarise(TotEmp = sum(C000)/nrow(stark), RetailEmp = sum(CNS07)/nrow(stark),
+                                     AccomEmp = sum(CNS18)/nrow(stark)) %>% as.data.frame()
+alder %>% summarise(TotEmp = sum(C000)/nrow(alder), RetailEmp = sum(CNS07)/nrow(alder),
+                                     AccomEmp = sum(CNS18)/nrow(alder)) %>% as.data.frame
+everett %>% summarise(TotEmp = sum(C000)/nrow(everett), RetailEmp = sum(CNS07)/nrow(everett),
+                                     AccomEmp = sum(CNS18)/nrow(everett)) %>% as.data.frame
+# get employment at block level, divided by nrow()
+ 
+
+# t-test: compare retail, food_accom, business amount---
+t.test(stark$Business, alder$Business)
+t.test(stark$Retail, alder$Retail)
+t.test(stark$Food_Accom, alder$Food_Accom)
+t.test(stark$ratio1, alder$ratio1)
+t.test(stark$ratio2, alder$ratio2)
+
+t.test(stark$Business, everett$Business) # sig
+t.test(stark$Retail, everett$Retail)
+t.test(stark$Food_Accom, everett$Food_Accom) # sig
+t.test(stark$ratio1, everett$ratio1)
+t.test(stark$ratio2, everett$ratio2)
+
+
+# t-tests: growth rate----
+
+stark_growth <- portland_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Treatment", year<=conyear) 
+alder_growth <- portland_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Control: Alder", year<=conyear) 
+everett_growth <- portland_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Control: Everett", year<=conyear) 
+
+t.test(stark_growth$biz_growth,alder_growth$biz_growth)
+t.test(stark_growth$retail_growth,alder_growth$retail_growth)
+t.test(stark_growth$food_accom_growth,alder_growth$food_accom_growth)
+
+t.test(stark_growth$biz_growth,everett_growth$biz_growth)
+t.test(stark_growth$retail_growth,everett_growth$retail_growth)
+t.test(stark_growth$food_accom_growth,everett_growth$food_accom_growth)
+
+```
+
+# plot trend
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+stark_agg <- agg_trend_table(portland_corridor, group = 1)
+
+agg_retail_trend_plot <- agg_trend_plot(stark_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2011, end_year = 2012)
+
+agg_food_trend_plot <- agg_trend_plot(stark_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Stark & Oak Avenue", construct_year = 2011, end_year = 2012)
+
+plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
+```
+
+
+
+# distributional analysis
+```{r, fig.width=9.5, fig.asp=0.5}
+stark_dist <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    low_income = sum(CE01), mid_income = sum(CE02), high_income = sum(CE03), white = sum(CR01),
+    bach = sum(CD04), col = sum(CD03), high_sch = sum(CD02), tot_emp = sum(C000)) %>% 
+  mutate(
+    low_inc_perc = low_income/tot_emp*100,
+    white_perc = white/tot_emp*100,
+    bach_col_perc = (bach+col)/tot_emp*100) 
+
+pdx_dist <- portland_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    low_income = sum(CE01), mid_income = sum(CE02), high_income = sum(CE03), white = sum(CR01),
+    bach = sum(CD04), col = sum(CD03), high_sch = sum(CD02), tot_emp = sum(C000)) %>% 
+  mutate(
+    low_inc_perc = low_income/tot_emp*100,
+    white_perc = white/tot_emp*100,
+    bach_col_perc = (bach+col)/tot_emp*100,
+    Type = "City") %>% 
+  select(Type, year:bach_col_perc)
+
+stark_dist <- rbind(as.data.frame(stark_dist), as.data.frame(pdx_dist))
+stark_dist[stark_dist == 0] <- NA
+stark_dist$Type <- as.factor(as.character(stark_dist$Type))
+  
+inc_plot <- dist_trend_plot(stark_dist,demo = "Low Income", demo_code = "low_inc_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
+
+race_plot <- dist_trend_plot(stark_dist,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
+
+edu_plot <- dist_trend_plot(stark_dist,demo = "Attaining College Above Education", demo_code = "bach_col_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
+
+plot_grid(inc_plot, race_plot, edu_plot, nrow = 2)
+
+```
+
+
+## trend analysis
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+
+stark_agg <- agg_index_trend_table(portland_corridor, group = 1, construct_year = 2009)
+stark_agg$Type <- as.character(stark_agg$Type)
+portland <- portland_lehd %>% group_by(year) %>%
+  summarise(CNS07 = sum(CNS07),
+            CNS18 = sum(CNS18),
+            business = CNS07 + CNS18) %>%
+  mutate(CNS07_sd = CNS07/309.39,
+         CNS18_sd = CNS18/301.37,
+         business_sd = business/610.76,
+         Type = "City") %>%
+  select(Type, year, CNS07_sd, CNS18_sd, business_sd)
+stark_agg <- rbind(as.data.frame(stark_agg), as.data.frame(portland))
+stark_agg$Type <- as.factor(as.character(stark_agg$Type))
+
+stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2011)
+stark_agg_food_plot <- agg_index_trend_plot(stark_agg, industry = "Food/Accommodations", corridor_name = "Stark & Oak Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+plot_grid(stark_agg_retail_plot,stark_agg_food_plot)
+```
+
+
+# model
+```{r, echo=FALSE, results='asis'}
+
+portland_corridor$Type <- relevel(portland_corridor$Type,ref = "Treatment")
+
+#stark ave
+
+stark_agg_did <- did_agg_analysis(portland_corridor, group = 1, endyear = 2010)
+stargazer(stark_agg_did[[1]], stark_agg_did[[2]], stark_agg_did[[3]], 
+          title = "Stark & Oak Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+stark_agg_its <- agg_its_analysis(portland_corridor, group = 1, endyear = 2010)
+stargazer(stark_agg_its[[1]], stark_agg_its[[2]], stark_agg_its[[3]], 
+          title = "Stark & Oak Ave. Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
