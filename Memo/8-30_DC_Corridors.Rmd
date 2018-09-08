@@ -130,3 +130,15 @@ dc_growth <- growth_rate(dc_corridor)
 
 
 ```
+
+# 3. Corridor Comparisons
+
+Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for Washington DC as a whole for the year before construction. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
+
+Due to the data limitations of the LODES data for Washington DC we can test only the L and M Street corridors as they were completed after 2010. [if and when we get ancillary data we can update this]
+
+## 3.1 14th St.
+
+[insert map image here]
+
+Our first treatment corridor is 14th Street. Constructed in 2002, 14th is the oldest improved corridor in our data set. It's comparator corridor is Georgia Avenue NW, ranging from Irving to Upshur.
