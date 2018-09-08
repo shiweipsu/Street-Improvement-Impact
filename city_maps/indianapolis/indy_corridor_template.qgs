@@ -3,18 +3,24 @@
   <title></title>
   <autotransaction active="0"/>
   <evaluateDefaultValues active="0"/>
-  <layer-tree-group expanded="1" checked="Qt::Checked" name="">
+  <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
     <customproperties/>
     <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_corridors20180907114350944" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='id' table=&quot;public&quot;.&quot;indy_corridors&quot; (geom) sql=" name="indy_corridors">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_lehd20180907114703027" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select a.c000 as tot_emp, a.geom, b.group as street_group&#xd;&#xa;from indy_lehd a, indy_corridors b&#xd;&#xa;where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1_&#xa;)&quot; (geom) sql=" name="indy_lehd">
+    <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_lehd20180907114703027" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select a.c000 as tot_emp, a.geom, b.group as street_group, b.grouptype as grouptype, b.name as street_name&#xd;&#xa;from indy_lehd a, indy_corridors b&#xd;&#xa;where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1_&#xa;)&quot; (geom) sql=" name="indy_lehd">
       <customproperties/>
     </layer-tree-layer>
     <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="indy_boundary20180907115645192" source="D:/Street-Improvement-Impact/city_maps/indianapolis/indy_boundary.shp" name="indy_boundary">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="Stamen_Toner_Lite_OSM20180904162730212" source="&lt;GDAL_WMS>&#xd;&#xa;  &lt;Service name=&quot;TMS&quot;>&#xd;&#xa;    &lt;ServerUrl>http://tile.stamen.com/toner-lite/${z}/${x}/${y}.png&lt;/ServerUrl>&#xd;&#xa;  &lt;/Service>&#xd;&#xa;  &lt;DataWindow>&#xd;&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xd;&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xd;&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xd;&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xd;&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xd;&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xd;&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xd;&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xd;&#xa;  &lt;/DataWindow>&#xd;&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xd;&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xd;&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xd;&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xd;&#xa;  &lt;Cache />&#xd;&#xa;&lt;/GDAL_WMS>&#xd;&#xa;" name="Stamen Toner Lite/OSM">
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Unchecked" id="Stamen_Toner_Lite_OSM20180904162730212" source="&lt;GDAL_WMS>&#xd;&#xa;  &lt;Service name=&quot;TMS&quot;>&#xd;&#xa;    &lt;ServerUrl>http://tile.stamen.com/toner-lite/${z}/${x}/${y}.png&lt;/ServerUrl>&#xd;&#xa;  &lt;/Service>&#xd;&#xa;  &lt;DataWindow>&#xd;&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xd;&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xd;&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xd;&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xd;&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xd;&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xd;&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xd;&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xd;&#xa;  &lt;/DataWindow>&#xd;&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xd;&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xd;&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xd;&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xd;&#xa;  &lt;Cache />&#xd;&#xa;&lt;/GDAL_WMS>&#xd;&#xa;" name="Stamen Toner Lite/OSM">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="1" providerKey="wms" checked="Qt::Checked" id="Stamen_Toner_Lite20180907164543821" source="type=xyz&amp;zmin=0&amp;zmax=20&amp;url=http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png" name="Stamen Toner Lite">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="wms" checked="Qt::Unchecked" id="Stamen_Toner20180907164549158" source="type=xyz&amp;zmin=0&amp;zmax=20&amp;url=http://tile.stamen.com/toner/{z}/{x}/{y}.png" name="Stamen Toner">
       <customproperties/>
     </layer-tree-layer>
   </layer-tree-group>
@@ -22,10 +28,10 @@
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>-9591910.00578631833195686</xmin>
-      <ymin>4827398.83927301224321127</ymin>
-      <xmax>-9587110.62414362654089928</xmax>
-      <ymax>4834565.18772587087005377</ymax>
+      <xmin>-9591673.35376333445310593</xmin>
+      <ymin>4827653.80542344227433205</ymin>
+      <xmax>-9587522.88036950305104256</xmax>
+      <ymax>4834305.95899123325943947</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -44,6 +50,7 @@
     <rendermaptile>0</rendermaptile>
     <layer_coordinate_transform_info>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:5070" srcDatumTransform="-1" destDatumTransform="-1" layerid="indy_lehd20180907114703027"/>
+      <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="Stamen_Toner20180907164549158"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:4269" srcDatumTransform="-1" destDatumTransform="-1" layerid="memphis_city_boundary20180904161048058"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="Stamen_Toner_Lite_OSM20180904162730212"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:4269" srcDatumTransform="-1" destDatumTransform="-1" layerid="indy_boundary20180907115645192"/>
@@ -52,6 +59,7 @@
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="Stamen_Toner_OSM20180904162956494"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:5070" srcDatumTransform="-1" destDatumTransform="-1" layerid="indy_corridors20180907114350944"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:5070" srcDatumTransform="-1" destDatumTransform="-1" layerid="memhpis_corridors20180904160836397"/>
+      <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="Stamen_Toner_Lite20180907164543821"/>
     </layer_coordinate_transform_info>
   </mapcanvas>
   <layer-tree-canvas>
@@ -60,6 +68,8 @@
       <item>indy_corridors20180907114350944</item>
       <item>indy_lehd20180907114703027</item>
       <item>indy_boundary20180907115645192</item>
+      <item>Stamen_Toner_Lite20180907164543821</item>
+      <item>Stamen_Toner20180907164549158</item>
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
@@ -78,9 +88,19 @@
         <legendlayerfile isInOverview="0" layerid="indy_boundary20180907115645192" visible="1"/>
       </filegroup>
     </legendlayer>
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Stamen Toner Lite/OSM" showFeatureCount="0">
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="Stamen Toner Lite/OSM" showFeatureCount="0">
       <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="Stamen_Toner_Lite_OSM20180904162730212" visible="1"/>
+        <legendlayerfile isInOverview="0" layerid="Stamen_Toner_Lite_OSM20180904162730212" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Stamen Toner Lite" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="Stamen_Toner_Lite20180907164543821" visible="1"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="Stamen Toner" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="Stamen_Toner20180907164549158" visible="0"/>
       </filegroup>
     </legendlayer>
   </legend>
@@ -153,7 +173,7 @@
           <customproperties/>
         </ComposerItem>
       </ComposerShape>
-      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="7.14983" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="../../PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_02.svg" northOffset="0" pictureHeight="11.3694" mapId="-1" anchorPoint="0">
+      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="11.0773" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="../../PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_02.svg" northOffset="0" pictureHeight="11.1453" mapId="-1" anchorPoint="0">
         <ComposerItem pagey="16" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="243.412" y="16" visibility="1" zValue="6" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="11.0773" outlineWidth="0.3" excludeFromExports="0" uuid="{fdfae5b8-455c-4d0b-a6e2-9c8e9266ff31}" height="11.3694" itemRotation="0" frame="false" pagex="243.412">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
@@ -273,7 +293,7 @@
           <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
         </ComposerMapGrid>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="16" page="1" id="" lastValidViewScaleFactor="4.06237" positionMode="0" positionLock="false" x="14" y="16" visibility="1" zValue="2" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="191.8" outlineWidth="0.3" excludeFromExports="0" uuid="{cb5329f4-55a0-4123-90b1-740aaa0861a1}" height="176" itemRotation="0" frame="false" pagex="14">
+        <ComposerItem pagey="16" page="1" id="" lastValidViewScaleFactor="2.78621" positionMode="0" positionLock="false" x="14" y="16" visibility="1" zValue="2" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="191.8" outlineWidth="0.3" excludeFromExports="0" uuid="{cb5329f4-55a0-4123-90b1-740aaa0861a1}" height="176" itemRotation="0" frame="false" pagex="14">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -332,7 +352,7 @@
           <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
         </ComposerMapGrid>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="47.5885" page="1" id="" lastValidViewScaleFactor="4.06237" positionMode="0" positionLock="false" x="210.683" y="47.5885" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="76.5348" outlineWidth="0.3" excludeFromExports="0" uuid="{eed9e4aa-3af2-4800-aed5-8712347d10c5}" height="56.4115" itemRotation="0" frame="false" pagex="210.683">
+        <ComposerItem pagey="47.5885" page="1" id="" lastValidViewScaleFactor="2.78621" positionMode="0" positionLock="false" x="210.683" y="47.5885" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="76.5348" outlineWidth="0.3" excludeFromExports="0" uuid="{eed9e4aa-3af2-4800-aed5-8712347d10c5}" height="56.4115" itemRotation="0" frame="false" pagex="210.683">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -358,17 +378,43 @@
           <prop k="style" v="solid"/>
         </layer>
       </symbol>
+      <ComposerShape shapeType="1" cornerRadius="0">
+        <symbol alpha="1" clip_to_extent="1" type="fill" name="">
+          <layer pass="0" class="SimpleLine" locked="0">
+            <prop k="capstyle" v="square"/>
+            <prop k="customdash" v="5;2"/>
+            <prop k="customdash_map_unit_scale" v="0,0,0,0,0,0"/>
+            <prop k="customdash_unit" v="MM"/>
+            <prop k="draw_inside_polygon" v="0"/>
+            <prop k="joinstyle" v="miter"/>
+            <prop k="line_color" v="0,0,0,255"/>
+            <prop k="line_style" v="solid"/>
+            <prop k="line_width" v="0.5"/>
+            <prop k="line_width_unit" v="MM"/>
+            <prop k="offset" v="0"/>
+            <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+            <prop k="offset_unit" v="MM"/>
+            <prop k="use_custom_dash" v="0"/>
+            <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
+          </layer>
+        </symbol>
+        <ComposerItem pagey="74.2455" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="253.557" y="74.2455" visibility="1" zValue="9" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="12.5619" outlineWidth="0.3" excludeFromExports="0" uuid="{5c651dc6-c38f-4292-8857-1d9a6fccc4af}" height="8.61384" itemRotation="0" frame="false" pagex="253.557">
+          <FrameColor alpha="255" red="0" blue="0" green="0"/>
+          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+          <customproperties/>
+        </ComposerItem>
+      </ComposerShape>
       <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Indianapolis Corridors" htmlState="0" halign="1">
         <LabelFont description="MS Shell Dlg 2,24,-1,5,75,0,0,0,0,0" style=""/>
         <FontColor red="0" blue="0" green="0"/>
-        <ComposerItem pagey="-6.66134e-16" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0" y="-6.66134e-16" visibility="1" zValue="9" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="112.575" outlineWidth="0.3" excludeFromExports="0" uuid="{1d537706-31d6-4658-aafd-d70ee08ca227}" height="13.7583" itemRotation="0" frame="false" pagex="0">
+        <ComposerItem pagey="0" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0" y="0" visibility="1" zValue="8" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="112.575" outlineWidth="0.3" excludeFromExports="0" uuid="{1d537706-31d6-4658-aafd-d70ee08ca227}" height="15.875" itemRotation="0" frame="false" pagex="0">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
         </ComposerItem>
       </ComposerLabel>
-      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="11.3143" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="C:/PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_02.svg" northOffset="0" pictureHeight="17.9917" mapId="-1" anchorPoint="0">
-        <ComposerItem pagey="13.7583" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="256.178" y="13.7583" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="14.8042" outlineWidth="0.3" excludeFromExports="0" uuid="{b05f1b7c-e94f-4f5b-9420-3882a63ab5e7}" height="17.9917" itemRotation="0" frame="false" pagex="256.178">
+      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="11.3144" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="C:/PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_02.svg" northOffset="0" pictureHeight="17.9917" mapId="-1" anchorPoint="0">
+        <ComposerItem pagey="6.87915" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="273.406" y="6.87915" visibility="1" zValue="7" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="14.8042" outlineWidth="0.3" excludeFromExports="0" uuid="{b05f1b7c-e94f-4f5b-9420-3882a63ab5e7}" height="17.9917" itemRotation="0" frame="false" pagex="273.406">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <dataDefinedSource expr="" field="" active="false" useExpr="true"/>
@@ -397,46 +443,68 @@
             </layer>
           </symbol>
         </lineStyle>
-        <StartPoint x="253.471" y="76.7292"/>
-        <StopPoint x="234.207" y="46.0375"/>
-        <ComposerItem pagey="43.3304" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="231.5" y="43.3304" visibility="1" zValue="7" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.6779" outlineWidth="0.3" excludeFromExports="0" uuid="{81f6151d-4199-4c28-93c1-06c59a0c2fbb}" height="36.1059" itemRotation="0" frame="false" pagex="231.5">
+        <StartPoint x="253.471" y="75.8453"/>
+        <StopPoint x="234.207" y="45.1536"/>
+        <ComposerItem pagey="42.4465" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="231.5" y="42.4465" visibility="1" zValue="6" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.6782" outlineWidth="0.3" excludeFromExports="0" uuid="{81f6151d-4199-4c28-93c1-06c59a0c2fbb}" height="36.1059" itemRotation="0" frame="false" pagex="231.5">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
         </ComposerItem>
       </ComposerArrow>
-      <ComposerShape shapeType="1" cornerRadius="0">
-        <symbol alpha="1" clip_to_extent="1" type="fill" name="">
-          <layer pass="0" class="SimpleLine" locked="0">
-            <prop k="capstyle" v="square"/>
-            <prop k="customdash" v="5;2"/>
-            <prop k="customdash_map_unit_scale" v="0,0,0,0,0,0"/>
-            <prop k="customdash_unit" v="MM"/>
-            <prop k="draw_inside_polygon" v="0"/>
-            <prop k="joinstyle" v="miter"/>
-            <prop k="line_color" v="0,0,0,255"/>
-            <prop k="line_style" v="solid"/>
-            <prop k="line_width" v="0.5"/>
-            <prop k="line_width_unit" v="MM"/>
-            <prop k="offset" v="0"/>
-            <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
-            <prop k="offset_unit" v="MM"/>
-            <prop k="use_custom_dash" v="0"/>
-            <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
-          </layer>
-        </symbol>
-        <ComposerItem pagey="76.9833" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="255.077" y="76.9833" visibility="1" zValue="5" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="9.02292" outlineWidth="0.3" excludeFromExports="0" uuid="{6fed2624-7a33-4d92-aafa-4c778a3d39bc}" height="9.525" itemRotation="0" frame="false" pagex="255.077">
-          <FrameColor alpha="255" red="0" blue="0" green="0"/>
-          <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
-          <customproperties/>
-        </ComposerItem>
-      </ComposerShape>
       <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="1" previewMode="Cache" drawCanvasItems="true">
-        <Extent ymin="4794600.1061170045286417" xmin="-9618296.09696957841515541" ymax="4873430.90804694592952728" xmax="-9558211.64427907392382622"/>
+        <Extent ymin="4794600.1061170045286417" xmin="-9618296.09696957841515541" ymax="4869820.3369661858305335" xmax="-9558211.64427907392382622"/>
         <LayerSet/>
         <Grid/>
+        <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{aaf3480c-0f68-4097-8c42-d66e0e91c4f9}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
+          <lineStyle>
+            <symbol alpha="1" clip_to_extent="1" type="line" name="">
+              <layer pass="0" class="SimpleLine" locked="0">
+                <prop k="capstyle" v="square"/>
+                <prop k="customdash" v="5;2"/>
+                <prop k="customdash_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="customdash_unit" v="MM"/>
+                <prop k="draw_inside_polygon" v="0"/>
+                <prop k="joinstyle" v="bevel"/>
+                <prop k="line_color" v="0,0,0,255"/>
+                <prop k="line_style" v="solid"/>
+                <prop k="line_width" v="0"/>
+                <prop k="line_width_unit" v="MM"/>
+                <prop k="offset" v="0"/>
+                <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="offset_unit" v="MM"/>
+                <prop k="use_custom_dash" v="0"/>
+                <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
+              </layer>
+            </symbol>
+          </lineStyle>
+          <markerStyle>
+            <symbol alpha="1" clip_to_extent="1" type="marker" name="">
+              <layer pass="0" class="SimpleMarker" locked="0">
+                <prop k="angle" v="0"/>
+                <prop k="color" v="0,0,0,255"/>
+                <prop k="horizontal_anchor_point" v="1"/>
+                <prop k="joinstyle" v="bevel"/>
+                <prop k="name" v="circle"/>
+                <prop k="offset" v="0,0"/>
+                <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="offset_unit" v="MM"/>
+                <prop k="outline_color" v="0,0,0,255"/>
+                <prop k="outline_style" v="solid"/>
+                <prop k="outline_width" v="0"/>
+                <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="outline_width_unit" v="MM"/>
+                <prop k="scale_method" v="diameter"/>
+                <prop k="size" v="2"/>
+                <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="size_unit" v="MM"/>
+                <prop k="vertical_anchor_point" v="1"/>
+              </layer>
+            </symbol>
+          </markerStyle>
+          <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+        </ComposerMapGrid>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="38.6292" page="1" id="" lastValidViewScaleFactor="1.88976" positionMode="0" positionLock="true" x="231.5" y="38.6292" visibility="1" zValue="4" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="62.5" outlineWidth="0.3" excludeFromExports="0" uuid="{ba42070f-e7ad-4159-9981-e6ce0b5ed955}" height="82" itemRotation="0" frame="false" pagex="231.5">
+        <ComposerItem pagey="37.5524" page="1" id="" lastValidViewScaleFactor="2.78621" positionMode="0" positionLock="false" x="231.5" y="37.5524" visibility="1" zValue="4" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="65.5" outlineWidth="0.3" excludeFromExports="0" uuid="{ba42070f-e7ad-4159-9981-e6ce0b5ed955}" height="82" itemRotation="0" frame="false" pagex="231.5">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -464,39 +532,87 @@
           <customproperties/>
           <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_corridors20180907114350944" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='id' table=&quot;public&quot;.&quot;indy_corridors&quot; (geom) sql=" name="indy_corridors">
             <customproperties>
-              <property key="legend/title-label" value="Indianapolis corridors"/>
+              <property key="legend/title-label" value="Indianapolis Corridors"/>
             </customproperties>
           </layer-tree-layer>
-          <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_lehd20180907114703027" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select a.c000 as tot_emp, a.geom, b.group as street_group&#xd;&#xa;from indy_lehd a, indy_corridors b&#xd;&#xa;where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1_&#xa;)&quot; (geom) sql=" name="indy_lehd">
+          <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="indy_lehd20180907114703027" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' sslmode=disable key='_uid_' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select a.c000 as tot_emp, a.geom, b.group as street_group, b.grouptype as grouptype, b.name as street_name&#xd;&#xa;from indy_lehd a, indy_corridors b&#xd;&#xa;where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1_&#xa;)&quot; (geom) sql=" name="indy_lehd">
             <customproperties>
-              <property key="legend/title-label" value="Corridor groups"/>
+              <property key="legend/title-label" value="Corridor Groups"/>
             </customproperties>
           </layer-tree-layer>
         </layer-tree-group>
-        <ComposerItem pagey="134.4" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="231.5" y="134.4" visibility="1" zValue="3" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="65.5" outlineWidth="0.3" excludeFromExports="0" uuid="{26664ce2-8ad5-402b-bcdb-1ed548be5222}" height="75.6" itemRotation="0" frame="false" pagex="231.5">
+        <ComposerItem pagey="134.4" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="231.5" y="134.4" visibility="1" zValue="3" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="65.5" outlineWidth="0.3" excludeFromExports="0" uuid="{26664ce2-8ad5-402b-bcdb-1ed548be5222}" height="75.6" itemRotation="0" frame="false" pagex="231.5">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
         </ComposerItem>
       </ComposerLegend>
-      <ComposerScaleBar lineCapStyle="square" style="Single Box" numMapUnitsPerScaleBarUnit="1" segmentSizeMode="0" alignment="0" numSegments="4" segmentMillimeters="14.513" lineJoinStyle="miter" minBarWidth="50" numUnitsPerSegment="0.25" units="3" labelBarSpace="3" outlineWidth="0.3" numSegmentsLeft="0" maxBarWidth="150" height="3" boxContentSpace="1" mapId="0" unitLabel="Miles">
+      <ComposerScaleBar lineCapStyle="square" style="Single Box" numMapUnitsPerScaleBarUnit="1" segmentSizeMode="0" alignment="0" numSegments="4" segmentMillimeters="16.0971" lineJoinStyle="miter" minBarWidth="50" numUnitsPerSegment="0.25" units="3" labelBarSpace="3" outlineWidth="0.3" numSegmentsLeft="0" maxBarWidth="150" height="3" boxContentSpace="1" mapId="0" unitLabel="Miles">
         <scaleBarFont description="MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0" style=""/>
         <fillColor alpha="255" red="0" blue="0" green="0"/>
         <fillColor2 alpha="255" red="255" blue="255" green="255"/>
         <strokeColor alpha="255" red="0" blue="0" green="0"/>
         <textColor alpha="255" red="0" blue="0" green="0"/>
-        <ComposerItem pagey="190" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0" y="190" visibility="1" zValue="2" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="73.5522" outlineWidth="0.3" excludeFromExports="0" uuid="{a8e0622b-3b87-4a00-979e-d182764105f6}" height="20" itemRotation="0" frame="false" pagex="0">
+        <ComposerItem pagey="192.871" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="-5.27446e-16" y="192.871" visibility="1" zValue="2" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="79.8884" outlineWidth="0.3" excludeFromExports="0" uuid="{a8e0622b-3b87-4a00-979e-d182764105f6}" height="17.1287" itemRotation="0" frame="false" pagex="-5.27446e-16">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
         </ComposerItem>
       </ComposerScaleBar>
       <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="0" previewMode="Cache" drawCanvasItems="true">
-        <Extent ymin="4826632.43274469487369061" xmin="-9594305.20993984863162041" ymax="4835331.59425418823957443" xmax="-9584715.41999009624123573"/>
+        <Extent ymin="4827423.8979891799390316" xmin="-9593886.73093235306441784" ymax="4835267.62613179720938206" xmax="-9585239.95443227700889111"/>
         <LayerSet/>
         <Grid/>
+        <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{6fff8fbd-67d5-4b3b-ace4-42c5d4bffb6b}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
+          <lineStyle>
+            <symbol alpha="1" clip_to_extent="1" type="line" name="">
+              <layer pass="0" class="SimpleLine" locked="0">
+                <prop k="capstyle" v="square"/>
+                <prop k="customdash" v="5;2"/>
+                <prop k="customdash_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="customdash_unit" v="MM"/>
+                <prop k="draw_inside_polygon" v="0"/>
+                <prop k="joinstyle" v="bevel"/>
+                <prop k="line_color" v="0,0,0,255"/>
+                <prop k="line_style" v="solid"/>
+                <prop k="line_width" v="0"/>
+                <prop k="line_width_unit" v="MM"/>
+                <prop k="offset" v="0"/>
+                <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="offset_unit" v="MM"/>
+                <prop k="use_custom_dash" v="0"/>
+                <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
+              </layer>
+            </symbol>
+          </lineStyle>
+          <markerStyle>
+            <symbol alpha="1" clip_to_extent="1" type="marker" name="">
+              <layer pass="0" class="SimpleMarker" locked="0">
+                <prop k="angle" v="0"/>
+                <prop k="color" v="0,0,0,255"/>
+                <prop k="horizontal_anchor_point" v="1"/>
+                <prop k="joinstyle" v="bevel"/>
+                <prop k="name" v="circle"/>
+                <prop k="offset" v="0,0"/>
+                <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="offset_unit" v="MM"/>
+                <prop k="outline_color" v="0,0,0,255"/>
+                <prop k="outline_style" v="solid"/>
+                <prop k="outline_width" v="0"/>
+                <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="outline_width_unit" v="MM"/>
+                <prop k="scale_method" v="diameter"/>
+                <prop k="size" v="2"/>
+                <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
+                <prop k="size_unit" v="MM"/>
+                <prop k="vertical_anchor_point" v="1"/>
+              </layer>
+            </symbol>
+          </markerStyle>
+          <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+        </ComposerMapGrid>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="-6.12323e-16" page="1" id="" lastValidViewScaleFactor="1.88976" positionMode="0" positionLock="false" x="0" y="-6.12323e-16" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="231.5" outlineWidth="0.3" excludeFromExports="0" uuid="{8c6b9ba5-6077-4c4b-89fe-0b7d416259f2}" height="210" itemRotation="0" frame="false" pagex="0">
+        <ComposerItem pagey="0" page="1" id="" lastValidViewScaleFactor="2.78621" positionMode="0" positionLock="false" x="0" y="0" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="231.5" outlineWidth="0.3" excludeFromExports="0" uuid="{8c6b9ba5-6077-4c4b-89fe-0b7d416259f2}" height="210" itemRotation="0" frame="false" pagex="0">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -512,6 +628,98 @@
     </Composition>
   </Composer>
   <projectlayers>
+    <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>-20037508.34278924390673637</xmin>
+        <ymin>-20037508.34278925508260727</ymin>
+        <xmax>20037508.34278924390673637</xmax>
+        <ymax>20037508.34278924390673637</ymax>
+      </extent>
+      <id>Stamen_Toner20180907164549158</id>
+      <datasource>type=xyz&amp;zmin=0&amp;zmax=20&amp;url=http://tile.stamen.com/toner/{z}/{x}/{y}.png</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <attribution href="http://maps.stamen.com/">Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL</attribution>
+      <layername>Stamen Toner</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs</proj4>
+          <srsid>3857</srsid>
+          <srid>3857</srid>
+          <authid>EPSG:3857</authid>
+          <description>WGS 84 / Pseudo Mercator</description>
+          <projectionacronym>merc</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="identify/format" value="Undefined"/>
+      </customproperties>
+      <provider>wms</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="-1" band="1" type="singlebandcolordata">
+          <rasterTransparency/>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>-20037508.34278924390673637</xmin>
+        <ymin>-20037508.34278925508260727</ymin>
+        <xmax>20037508.34278924390673637</xmax>
+        <ymax>20037508.34278924390673637</ymax>
+      </extent>
+      <id>Stamen_Toner_Lite20180907164543821</id>
+      <datasource>type=xyz&amp;zmin=0&amp;zmax=20&amp;url=http://tile.stamen.com/toner-lite/{z}/{x}/{y}.png</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <attribution href="http://maps.stamen.com/">Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL</attribution>
+      <layername>Stamen Toner Lite</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs</proj4>
+          <srsid>3857</srsid>
+          <srid>3857</srid>
+          <authid>EPSG:3857</authid>
+          <description>WGS 84 / Pseudo Mercator</description>
+          <projectionacronym>merc</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="identify/format" value="Undefined"/>
+      </customproperties>
+      <provider>wms</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="-1" band="1" type="singlebandcolordata">
+          <rasterTransparency/>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
     <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
       <extent>
         <xmin>-20037508.33999999985098839</xmin>
@@ -859,6 +1067,7 @@
       <SingleCategoryDiagramRenderer diagramType="Histogram" sizeLegend="0" attributeLegend="1">
         <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" sizeScale="0,0,0,0,0,0" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" lineSizeScale="0,0,0,0,0,0" sizeType="MM" lineSizeType="MM" minScaleDenominator="inf">
           <fontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+          <attribute field="" color="#000000" label=""/>
         </DiagramCategory>
         <symbol alpha="1" clip_to_extent="1" type="marker" name="sizeSymbol">
           <layer pass="0" class="SimpleMarker" locked="0">
@@ -884,7 +1093,7 @@
         </symbol>
       </SingleCategoryDiagramRenderer>
       <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="0" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
-      <annotationform></annotationform>
+      <annotationform>.</annotationform>
       <aliases>
         <alias field="STATEFP" index="0" name=""/>
         <alias field="PLACEFP" index="1" name=""/>
@@ -927,10 +1136,10 @@
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
-      <editform></editform>
+      <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[# -*- coding: utf-8 -*-
 """
 QGIS forms can have a Python function that is called when the form is
@@ -976,6 +1185,12 @@ def my_form_open(dialog, layer, feature):
       <previewExpression></previewExpression>
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+      <extent>
+        <xmin>833999.17317638301756233</xmin>
+        <ymin>1900987.24391470989212394</ymin>
+        <xmax>836544.98192499694414437</xmax>
+        <ymax>1905651.37271278002299368</ymax>
+      </extent>
       <id>indy_corridors20180907114350944</id>
       <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='id' table="public"."indy_corridors" (geom) sql=</datasource>
       <keywordList>
@@ -1042,7 +1257,7 @@ def my_form_open(dialog, layer, feature):
               <prop k="customdash_unit" v="MM"/>
               <prop k="draw_inside_polygon" v="0"/>
               <prop k="joinstyle" v="bevel"/>
-              <prop k="line_color" v="209,124,192,255"/>
+              <prop k="line_color" v="209,31,174,255"/>
               <prop k="line_style" v="solid"/>
               <prop k="line_width" v="0.66"/>
               <prop k="line_width_unit" v="MM"/>
@@ -1061,7 +1276,7 @@ def my_form_open(dialog, layer, feature):
               <prop k="customdash_unit" v="MM"/>
               <prop k="draw_inside_polygon" v="0"/>
               <prop k="joinstyle" v="bevel"/>
-              <prop k="line_color" v="216,209,126,255"/>
+              <prop k="line_color" v="236,217,5,255"/>
               <prop k="line_style" v="solid"/>
               <prop k="line_width" v="0.66"/>
               <prop k="line_width_unit" v="MM"/>
@@ -1170,8 +1385,6 @@ def my_form_open(dialog, layer, feature):
             </layer>
           </symbol>
         </source-symbol>
-        <colorramp type="randomcolors" name="[source]"/>
-        <invertedcolorramp value="0"/>
         <rotation/>
         <sizescale scalemethod="diameter"/>
       </renderer-v2>
@@ -1347,6 +1560,7 @@ def my_form_open(dialog, layer, feature):
       <SingleCategoryDiagramRenderer diagramType="Histogram" sizeLegend="0" attributeLegend="1">
         <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" sizeScale="0,0,0,0,0,0" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" lineSizeScale="0,0,0,0,0,0" sizeType="MM" lineSizeType="MM" minScaleDenominator="inf">
           <fontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+          <attribute field="" color="#000000" label=""/>
         </DiagramCategory>
         <symbol alpha="1" clip_to_extent="1" type="marker" name="sizeSymbol">
           <layer pass="0" class="SimpleMarker" locked="0">
@@ -1372,7 +1586,7 @@ def my_form_open(dialog, layer, feature):
         </symbol>
       </SingleCategoryDiagramRenderer>
       <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="2" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
-      <annotationform></annotationform>
+      <annotationform>.</annotationform>
       <aliases>
         <alias field="id" index="0" name=""/>
         <alias field="name" index="1" name=""/>
@@ -1385,7 +1599,7 @@ def my_form_open(dialog, layer, feature):
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
       <attributeactions default="-1"/>
-      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="2">
+      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
         <columns>
           <column width="-1" hidden="0" type="field" name="id"/>
           <column width="226" hidden="0" type="field" name="name"/>
@@ -1397,10 +1611,10 @@ def my_form_open(dialog, layer, feature):
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
-      <editform></editform>
+      <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[# -*- coding: utf-8 -*-
 """
 QGIS forms can have a Python function that is called when the form is
@@ -1441,10 +1655,10 @@ def my_form_open(dialog, layer, feature):
         <xmin>833846.02933152997866273</xmin>
         <ymin>1900828.12275940994732082</ymin>
         <xmax>836830.82191702502314001</xmax>
-        <ymax>1905827.548427389934659</ymax>
+        <ymax>1905047.94263211009092629</ymax>
       </extent>
       <id>indy_lehd20180907114703027</id>
-      <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='_uid_' table="(SELECT row_number() over () AS _uid_,* FROM (select a.c000 as tot_emp, a.geom, b.group as street_group&#xd;
+      <datasource>dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 user='jamgreen' password='&amp;zSpR-rmd&amp;v5REgZ' sslmode=disable key='_uid_' table="(SELECT row_number() over () AS _uid_,* FROM (select a.c000 as tot_emp, a.geom, b.group as street_group, b.grouptype as grouptype, b.name as street_name&#xd;
 from indy_lehd a, indy_corridors b&#xd;
 where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1_
 )" (geom) sql=</datasource>
@@ -1481,17 +1695,23 @@ where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1
         <edittype widgetv2type="TextEdit" name="street_group">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
+        <edittype widgetv2type="TextEdit" name="grouptype">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="street_name">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
       </edittypes>
       <renderer-v2 attr="street_group" forceraster="0" symbollevels="0" type="categorizedSymbol" enableorderby="0">
         <categories>
-          <category render="true" symbol="0" value="1" label="Virginia Ave corridors"/>
-          <category render="true" symbol="1" value="2" label="Mass Ave corridors"/>
+          <category render="true" symbol="0" value="1" label="Virginia Ave"/>
+          <category render="true" symbol="1" value="2" label="Massachusetts Ave"/>
         </categories>
         <symbols>
           <symbol alpha="1" clip_to_extent="1" type="fill" name="0">
             <layer pass="0" class="SimpleFill" locked="0">
               <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
-              <prop k="color" v="133,198,133,255"/>
+              <prop k="color" v="247,224,164,255"/>
               <prop k="joinstyle" v="bevel"/>
               <prop k="offset" v="0,0"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -1506,7 +1726,7 @@ where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1
           <symbol alpha="1" clip_to_extent="1" type="fill" name="1">
             <layer pass="0" class="SimpleFill" locked="0">
               <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
-              <prop k="color" v="255,255,179,255"/>
+              <prop k="color" v="120,198,121,255"/>
               <prop k="joinstyle" v="bevel"/>
               <prop k="offset" v="0,0"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -1713,6 +1933,7 @@ where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1
       <SingleCategoryDiagramRenderer diagramType="Histogram" sizeLegend="0" attributeLegend="1">
         <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" sizeScale="0,0,0,0,0,0" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" lineSizeScale="0,0,0,0,0,0" sizeType="MM" lineSizeType="MM" minScaleDenominator="inf">
           <fontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+          <attribute field="" color="#000000" label=""/>
         </DiagramCategory>
         <symbol alpha="1" clip_to_extent="1" type="marker" name="sizeSymbol">
           <layer pass="0" class="SimpleMarker" locked="0">
@@ -1743,6 +1964,8 @@ where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1
         <alias field="_uid_" index="0" name=""/>
         <alias field="tot_emp" index="1" name=""/>
         <alias field="street_group" index="2" name=""/>
+        <alias field="grouptype" index="3" name=""/>
+        <alias field="street_name" index="4" name=""/>
       </aliases>
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
@@ -1753,6 +1976,8 @@ where st_intersects(a.geom, st_buffer(b.geom, 20)) and year = '2013') AS _subq_1
           <column width="-1" hidden="0" type="field" name="tot_emp"/>
           <column width="-1" hidden="0" type="field" name="street_group"/>
           <column width="-1" hidden="1" type="actions"/>
+          <column width="-1" hidden="0" type="field" name="grouptype"/>
+          <column width="-1" hidden="0" type="field" name="street_name"/>
         </columns>
       </attributetableconfig>
       <editform>../../Data</editform>
@@ -1787,8 +2012,10 @@ def my_form_open(dialog, layer, feature):
         <default field="_uid_" expression=""/>
         <default field="tot_emp" expression=""/>
         <default field="street_group" expression=""/>
+        <default field="grouptype" expression=""/>
+        <default field="street_name" expression=""/>
       </defaults>
-      <previewExpression></previewExpression>
+      <previewExpression>COALESCE( "_uid_", '&lt;NULL>' )</previewExpression>
     </maplayer>
   </projectlayers>
   <properties>
