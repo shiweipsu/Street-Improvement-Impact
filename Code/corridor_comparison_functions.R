@@ -443,7 +443,7 @@ city_agg_trend_plot <- function(df_plot, industry, corridor_name,
 
 
 dist_trend_plot <- function(df_plot, demo, corridor_name, 
-                           demo_code = c("low_inc_perc", "white_perc", "bach_col_perc"), 
+                           demo_code = c("low_inc_perc", "white_perc","black_perc","asian_perc","female_perc", "bach_col_perc"), 
                            construct_year, end_year) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
