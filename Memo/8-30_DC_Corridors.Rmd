@@ -137,8 +137,93 @@ Our first test in corridor comparability is comparing the count of the total num
 
 Due to the data limitations of the LODES data for Washington DC we can test only the L and M Street corridors as they were completed after 2010. [if and when we get ancillary data we can update this]
 
-## 3.1 14th St.
+## 3.1 L St.
 
 [insert map image here]
 
-Our first treatment corridor is 14th Street. Constructed in 2002, 14th is the oldest improved corridor in our data set. It's comparator corridor is Georgia Avenue NW, ranging from Irving to Upshur.
+Our first treatment corridor is L Street. Constructed in 2012, L runs from 14th to 25th St NW. It's comparator corridors are I and K streets running from 14th to 23rd St Nw. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#comparisons-----
+
+# prepare city level data & block level corridor data at the year before construction
+conyear <- first(filter(dc_corridor, Group== 2, Type== "Improvement")$BuildStart)-1 
+
+dc_corridor$Type <- as.character(dc_corridor$Type)
+dc_corridor[dc_corridor$Name =="I St",]$Type <- "Control: I St"
+dc_corridor[dc_corridor$Name=="K St",]$Type <- "Control: K St"
+
+dc_corridor$Type <- as.factor(dc_corridor$Type)
+# find the year before construction
+
+
+dc_lehd_2011 <- dc_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+
+fifteenth <- dc_corridor %>% filter(Group == 2, Type =="Improvement", year==conyear) %>%  employ_ratio_test(.)
+
+i_st_nw <- dc_corridor %>% filter(Group == 2, Type == "Control: I St", year ==conyear) %>% employ_ratio_test(.)
+
+k_st_nw <- dc_corridor %>% filter(Group == 2, Type == "Control: K St", year ==conyear) %>% employ_ratio_test(.)
+
+
+# find quantile dataframe 
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(dc_lehd_2011$C000, 
+                                            probs = p, na.rm = TRUE),
+                       q_retail = quantile(dc_lehd_2011$CNS07, 
+                                           probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(dc_lehd_2011$CNS18, 
+                                               probs = p, na.rm = TRUE),
+                       probs = p)
+
+fifteenth %>% summarise(TotEmp = sum(C000)/nrow(fifteenth), RetailEmp = sum(CNS07)/nrow(fifteenth), AccomEmp = sum(CNS18)/nrow(fifteenth)) %>% as.data.frame()
+
+i_st_nw %>% summarise(TotEmp = sum(C000)/nrow(i_st_nw), RetailEmp = sum(CNS07)/nrow(i_st_nw), AccomEmp = sum(CNS18)/nrow(i_st_nw)) %>% 
+  as.data.frame
+
+
+k_st_nw %>% summarise(TotEmp = sum(C000)/nrow(k_st_nw), RetailEmp = sum(CNS07)/nrow(k_st_nw), AccomEmp = sum(CNS18)/nrow(k_st_nw)) %>% 
+  as.data.frame
+
+# t-test: compare retail, food_accom, business amount---
+t.test(fifteenth$Business, i_st_nw$Business)
+t.test(fifteenth$Retail, i_st_nw$Retail)
+t.test(fifteenth$Food_Accom, i_st_nw$Food_Accom)
+t.test(fifteenth$ratio1, i_st_nw$ratio1)
+t.test(fifteenth$ratio2, i_st_nw$ratio2)
+
+t.test(fifteenth$Business, k_st_nw$Business)
+t.test(fifteenth$Retail, k_st_nw$Retail)
+t.test(fifteenth$Food_Accom, k_st_nw$Food_Accom)
+t.test(fifteenth$ratio1, k_st_nw$ratio1)
+t.test(fifteenth$ratio2, k_st_nw$ratio2)
+
+#t-tests growth rates...only two observations, can't run it----
+
+fifteenth_growth <- dc_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type=="Improvement", year<=conyear) 
+
+i_st_growth <- dc_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type== "Control: I St", year<=conyear) 
+
+k_st_growth <- dc_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type== "Control: K St", year<=conyear) 
+
+
+t.test(fifteenth_growth$biz_growth,i_st_growth$biz_growth)
+t.test(fifteenth_growth$retail_growth,i_st_growth$retail_growth)
+t.test(fifteenth_growth$food_accom_growth,i_st_growth$food_accom_growth)
+
+t.test(fifteenth_growth$biz_growth,k_st_growth_growth$biz_growth)
+t.test(fifteenth_growth$retail_growth,k_st_growth_growth$retail_growth)
+t.test(fifteenth_growth$food_accom_growth,k_st_growth_growth$food_accom_growth)
+
+
+```
