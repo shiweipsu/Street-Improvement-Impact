@@ -372,6 +372,64 @@ agg_food_trend_plot <- agg_trend_plot(virginia_agg, industry = "Food/Accommodata
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
 
+Indexing the empployment figures allows us to examine the change in the growth of employment on the same scale. For Virginia Ave, indexing employment to 2011, the beginning of construction, shows us some interesting patterns before and after installation. The retail plot shows that Virginia roughly followed the patterns of its comparator corridors with positive employment growth,  collapse during the recession and then rebounding in the late 2000s/early 2010s. The treatment corridor does not track any particular comparator corridor that closely but it is much closer to Meridian, and the city as a whole, post-construction than the others.
+
+The indexed accommodations employment chart shows a much tighter relationship among the corridors and the city. This should be expected given the relatively small amounts of accommmodations employment across the corridors, but Virginia Ave's clear, consistent growth starting after 2007 is tracked only by Prospect. 
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width= 9.5, fig.asp=.5}
+
+indy_corridor <- indy_corridor %>% 
+  rename(geometry = geom)
+
+va_index <- agg_index_trend_table(indy_corridor, group = 1, construct_year = 2011)
+
+indy_index <- city_agg_index_trend_table(indy_lehd, construct_year = 2011)
+
+va_index <- bind_rows(va_index, indy_index)
+va_index <- va_index %>% mutate(Type = if_else(Type == "city", "City", Type))
+
+va_index$Type <- factor(va_index$Type, 
+                        levels = c("Treatment","City", 
+                                   "Control: Meridian",
+                                   "Control: Prospect",
+                                   "Control: Shelby"))
+
+construct_year <-  as.Date("2011-01-01","%Y-%m-%d")
+end_year <- as.Date("2013-01-01","%Y-%m-%d")
+
+
+va_city_idx_retail_plot <- ggplot(va_index, aes(x = as.Date(year, "%Y"), y = CNS07_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_rect(aes(xmin = as.Date("2011-01-01","%Y-%m-%d"), 
+                  xmax = as.Date("2013-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_line()  +
+    geom_point(size = 3) +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Retail Employment Comparison:\n Virginia Ave.", x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2011\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+va_city_idx_accom_plot <- ggplot(va_index, aes(x = as.Date(year, "%Y"), y = CNS18_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_rect(aes(xmin = as.Date("2011-01-01","%Y-%m-%d"), 
+                  xmax = as.Date("2013-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_line()  +
+    geom_point(size = 3) +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Accommodations Employment Comparison:\n Virginia Ave.", x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2011\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+plot_grid(va_city_idx_retail_plot, va_city_idx_accom_plot, ncol = 1)
+```
+
 #### 4.1.1.1 Sales Tax Comparisons
 
 In terms of sales tax revenue and growth patterns, all three corridors are appropriately comparable. Meridian has a much higher absolute amount of tax receipts, but its trajectory, though more unstable, is still generally positive and matches those of the other corridors in the set. Virginia Ave itself sees steady and increasing tax revenue over time with anomalous spike in 2014 but it quickly returns to normal. Shelby and Prospect mirror Virginia Avenue in terms of total tax receipts and also generally follow growth trends, though both have more modest growth over time than Virginia. The t-test comparison of corridor growth rates came back non-significant for all three corridors giving us qualified confidence that these are appropriate comparators.  
@@ -631,6 +689,62 @@ mass_agg <- agg_trend_table(indy_corridor, group = 2)
 agg_retail_trend_plot <- agg_trend_plot(mass_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "2nd Ave.", construct_year = 2008, end_year = 2009)
 agg_food_trend_plot <- agg_trend_plot(mass_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "2nd Ave.", construct_year = 2008, end_year = 2009)
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+indy_corridor <- indy_corridor %>% 
+  rename(geometry = geom)
+
+mass_index <- agg_index_trend_table(indy_corridor, group = 2, construct_year = 2009)
+
+indy_index <- city_agg_index_trend_table(indy_lehd, construct_year = 2009)
+
+mass_index <- bind_rows(mass_index, indy_index)
+mass_index <- mass_index %>% mutate(Type = if_else(Type == "city", "City", Type))
+
+mass_index$Type <- factor(mass_index$Type, 
+                        levels = c("Treatment","City", 
+                                   "Control: Meridian",
+                                   "Control: Prospect",
+                                   "Control: Shelby"))
+
+construct_year <-  as.Date("2009-01-01","%Y-%m-%d")
+end_year <- as.Date("2010-01-01","%Y-%m-%d")
+
+
+mass_city_idx_retail_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = CNS07_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_rect(aes(xmin = as.Date("2009-01-01","%Y-%m-%d"), 
+                  xmax = as.Date("2010-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_line()  +
+    geom_point(size = 3) +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Retail Employment Comparison:\n Massachusetts Ave.", x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2009\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+mass_city_idx_accom_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = CNS18_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_rect(aes(xmin = as.Date("2009-01-01","%Y-%m-%d"), 
+                  xmax = as.Date("2010-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_line()  +
+    geom_point(size = 3) +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Accommodations Employment Comparison:\n Massachusetts Ave.", x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2009\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+plot_grid(mass_city_idx_retail_plot, mass_city_idx_accom_plot, ncol = 1)
+
 ```
 
 
