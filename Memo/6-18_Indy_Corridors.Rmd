@@ -681,22 +681,23 @@ Our ITS model shows both a positive and significant effect of bike lane installa
 
 ### 4.2.1 Employment trend comparison
 
-The employment trend graphs of two corridors are presented below. In terms of retail employment, the two corridors  experienced a significant employment drop around 2007 due to recession and are in the midst of a recovery but with the treatment corridor lagging in terms of new employment growth. In terms of food/accommodation sector, both show pre-constructions drops in employment with rebounds in employment in the years after. Given the proximity of the corridors, this is to be expected and is reflected by the non-significant t-test results. 
+The employment trend graphs of two corridors are presented below. In terms of retail employment, the two corridors  experienced a significant employment drop around 2007 (with retail employment dropping to zero in 2009) due to recession and are in the midst of a recovery but with the treatment corridor lagging in terms of new employment growth. In terms of food/accommodation sector, both show pre-constructions drops in employment with rebounds in employment in the years after. Given the proximity of the corridors, this is to be expected and is reflected by the non-significant t-test results. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
 mass_agg <- agg_trend_table(indy_corridor, group = 2)
-agg_retail_trend_plot <- agg_trend_plot(mass_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "2nd Ave.", construct_year = 2008, end_year = 2009)
-agg_food_trend_plot <- agg_trend_plot(mass_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "2nd Ave.", construct_year = 2008, end_year = 2009)
+agg_retail_trend_plot <- agg_trend_plot(mass_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Massachusetts Ave.", construct_year = 2009, end_year = 2010)
+
+agg_food_trend_plot <- agg_trend_plot(mass_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Massachusetts Ave.", construct_year = 2009, end_year = 2010)
+
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
 
+What follows is a plot of accommodations employment growth indexed to the construction starting year 2009. We do not include the retail index numbers because there was no 0 retail employment in the treated section of Massachusetts, according to the LEHD, so there is plot for retail. The food/accommodations index plot does show the rather vigorous employment growth on the greater Massachusetts Ave corridor. The growth is all the more impressive when compared to the city as a whole. While the Massachusetts corridor is starting from a smaller base the growth is still impressive, but does not really start until well after construction of the new cycling lanes. 
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
-indy_corridor <- indy_corridor %>% 
-  rename(geometry = geom)
 
 mass_index <- agg_index_trend_table(indy_corridor, group = 2, construct_year = 2009)
 
@@ -707,9 +708,7 @@ mass_index <- mass_index %>% mutate(Type = if_else(Type == "city", "City", Type)
 
 mass_index$Type <- factor(mass_index$Type, 
                         levels = c("Treatment","City", 
-                                   "Control: Meridian",
-                                   "Control: Prospect",
-                                   "Control: Shelby"))
+                                   "Control: Mass Ave"))
 
 construct_year <-  as.Date("2009-01-01","%Y-%m-%d")
 end_year <- as.Date("2010-01-01","%Y-%m-%d")
@@ -739,11 +738,11 @@ mass_city_idx_accom_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = 
     geom_point(size = 3) +
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = "Accommodations Employment Comparison:\n Massachusetts Ave.", x="Year",y="Employment Index",
+    labs(title = "Food/Accommodations Employment Comparison:\n Massachusetts Ave.", x="Year",y="Employment Index",
          caption = glue("Employment is indexed to 2009\n Shaded Area is Construction Period")) +
     guides(title = "Street Type")
 
-plot_grid(mass_city_idx_retail_plot, mass_city_idx_accom_plot, ncol = 1)
+plot(mass_city_idx_accom_plot)
 
 ```
 
@@ -803,7 +802,7 @@ According to the QCEW data the treatment section of Massachusetts Avenue did not
 
 Due to the lack of data during the construction period, no index values were calculated for this corridor.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=.5}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=1}
 
 
 
@@ -854,7 +853,7 @@ qc4 <- ggplot(mass_qcew,
   scale_y_continuous(labels = scales::dollar) +
    theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
 
-plot_grid(qc3, qc4)
+plot_grid(qc3, qc4, ncol = 1)
 
 
 
