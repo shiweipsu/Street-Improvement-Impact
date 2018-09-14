@@ -211,7 +211,7 @@ On all three metrics the t-test returned non-significant results meaning that th
 
 ## 3.2 Franklin Ave
 
-![Frankline Avenue Corridor](images/minneapolis_franklin_corridor_blkgrp.png)
+![Franklin Avenue Corridor](images/minneapolis_franklin_corridor_blkgrp.png)
 
 ### 3.2.1 Corridor Employment Counts
 
@@ -493,44 +493,72 @@ The Riverside accommodations patterns are more mixed. Employment growth for the 
 
 #### Sales Tax 
 
-In order to have a fuller understanding of the impact of new cycle infrastructure we also collected sales tax data for the corridors from the state of Minnesota. As mentioned in the introduction, sales taxes are a more sensitive measure of economic impact than employment and is measured more frequently. As such, we have a more sensitive measure of economic impact.
+In order to have a fuller understanding of the impact of new cycle infrastructure we also collected sales tax data for the corridors from the state of Minnesota. As mentioned in the introduction, sales taxes are a more sensitive measure of economic activity than employment and is measured more frequently.
+
+In terms of retail sales, Riverside remains consistently lower than Cedar Avenue in absolute terms and in terms of growth over time. While Cedar Ave shows consistent growth over time with a spike in sales immediately pre-construction, Riverside see a drop in sales, minor recovery, and declining sales growth post-construction that is only now recovering. 
+
+While Cedar Avenue is the dominant corridor in terms of retail sales, both corridors track each other much more closely when examining restaurant sales tax receipts. Both Cedar and Riverside have consistent positive growth basically over the whole study period. Both corridors also have significant jumps in the rate of growth immediately post-construction though Cedar's rate is greater. 
+
+```{r riverside_sales, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+
+#prep corridor sales tax df from Wei---------------
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
+
+
+
+#riverside graphs-------------
+
+riverside_agg <- agg_trend_table(minn_sale, group = 1)
+riverside_agg <- riverside_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Cedar Ave.")) 
+
+riverside_agg$Type <- factor(riverside_agg$Type, levels = c("Treatment", "Control: Cedar Ave."))
+
+riverside_agg_retail_plot <- ggplot(riverside_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+
+
+```
 
 Comparing the trends for the Riverside corridor it is not immediately apparent that the construction had an impact on retail or restaurant sales. In both cases, the treatment and control corridors largely follow each other in terms of growth, except for a dramatic drop and recovery in retail sales between 2013 and 2014. Given the sensitivity of sales tax as a measure it is unlikely that drop, and subsequent recovery, are a reaction to construction completed years before. In the case of restaurant sales, both corridors experienced dramatic growth, though the improved corridor's rate of growth is more modest, both corridors have significantly more restaurant sales post construction. 
 
 ```{r riverside_sales, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
-#prep corridor sales tax df from Wei---------------
-minn_sale <- read.csv(here::here("Data/Minneapolis/BikeDataAggregated.csv"))
 
-minn_sale <- minn_sale %>% 
-  filter(!is.na(Street)) %>%
-  mutate(Group= case_when(Street %in% c("RIVERSIDE AVE","CEDAR AVE S") ~ 1,
-                          Street=="FRANKLIN AVE E" ~ 2,
-                          Street %in% c("CENTRAL AVE NE","UNIVERSITY AVE NE") ~3,
-                          Street %in% c("LYNDALE AVE S","GRAND AVE S") ~4,
-                          Street %in% c("2ND ST N","WEST BROADWAY") ~5),
-         Study= case_when(Group==1 ~ ifelse(Street=="RIVERSIDE AVE"," Improvement","Control"),
-                          Group==2 ~ ifelse(Street=="FRANKLIN AVE E"," Improvement","Control"),
-                         Group==3 ~ ifelse(Street=="CENTRAL AVE NE"," Improvement","Control"),
-                         Group==4 ~ ifelse(Street=="LYNDALE AVE S"," Improvement","Control"),
-                         Group==5 ~ ifelse(Street=="2ND ST N"," Improvement","Control"))) %>% 
-  filter(Group %in% c(1:5)) %>% 
-  group_by(Street,Type,Group,Study,TaxYear) %>% 
-  summarise(TaxableSales = sum(TaxableSales, na.rm = TRUE))
 
-minn_sale <- minn_sale %>% 
-  spread(Type,TaxableSales) %>% 
-  mutate(year=TaxYear,
-         Type=Study,
-         CNS07=Retail,
-         CNS18=Restaurant,
-         geometry=1)
 
 #riverside graphs-------------
 
-riverside_agg <- agg_index_trend_table (minn_sale, group = 1,2009)
+riverside_agg_idx <- agg_index_trend_table (minn_sale, group = 1,2009)
 
-riverside_agg_retail_plot <- ggplot(riverside_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+riverside_agg_idx <- riverside_agg_idx %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Cedar Ave.")) 
+
+riverside_agg_idx$Type <- factor(riverside_agg_idx$Type, levels = c("Treatment", "Control: Cedar Ave."))
+
+riverside_agg_retail_idx_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -540,7 +568,7 @@ riverside_agg_retail_plot <- ggplot(riverside_agg,aes(x=year, y=CNS07_sd,group=T
   labs(title = "Retail Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
-riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+riverside_agg_idx_accom_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -550,10 +578,14 @@ riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18_sd,group=Ty
   labs(title = "Resturaunt Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
-plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+plot_grid(riverside_agg_idx_retail_plot, riverside_agg_idx_accom_plot, align = "h")
 
 
 ```
+
+The indexed plots give us an alternative view of the corridors that reinfoece what the non-indexed plots have shown us. Retail sales values, indexed to 2009, hihglight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
+
+ 
 
 ### 4.1.2 Difference-in-Difference
 
@@ -610,6 +642,36 @@ In terms of accommodations employment the trend analysis is relatively ambiguous
 
 ```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
+franklin_agg <- agg_trend_table(minn_sale, group = 2)
+
+franklin_agg_retail_plot <- ggplot(franklin_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Franklin Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Franklin Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
+```
+
+
+[indexed sales tax values insert]
+
+```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
 franklin_agg <- agg_index_trend_table(minn_sale, group = 2,2011)
 
 franklin_agg_retail_plot <- ggplot(franklin_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
@@ -634,6 +696,8 @@ franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_sd,group=Type
 
 plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
 ```
+
+
 
 ### 4.2.2 Difference-in-Difference
 
