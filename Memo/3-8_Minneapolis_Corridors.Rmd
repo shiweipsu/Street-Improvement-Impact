@@ -637,12 +637,17 @@ In terms of accommodations employment the trend analysis is relatively ambiguous
 
 #### Sales Tax 
 
-[Fix error]
-
+It was not imposisble to parse out the sales tax differences between the two sections of Franklin Avenue due to their proximity so these figures are excluded from the study.
 
 ```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
 franklin_agg <- agg_trend_table(minn_sale, group = 2)
+
+franklin_agg <- franklin_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Cedar Ave."))
+
+franklin_agg$Type <- factor(franklin_agg$Type, levels = )
 
 franklin_agg_retail_plot <- ggplot(franklin_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
@@ -668,7 +673,6 @@ plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
 ```
 
 
-[indexed sales tax values insert]
 
 ```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
@@ -710,7 +714,6 @@ Franklin Avenue exhibits mixed results. For accommodations employment the corrid
 
 [insert ITS table]
 
-The mixed results are also echoed when looking at the sales tax receipts. While there is a marginally significant and positive result for the *pre_post* term showing positive receipt growth post-construction, the *ts_year:pre_post* term is negative and significant for restaurant sales tax receipts. While retail sales do not seem to have been harmed restaurants given this model specification, there is some stronger evidence that the construction had a negative influence on restaurant sales.
 
 ## 4.3 Central Avenue
 
@@ -747,12 +750,54 @@ The accommodations employment trend is more ambiguous. The treatment corridor sa
 
 #### Sales Tax 
 
-Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or the other. While Central has received more receipts, indexed to 2012, from both retail and restaurants there does not seem to be a clear relationship to the construction date. The LEHD employment data cannot give us a better idea here as it is not possible to pull out restaurants or detailed retail sectors directly. But looking at these trends it does not seem construction of the lane had an immediate impact on sales tax for Central Ave for either industry. 
+Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or the other. While Central's receipts, overall, have grown for bothe retail and restaurant sales, the posiive growth trends for both industries start either before or at the beginning of the construction period.  The rate of change in growth, though, in restaurant receipts for both Central accelarates post-construction. While not definitive, the restaurant receipts hint at a potential relationship with the new infrastructure that our econometric models will be better able to explore.   
 
 ```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
-central_agg <- agg_index_trend_table (minn_sale, group = 3,2012)
+central_agg <- agg_trend_table (minn_sale, group = 3)
 
-central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+central_agg <- central_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: University Ave."))
+
+central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: University Ave."))
+
+central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07_,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "h")
+
+```
+
+The index value plots bring the difference in growth rates between the two corridors into stark relief. Central has fared much better over thecourse of the study period exhibiting robust growth in retail and restaurant sales. The post-construction growth bump is especially apparent in the restaurant sales indexed plot. University Ave's flattened growth in both restaurant and retail sales is especially striking in comparison to niversity's consistent growth. 
+
+```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+central_agg_idx <- agg_index_trend_table (minn_sale, group = 3,2012)
+central_agg_idx <- central_agg_idx %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: University Ave."))
+
+central_agg_idx$Type <- factor(central_agg_idx$Type, levels = c("Treatment", "Control: University Ave."))
+
+
+
+central_agg_idx_retail_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -762,7 +807,7 @@ central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07_sd,group=Type,
   labs(title = "Retail Sales Comparison: Central Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
-central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+central_agg_idx_accom_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -772,7 +817,7 @@ central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18_sd,group=Type,c
   labs(title = "Resturaunt Sales Comparison: Central Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
-plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "h")
+plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, align = "h")
 
 ```
 
@@ -822,6 +867,45 @@ In terms of accommodations employment, the treatment corridor shows no real effe
 ### 4.4.2 Sales Tax Comparison
 
 The Lyndale Ave corridor also displays ambiguous impacts of new cycling infrastructure on retail and restaurant demand. There is a  minor bump post construction for retail that results in increased growth over time signaling a possible effect of construction. Restaurant sales tax growth, though, is clearly tied to some major increase in demand nearly a decade after construction. Additionally, the growth in restaurant sales tax receipts was less than that of its control corridor both in absolute and relative terms. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+
+lyndale_agg <- agg_trend_table(minn_sale, group = 4)
+
+lyndale_agg <- lyndale_agg %>% 
+  mutate(Type = stringr::str_trim(Type, "both"),
+         Type = case_when(Type == "Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Grand Ave."))
+
+lyndale_agg$Type <- factor(lyndale_agg$Type, levels = c("Treatment", "Control: Grand Ave."))
+
+
+lyndale_agg_retail_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Retail Sales Comparison: Lyndale Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels == scales::dollar)
+
+lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
+  geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size=3, fill="white") +
+  scale_shape_manual(values=c(22,21))+
+  scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
+  theme_minimal() +
+  labs(title = "Resturaunt Sales Comparison: Lyndale Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
+
+plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
+
+
+```
+
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
