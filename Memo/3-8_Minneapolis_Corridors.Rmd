@@ -533,7 +533,7 @@ riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18,group=Type,
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
+  labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
 plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
@@ -575,7 +575,7 @@ riverside_agg_idx_accom_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS18_sd,
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
+  labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
 plot_grid(riverside_agg_idx_retail_plot, riverside_agg_idx_accom_plot, align = "h")
@@ -666,7 +666,7 @@ franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_,group=Type,c
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Franklin Ave", x="Year",y="Sales Tax") +
+  labs(title = "Restaurant Sales Comparison: Franklin Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
 plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
@@ -695,7 +695,7 @@ franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_sd,group=Type
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Franklin Ave", x="Year",y="Sale Index",
+  labs(title = "Restaurant Sales Comparison: Franklin Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
 plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
@@ -778,7 +778,7 @@ central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18,group=Type,colo
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
+  labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
 plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "h")
@@ -814,7 +814,7 @@ central_agg_idx_accom_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS18_sd,grou
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Central Ave", x="Year",y="Sale Index",
+  labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
 plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, align = "h")
@@ -887,8 +887,8 @@ lyndale_agg_retail_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS07,group=Type,col
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Lyndale Ave", x="Year",y="Sales Tax") +
-  scale_y_continuous(labels == scales::dollar)
+  labs(title = "Retail Sales Comparison: Lyndale Ave S.", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
 
 lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
@@ -897,7 +897,7 @@ lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colo
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Lyndale Ave", x="Year",y="Sales Tax") +
+  labs(title = "Restaurant Sales Comparison: Lyndale Ave S.", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
 plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
@@ -905,13 +905,20 @@ plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
 
 ```
 
-
+The index plots echo the conclusions seen in the absolute value plots. In particular, notice the dramatic decline of retail sales for Grand Ave compared to the modest, but steady, growth in receipts on Lyndale. Grand performs better when examining restaurant sales growing at a faster rate than Lyndale until the final year where Lyndale experiences a monster jump in growth. But as mentioned earlier, these graphs do not provide compelling visual clues as to the effect of new infrastructure on sales tax receipts. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
-lyndale_agg <- agg_index_trend_table (minn_sale, group = 4,2008)
+lyndale_agg_idx <- agg_index_trend_table (minn_sale, group = 4,2008)
 
-lyndale_agg_retail_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
+lyndale_agg_idx <- lyndale_agg_idx %>% 
+  mutate(Type = stringr::str_trim(Type, "both"),
+         Type = case_when(Type == "Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Grand Ave."))
+
+lyndale_agg_idx$Type <- factor(lyndale_agg_idx$Type, levels = c("Treatment", "Control: Grand Ave."))
+
+lyndale_agg_idx_retail_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -921,14 +928,14 @@ lyndale_agg_retail_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS07_sd,group=Type,
   labs(title = "Retail Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
-lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
+lyndale_agg_idx_accom_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2008, xmax = 2009, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
+  labs(title = "Restaurant Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
 plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
@@ -991,13 +998,21 @@ Accommodations employment growth is quite robust for the treatment corridor but 
 
 #### Sales Tax 
 
-North 2nd offers an example of a potentially positive affect of construction, at least for retail sales taxes. There is an initial drop in retail receipts during the construction period, as one would hypothesize during a disruptive construction process on a commercial corridor, with an immediate rebound in the following year. Additionally, the corridor sees consistent growth in receipts followed by a spike in receipts around 2014. 
+At first glance, North 2nd potential offers dramatic evidence of a positive effect of new infrastructure construction, but the extreme jump in sales tax receipts signals some greater change probably affected the corridor, such as the opening of multiple new establishments or one especially large establishment. Initial jump aside, the consintued growth after the large spike in growth is a positive sign of the overall health of retail on the corridor. 
 
-[fix error]
+We do not include the restaurant sales tax values because no restaurant sales tax was collected on North 2nd until 2014.
 
-```{r eval=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE, include=FALSE}
 
-second_agg <- agg_index_trend_table (minn_sale, group = 5,2011)
+```{r north_sales, eval=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE, include=FALSE}
+
+second_agg <- agg_trend_table(minn_sale, group = 5)
+
+second_agg <- second_agg %>% 
+  mutate(Type = stringr::str_trim(Type, "both"),
+         Type = case_when(Type == "Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: West Broadway"))
+
+second_agg$Type <- factor(second_agg$Type, levels = c("Treatment", "Control: West Broadway"))
 
 second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
@@ -1006,20 +1021,42 @@ second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07,group=Type,colou
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sale Index",
-       caption = "Shaded Area is Construction Period")
+  labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar)
 
-second_agg_accom_plot <- ggplot(second_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
+
+
+plot(second_agg_retail_plot)
+
+
+```
+
+The index plot highlights the immense rate of growth North 2nd has seen in retail sales since 2012 and the relatively static nature of retail activity on West Broadway. Again, it is unlikely that the new infrastructure is the principle cause of such a dramatic jump in sales, but consistent growth over time after the initial jump may be, in some part, connected to the new infrastructure.  
+
+```{r eval=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE, include=FALSE}
+
+second_agg_idx <- agg_index_trend_table(minn_sale, group = 5,2012)
+
+second_agg_idx <- second_agg_idx %>% 
+  mutate(Type = stringr::str_trim(Type, "both"),
+         Type = case_when(Type == "Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: West Broadway"))
+
+second_agg_idx$Type <- factor(second_agg_idx$Type, levels = c("Treatment", "Control: West Broadway"))
+
+second_agg_idx_retail_plot <- ggplot(second_agg_idx,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Resturaunt Sales Comparison: second Ave", x="Year",y="Sale Index",
-       caption = "Shaded Area is Construction Period")
+  labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sales Tax",
+       caption = "Sales Tax values are indexed to 2012 due to missing data in 2011") 
 
-plot_grid(second_agg_retail_plot, second_agg_accom_plot, align = "h")
+
+
+plot(second_agg_idx_retail_plot)
 
 
 ```
