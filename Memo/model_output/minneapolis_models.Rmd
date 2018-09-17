@@ -102,7 +102,6 @@ stargazer(north_its[[1]], north_its[[2]], north_its[[3]], type = "html",
 
 # sales tax models-----------------------------------
 
-minn_sale <- read.csv(here::here("Data/Minneapolis/BikeDataAggregated.csv"))
 
 minn_sale <- tbl(con, "minn_sales_tax")
 minn_sale <- collect(minn_sale)
@@ -189,6 +188,15 @@ stargazer(lyndale_its_rest, lyndale_its_retail, type = "html",
           column.labels = c("Restaurant Sales", "Retail Sales")) 
 
 #2nd street....ITS only for restaurant because too many missing DID terms
+
+second_sale <- minn_sale %>% filter(Group == 5) %>% 
+  mutate(pre_post = if_else(year >= 2011, 1, 0))
+
+second_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = second_sale)
+
+stargazer(second_did_retail, type = "html",
+         title = "North 2nd Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Retail Sales")) 
 
 second_sale <- minn_sale %>% filter(Group == 5, Type == "Improvement") %>% 
   mutate(pre_post = if_else(year >= 2011, 1, 0), ts_year = year - 2003)
