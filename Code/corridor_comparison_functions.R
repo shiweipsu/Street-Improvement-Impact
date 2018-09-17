@@ -142,9 +142,9 @@ agg_index_trend_table <- function(df, group, construct_year) {
   
 
   df_agg <- df %>% group_by(year, Type) %>%
-    summarise(CNS07 = sum(CNS07),
-              CNS18 = sum(CNS18),
-              business = sum(business))
+    summarise(CNS07 = sum(CNS07, na.rm = TRUE),
+              CNS18 = sum(CNS18, na.rm = TRUE),
+              business = sum(business, na.rm = TRUE))
   
   base_year <-  df_agg %>% filter(year == as.character(construct_year)) %>% 
     select(CNS07_base = CNS07, CNS18_base = CNS18, business_base = business, Type, year)
