@@ -479,9 +479,30 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2009)
 riverside_agg_idx <- bind_rows(riverside_agg_idx, minn_agg)
 riverside_agg_idx <- riverside_agg_idx %>% filter(!is.na(year))
 
-riverside_agg_retail <- city_agg_index_trend_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 
-riverside_agg_accom <- city_agg_index_trend_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+# riverside_agg_idx <- riverside_agg_idx %>% 
+#   mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+#                           Type == "control" ~ "Control: Cedar Ave.",
+#                           Type == "city" ~ "City"))
+# 
+# riverside_agg_idx$Type <- factor(riverside_agg_idx$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
+
+
+# construct_year <- 2009
+# end_year <- 2010
+# 
+# construct_date <- as.character(paste0(construct_year, "-01-01"))
+# construct_date <- as.Date(construct_date, "%Y-%m-%d")
+#   
+#   
+# end_date <- as.character(paste0(end_year, "-01-01"))
+# end_date <- as.Date(end_date, "%Y-%m-%d")
+
+riverside_agg_retail <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
 
 plot_grid(riverside_agg_retail, riverside_agg_accom, align = "h")
 
@@ -500,6 +521,9 @@ In terms of retail sales, Riverside remains consistently lower than Cedar Avenue
 While Cedar Avenue is the dominant corridor in terms of retail sales, both corridors track each other much more closely when examining restaurant sales tax receipts. Both Cedar and Riverside have consistent positive growth basically over the whole study period. Both corridors also have significant jumps in the rate of growth immediately post-construction though Cedar's rate is greater. 
 
 ```{r riverside_sales, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
 
 #prep corridor sales tax df from Wei---------------
 minn_sale <- tbl(con, "minn_sales_tax")
@@ -536,14 +560,14 @@ riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18,group=Type,
   labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "h")
+plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "v")
 
 
 ```
 
 Comparing the trends for the Riverside corridor it is not immediately apparent that the construction had an impact on retail or restaurant sales. In both cases, the treatment and control corridors largely follow each other in terms of growth, except for a dramatic drop and recovery in retail sales between 2013 and 2014. Given the sensitivity of sales tax as a measure it is unlikely that drop, and subsequent recovery, are a reaction to construction completed years before. In the case of restaurant sales, both corridors experienced dramatic growth, though the improved corridor's rate of growth is more modest, both corridors have significantly more restaurant sales post construction. 
 
-```{r riverside_sales, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+```{r riverside_sales_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 
 
 
@@ -578,7 +602,7 @@ riverside_agg_idx_accom_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS18_sd,
   labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
-plot_grid(riverside_agg_idx_retail_plot, riverside_agg_idx_accom_plot, align = "h")
+plot_grid(riverside_agg_retail_idx_plot, riverside_agg_idx_accom_plot, align = "v")
 
 
 ```
@@ -601,7 +625,7 @@ The Riverside Ave corridor does not exhibit a level or slope change from the pre
 
 [insert riverside its table]
 
-The non-significant results from the *ts_year:pre_post* term gives some support evidence that the construction was not directly responsible for the drop in sales tax receipts for the corridor that the DiD highlighted. Overall, it seems unlikely there is a clear causal relationship between the corridor construction and employment or sales tax effects.
+The non-significant results from the *ts_year:pre_post* term gives some supportive evidence that the construction was not directly responsible for the drop in sales tax receipts for the corridor that the DiD highlighted. Overall, it seems unlikely there is a clear causal relationship between the corridor construction and employment or sales tax effects.
 
 ## 4.2 Franklin Avenue
 
@@ -617,16 +641,57 @@ Retail employment does show consistent, though moderate, growth for the improvem
 franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
 minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
 
-# franklin_agg_retail_plot <- agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
-# 
-# 
-# franklin_agg_accom_plot <- agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
 
 franklin_agg <- bind_rows(franklin_agg, minn_agg)
+franklin_agg <- franklin_agg %>% 
+  mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+                          Type == "control" ~ "Control: Franklin Ave."))
 
-franklin_idx_retail <- city_agg_index_trend_plot(franklin_agg, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012, corridor_name = "Franklin Ave. Corridor")
+franklin_agg$Type <- factor(franklin_agg$Type, levels = c("Treatment", "Control: Franklin Ave.", "City"))
 
-franklin_idx_accom <- city_agg_index_trend_plot(franklin_agg, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012, corridor_name = "Frankline Ave. Corridor")
+
+construct_year <- 2011
+end_year <- 2012
+
+construct_date <- as.character(paste0(construct_year, "-01-01"))
+construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  
+end_date <- as.character(paste0(end_year, "-01-01"))
+end_date <- as.Date(end_date, "%Y-%m-%d")
+
+franklin_idx_retail <- ggplot(franklin_agg, aes(x = year, y = CNS07_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date("2011-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2012-01-01", "%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+         caption = "Employment is indexed to 2011\n Shaded Area is Construction Period") +
+    guides(title = "Street Type")
+
+franklin_idx_accom <- ggplot(franklin_agg, aes(x = year, y = CNS18_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date("2011-01-01", "%Y"), 
+                  xmax = as.Date("2012-01-01", "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+         caption = "Employment is indexed to 2011\n Shaded Area is Construction Period") +
+    guides(title = "Street Type")
+
+
+
 
 plot_grid(franklin_idx_retail, franklin_idx_accom, align = "h")
 
@@ -645,7 +710,7 @@ franklin_agg <- agg_trend_table(minn_sale, group = 2)
 
 franklin_agg <- franklin_agg %>% 
   mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
-                          Type == "Control" ~ "Control: Cedar Ave."))
+                          Type == "Control" ~ "Control: Franklin Ave."))
 
 franklin_agg$Type <- factor(franklin_agg$Type, levels = )
 
@@ -674,7 +739,7 @@ plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
 
 
 
-```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+```{r franklin_sales_idx, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
 franklin_agg <- agg_index_trend_table(minn_sale, group = 2,2011)
 
@@ -714,6 +779,7 @@ Franklin Avenue exhibits mixed results. For accommodations employment the corrid
 
 [insert ITS table]
 
+ITS models were not run for Franklin due to the data consolidation issue. 
 
 ## 4.3 Central Avenue
 
@@ -733,13 +799,50 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2012)
 
 central_agg <- bind_rows(central_agg, minn_agg)
 
-# central_agg_retail_plot <- agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
-# 
-# central_agg_accom_plot <- agg_index_trend_plot(central_agg, industry = "Accommodation", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
 
-central_agg_idx_retail <- city_agg_index_trend_plot(central_agg, industry = "Retail", corridor_name = "Central Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
 
-central_agg_idx_accom <- city_agg_index_trend_plot(central_agg, industry = "Accommodations", corridor_name = "Central Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+construct_year <- 2012
+end_year <- 2013
+
+construct_date <- as.character(paste0(construct_year, "-01-01"))
+construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  
+end_date <- as.character(paste0(end_year, "-01-01"))
+end_date <- as.Date(end_date, "%Y-%m-%d")
+
+central_agg_idx_retail <- ggplot(central_agg, aes(x = year, y = CNS07_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date("2012-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2013-01-01", "%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+         caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
+    guides(title = "Street Type")
+
+central_agg_idx_accom <- ggplot(central_agg, aes(x = year, y = CNS18_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date("2012-01-01", "%Y"), 
+                  xmax = as.Date("2013-01-01", "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+         caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
+    guides(title = "Street Type")
+
+
 
 plot_grid(central_agg_idx_retail, central_agg_idx_accom, align = "h")
 
@@ -761,7 +864,7 @@ central_agg <- central_agg %>%
 
 central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: University Ave."))
 
-central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07_,group=Type,colour=Type,shape=Type))+
+central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +
@@ -781,13 +884,13 @@ central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18,group=Type,colo
   labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "h")
+plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "v")
 
 ```
 
 The index value plots bring the difference in growth rates between the two corridors into stark relief. Central has fared much better over thecourse of the study period exhibiting robust growth in retail and restaurant sales. The post-construction growth bump is especially apparent in the restaurant sales indexed plot. University Ave's flattened growth in both restaurant and retail sales is especially striking in comparison to niversity's consistent growth. 
 
-```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+```{r central_sales_tax_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
 central_agg_idx <- agg_index_trend_table (minn_sale, group = 3,2012)
 central_agg_idx <- central_agg_idx %>% 
   mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
@@ -817,21 +920,21 @@ central_agg_idx_accom_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS18_sd,grou
   labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
-plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, align = "h")
+plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, align = "v")
 
 ```
 
 ### 4.3.2 Difference-in-Difference
 
-Central Avenue's difference term is significant and highly negative. For Central Avenue, therefore, the installation of the new infrastructure is responsible for the loss of approximately 203 accommodations jobs compared to the control corridor. This result can be intuited if you revisit the aggregate employment graph for the Central Avenue corridors and you can see there is a large gap in the overall number of accommodations jobs between the treatment and control corridor. Additionally, the control corridor has more robust growth over time compared to the treatment.
+Central Avenue's difference term is significant and negative for accommodations employment, though non-significant for retail. For Central Avenue, therefore, the installation of the new infrastructure is responsible for the loss of approximately 203 accommodations jobs compared to the control corridor. This result can be intuited if you revisit the aggregate employment graph for the Central Avenue corridors and you can see there is a large gap in the overall number of accommodations jobs between the treatment and control corridor. Additionally, the control corridor has more robust growth over time compared to the treatment.
 
 [inset did table]
 
-In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
+In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. Overall, this model specification implies that new infrastructure construction is repsonible for an additional 7 million dollars in retail sales tax receipts and a loss of 5.7 million dollars in restaurant receipts.It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
 
 ### 4.3.3 ITS
 
-Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accommodations employment term.
+Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope singaling an overall positive growth trend. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accommodations employment term.
 
 [insert its table]
 
@@ -900,7 +1003,7 @@ lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colo
   labs(title = "Restaurant Sales Comparison: Lyndale Ave S.", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
+plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "v")
 
 
 ```
@@ -938,18 +1041,18 @@ lyndale_agg_idx_accom_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS18_sd,grou
   labs(title = "Restaurant Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
-plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "h")
+plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "v")
 
 
 ```
 
 ### 4.4.3 Difference-in-Difference
 
-For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment. Again, the interpretation of the difference term is that "but for" the installation of the infrastructure Lyndale Avenue would have nearly 109 additional accommodations jobs. 
+For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment and a non-significant result for retail employment. Again, the interpretation of the difference term is that "but for" the installation of the infrastructure Lyndale Avenue would have nearly 109 additional accommodations jobs. 
 
 [insert d-i-d]
 
-The DiD specification for sales tax for Lyndale shows a non-significant effect of construction on restaurant sales tax receipts but a positive and significant effect on retail sales. 
+The DiD specification for sales tax for Lyndale shows a non-significant effect of construction on restaurant sales tax receipts but a positive and significant effect on retail sales tax receipts. In this case, the model implies that the corridor construction was responsible for an additional 4 million dollars in receipts compared to the control corridor.  
 
 ### 4.4.4 ITS
 
@@ -1003,7 +1106,7 @@ At first glance, North 2nd potential offers dramatic evidence of a positive effe
 We do not include the restaurant sales tax values because no restaurant sales tax was collected on North 2nd until 2014.
 
 
-```{r north_sales, eval=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE, include=FALSE}
+```{r north_sales, echo=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE}
 
 second_agg <- agg_trend_table(minn_sale, group = 5)
 
@@ -1033,7 +1136,7 @@ plot(second_agg_retail_plot)
 
 The index plot highlights the immense rate of growth North 2nd has seen in retail sales since 2012 and the relatively static nature of retail activity on West Broadway. Again, it is unlikely that the new infrastructure is the principle cause of such a dramatic jump in sales, but consistent growth over time after the initial jump may be, in some part, connected to the new infrastructure.  
 
-```{r eval=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE, include=FALSE}
+```{r eval=FALSE, echo=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE}
 
 second_agg_idx <- agg_index_trend_table(minn_sale, group = 5,2012)
 
@@ -1067,7 +1170,7 @@ Our difference-in-difference estimation shows a positive and significant effect 
 
 [insert d-i-d table]
 
-We were unable to run a difference-in-difference estimate for sales tax on this corridor due to missing data.
+Due to missing data we only ran a difference-in-difference model for the retail sales tax receipts. As the table shows, the difference term for North Second Ave is negative but non-significant indicating there is not a causal relationship between the change in retail sales tax receipts and new infrastructure placement compared to the control. 
 
 ### 4.5.4 ITS
 
@@ -1089,11 +1192,11 @@ More importantly, while these results are interesting they should be taken with 
 * The impact of new cycling ifnrastructure on retail *sales tax* is negative
 * The LEHD and sales tax data contradict each other here requiring further research into why they diverge
 
+```{r, include=FALSE}
 
+ dbDisconnect(con)
 
- 
-
-
+```
 
 
 

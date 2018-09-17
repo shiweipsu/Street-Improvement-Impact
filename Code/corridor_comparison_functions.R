@@ -326,8 +326,6 @@ city_agg_index_trend_plot <- function(df_plot, industry, corridor_name,
                                  industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
                                  construct_year, end_year) {
   
-  # df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
-  
   #convert year to proper date
   
   df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
@@ -355,6 +353,52 @@ city_agg_index_trend_plot <- function(df_plot, industry, corridor_name,
     geom_point(size = 3, fill="white") +
     scale_shape_discrete(breaks=c("improvement","control","city"))+
     scale_colour_discrete(breaks=c("improvement","control","city"))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to {construct_year}\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+city_agg_index_trend_one_control_plot <- function(df_plot, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                      construct_year, end_year) {
+  
+df_plot <- df_plot %>% 
+    mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+                            Type == "control" ~ paste0("Control: ", control_corridor),
+                            Type == "city" ~ "City"))
+
+df_plot$Type <- factor(df_plot$Type, 
+                       levels = c("Treatment", paste0("Control: ", control_corridor), "City"))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment Index",
