@@ -560,7 +560,7 @@ riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18,group=Type,
   labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, align = "v")
+plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, ncol = 1)
 
 
 ```
@@ -602,7 +602,7 @@ riverside_agg_idx_accom_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS18_sd,
   labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
-plot_grid(riverside_agg_retail_idx_plot, riverside_agg_idx_accom_plot, align = "v")
+plot_grid(riverside_agg_retail_idx_plot, riverside_agg_idx_accom_plot, ncol = 1)
 
 
 ```
@@ -643,52 +643,58 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
 
 
 franklin_agg <- bind_rows(franklin_agg, minn_agg)
-franklin_agg <- franklin_agg %>% 
-  mutate(Type = case_when(Type == "improvement" ~ "Treatment",
-                          Type == "control" ~ "Control: Franklin Ave."))
 
-franklin_agg$Type <- factor(franklin_agg$Type, levels = c("Treatment", "Control: Franklin Ave.", "City"))
+franklin_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = franklin_agg, industry = "Retail",
+                                                            corridor_name = "Franklin Ave.", control_corridor = "Franklin Ave.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
 
+franklin_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = franklin_agg, industry = "Accommodations", corridor_name = "Franklin Ave.", control_corridor = "Franklin Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
-construct_year <- 2011
-end_year <- 2012
-
-construct_date <- as.character(paste0(construct_year, "-01-01"))
-construct_date <- as.Date(construct_date, "%Y-%m-%d")
-  
-  
-end_date <- as.character(paste0(end_year, "-01-01"))
-end_date <- as.Date(end_date, "%Y-%m-%d")
-
-franklin_idx_retail <- ggplot(franklin_agg, aes(x = year, y = CNS07_sd, 
-                                group = Type, colour = Type, shape=Type)) + 
-    geom_line()  +
-    geom_rect(aes(xmin = as.Date("2011-01-01", "%Y-%m-%d"), 
-                  xmax = as.Date("2012-01-01", "%Y-%m-%d"), 
-                  ymin = -Inf, ymax = Inf),
-              fill = "#adff2f",linetype=0,alpha = 0.03) +
-    
-    geom_point(size = 3, fill="white") +
-    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-    theme_minimal() +
-    labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
-         caption = "Employment is indexed to 2011\n Shaded Area is Construction Period") +
-    guides(title = "Street Type")
-
-franklin_idx_accom <- ggplot(franklin_agg, aes(x = year, y = CNS18_sd, 
-                                group = Type, colour = Type, shape=Type)) + 
-    geom_line()  +
-    geom_rect(aes(xmin = as.Date("2011-01-01", "%Y"), 
-                  xmax = as.Date("2012-01-01", "%Y"), 
-                  ymin = -Inf, ymax = Inf),
-              fill = "#adff2f",linetype=0,alpha = 0.03) +
-    
-    geom_point(size = 3, fill="white") +
-    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-    theme_minimal() +
-    labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
-         caption = "Employment is indexed to 2011\n Shaded Area is Construction Period") +
-    guides(title = "Street Type")
+# franklin_agg <- franklin_agg %>% 
+#   mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+#                           Type == "control" ~ "Control: Franklin Ave."))
+# 
+# franklin_agg$Type <- factor(franklin_agg$Type, levels = c("Treatment", "Control: Franklin Ave.", "City"))
+# 
+# 
+# construct_year <- 2011
+# end_year <- 2012
+# 
+# construct_date <- as.character(paste0(construct_year, "-01-01"))
+# construct_date <- as.Date(construct_date, "%Y-%m-%d")
+#   
+#   
+# end_date <- as.character(paste0(end_year, "-01-01"))
+# end_date <- as.Date(end_date, "%Y-%m-%d")
+# 
+# franklin_idx_retail <- ggplot(franklin_agg, aes(x = year, y = CNS07_sd, 
+#                                 group = Type, colour = Type, shape=Type)) + 
+#     geom_line()  +
+#     geom_rect(aes(xmin = as.Date("2011-01-01", "%Y-%m-%d"), 
+#                   xmax = as.Date("2012-01-01", "%Y-%m-%d"), 
+#                   ymin = -Inf, ymax = Inf),
+#               fill = "#adff2f",linetype=0,alpha = 0.03) +
+#     
+#     geom_point(size = 3, fill="white") +
+#     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+#     theme_minimal() +
+#     labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+#          caption = "Employment is indexed to 2011\n Shaded Area is Construction Period") +
+#     guides(title = "Street Type")
+# 
+# franklin_idx_accom <- ggplot(franklin_agg, aes(x = year, y = CNS18_sd, 
+#                                 group = Type, colour = Type, shape=Type)) + 
+#     geom_line()  +
+#     geom_rect(aes(xmin = as.Date("2011-01-01", "%Y"), 
+#                   xmax = as.Date("2012-01-01", "%Y"), 
+#                   ymin = -Inf, ymax = Inf),
+#               fill = "#adff2f",linetype=0,alpha = 0.03) +
+#     
+#     geom_point(size = 3, fill="white") +
+#     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+#     theme_minimal() +
+#     labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+#          caption = "Employment is indexed to 2011\n Shaded Area is Construction Period") +
+#     guides(title = "Street Type")
 
 
 
@@ -734,7 +740,7 @@ franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_,group=Type,c
   labs(title = "Restaurant Sales Comparison: Franklin Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
+plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, ncol = 1)
 ```
 
 
@@ -763,7 +769,7 @@ franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_sd,group=Type
   labs(title = "Restaurant Sales Comparison: Franklin Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
 
-plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, align = "h")
+plot_grid(franklin_agg_retail_plot, franklin_agg_accom_plot, ncol = 1)
 ```
 
 
@@ -799,48 +805,52 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2012)
 
 central_agg <- bind_rows(central_agg, minn_agg)
 
-central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
+central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Retail", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
 
+central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
-construct_year <- 2012
-end_year <- 2013
-
-construct_date <- as.character(paste0(construct_year, "-01-01"))
-construct_date <- as.Date(construct_date, "%Y-%m-%d")
-  
-  
-end_date <- as.character(paste0(end_year, "-01-01"))
-end_date <- as.Date(end_date, "%Y-%m-%d")
-
-central_agg_idx_retail <- ggplot(central_agg, aes(x = year, y = CNS07_sd, 
-                                group = Type, colour = Type, shape=Type)) + 
-    geom_line()  +
-    geom_rect(aes(xmin = as.Date("2012-01-01", "%Y-%m-%d"), 
-                  xmax = as.Date("2013-01-01", "%Y-%m-%d"), 
-                  ymin = -Inf, ymax = Inf),
-              fill = "#adff2f",linetype=0,alpha = 0.03) +
-    
-    geom_point(size = 3, fill="white") +
-    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-    theme_minimal() +
-    labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
-         caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
-    guides(title = "Street Type")
-
-central_agg_idx_accom <- ggplot(central_agg, aes(x = year, y = CNS18_sd, 
-                                group = Type, colour = Type, shape=Type)) + 
-    geom_line()  +
-    geom_rect(aes(xmin = as.Date("2012-01-01", "%Y"), 
-                  xmax = as.Date("2013-01-01", "%Y"), 
-                  ymin = -Inf, ymax = Inf),
-              fill = "#adff2f",linetype=0,alpha = 0.03) +
-    
-    geom_point(size = 3, fill="white") +
-    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-    theme_minimal() +
-    labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
-         caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
-    guides(title = "Street Type")
+# central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
+# 
+# 
+# construct_year <- 2012
+# end_year <- 2013
+# 
+# construct_date <- as.character(paste0(construct_year, "-01-01"))
+# construct_date <- as.Date(construct_date, "%Y-%m-%d")
+#   
+#   
+# end_date <- as.character(paste0(end_year, "-01-01"))
+# end_date <- as.Date(end_date, "%Y-%m-%d")
+# 
+# central_agg_idx_retail <- ggplot(central_agg, aes(x = year, y = CNS07_sd, 
+#                                 group = Type, colour = Type, shape=Type)) + 
+#     geom_line()  +
+#     geom_rect(aes(xmin = as.Date("2012-01-01", "%Y-%m-%d"), 
+#                   xmax = as.Date("2013-01-01", "%Y-%m-%d"), 
+#                   ymin = -Inf, ymax = Inf),
+#               fill = "#adff2f",linetype=0,alpha = 0.03) +
+#     
+#     geom_point(size = 3, fill="white") +
+#     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+#     theme_minimal() +
+#     labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+#          caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
+#     guides(title = "Street Type")
+# 
+# central_agg_idx_accom <- ggplot(central_agg, aes(x = year, y = CNS18_sd, 
+#                                 group = Type, colour = Type, shape=Type)) + 
+#     geom_line()  +
+#     geom_rect(aes(xmin = as.Date("2012-01-01", "%Y"), 
+#                   xmax = as.Date("2013-01-01", "%Y"), 
+#                   ymin = -Inf, ymax = Inf),
+#               fill = "#adff2f",linetype=0,alpha = 0.03) +
+#     
+#     geom_point(size = 3, fill="white") +
+#     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+#     theme_minimal() +
+#     labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
+#          caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
+#     guides(title = "Street Type")
 
 
 
@@ -884,7 +894,7 @@ central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18,group=Type,colo
   labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(central_agg_retail_plot, central_agg_accom_plot, align = "v")
+plot_grid(central_agg_retail_plot, central_agg_accom_plot, ncol = 1)
 
 ```
 
@@ -920,7 +930,7 @@ central_agg_idx_accom_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS18_sd,grou
   labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
-plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, align = "v")
+plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, ncol = 1)
 
 ```
 
@@ -953,13 +963,17 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2008)
 
 lyndale_trend <- bind_rows(lyndale_trend, minn_agg)
 
+lyndale_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = lyndale_trend,industry = "Retail",corridor_name = "Lyndale Ave. S.", control_corridor = "Grand Ave.",industry_code = "CNS07_sd",construct_year = 2008, end_year = 2009)
+
+lyndale_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = lyndale_trend,industry = "Accommodations",corridor_name = "Lyndale Ave. S.", control_corridor = "Grand Ave.",industry_code = "CNS18_sd",construct_year = 2008, end_year = 2009)
+
 # lyndale_retail_trend <- agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 # 
 # lyndale_accom_trend <- agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 
-lyndale_idx_retail <- city_agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
-
-lyndale_idx_accom <- city_agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+# lyndale_idx_retail <- city_agg_index_trend_plot(lyndale_trend, industry = "Retail", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
+# 
+# lyndale_idx_accom <- city_agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 
 plot_grid(lyndale_idx_retail, lyndale_idx_accom, align = "h")
 
@@ -1003,7 +1017,7 @@ lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colo
   labs(title = "Restaurant Sales Comparison: Lyndale Ave S.", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "v")
+plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, ncol = 1)
 
 
 ```
@@ -1041,7 +1055,7 @@ lyndale_agg_idx_accom_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS18_sd,grou
   labs(title = "Restaurant Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
-plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, align = "v")
+plot_grid(lyndale_agg_idx_retail_plot, lyndale_agg_idx_accom_plot, ncol = 1)
 
 
 ```
@@ -1085,13 +1099,17 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
 
 north_agg <- bind_rows(north_agg, minn_agg)
 
+north_retail_idx <- city_agg_index_trend_one_control_plot(df_plot = north_agg, industry = "Retail", corridor_name = "North 2nd St.", control_corridor = "Broadway Ave.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+north_accom_idx <- city_agg_index_trend_one_control_plot(df_plot = north_agg, industry = "Accommodations", corridor_name = "North 2nd St.", control_corridor = "Broadway Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
 # north_retail_trend <- agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
 # 
 # north_accom_trend <- agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
-north_retail_idx <- city_agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
-
-north_accom_idx <- city_agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+# north_retail_idx <- city_agg_index_trend_plot(north_agg, industry = "Retail", corridor_name = "North 2nd St.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+# 
+# north_accom_idx <- city_agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
 plot_grid(north_retail_idx, north_accom_idx, align = "h")
 

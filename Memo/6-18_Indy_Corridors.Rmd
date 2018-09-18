@@ -357,7 +357,9 @@ This section presents the results of the econometric models for the appropriate 
 
 ## 4.1 Virginia Avenue
 
-### 4.1.1 Employment trend comparison
+### 4.1.1 Trend Analysis
+
+#### LEHD Data
 
 In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Meridian corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Prospect and Shelby corridors while the Meridian corridor shows much more volatility over the study period.
 
@@ -372,7 +374,7 @@ agg_food_trend_plot <- agg_trend_plot(virginia_agg, industry = "Food/Accommodata
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
 
-Indexing the empployment figures allows us to examine the change in the growth of employment on the same scale. For Virginia Ave, indexing employment to 2011, the beginning of construction, shows us some interesting patterns before and after installation. The retail plot shows that Virginia roughly followed the patterns of its comparator corridors with positive employment growth,  collapse during the recession and then rebounding in the late 2000s/early 2010s. The treatment corridor does not track any particular comparator corridor that closely but it is much closer to Meridian, and the city as a whole, post-construction than the others.
+Indexing the employment figures allows us to examine the change in the growth of employment on the same scale. For Virginia Ave, indexing employment to 2011, the beginning of construction, shows us some interesting patterns before and after installation. The retail plot shows that Virginia roughly followed the patterns of its comparator corridors with positive employment growth,  collapse during the recession and then rebounding in the late 2000s/early 2010s. The treatment corridor does not track any particular comparator corridor that closely but it is much closer to Meridian, and the city as a whole, post-construction than the others.
 
 The indexed accommodations employment chart shows a much tighter relationship among the corridors and the city. This should be expected given the relatively small amounts of accommmodations employment across the corridors, but Virginia Ave's clear, consistent growth starting after 2007 is tracked only by Prospect. 
 
@@ -387,6 +389,7 @@ va_index <- agg_index_trend_table(indy_corridor, group = 1, construct_year = 201
 indy_index <- city_agg_index_trend_table(indy_lehd, construct_year = 2011)
 
 va_index <- bind_rows(va_index, indy_index)
+
 va_index <- va_index %>% mutate(Type = if_else(Type == "city", "City", Type))
 
 va_index$Type <- factor(va_index$Type, 
@@ -430,7 +433,7 @@ va_city_idx_accom_plot <- ggplot(va_index, aes(x = as.Date(year, "%Y"), y = CNS1
 plot_grid(va_city_idx_retail_plot, va_city_idx_accom_plot, ncol = 1)
 ```
 
-#### 4.1.1.1 Sales Tax Comparisons
+####  Sales Tax 
 
 In terms of sales tax revenue and growth patterns, all three corridors are appropriately comparable. Meridian has a much higher absolute amount of tax receipts, but its trajectory, though more unstable, is still generally positive and matches those of the other corridors in the set. Virginia Ave itself sees steady and increasing tax revenue over time with anomalous spike in 2014 but it quickly returns to normal. Shelby and Prospect mirror Virginia Avenue in terms of total tax receipts and also generally follow growth trends, though both have more modest growth over time than Virginia. The t-test comparison of corridor growth rates came back non-significant for all three corridors giving us qualified confidence that these are appropriate comparators.  
 
@@ -505,7 +508,7 @@ plot(va_p1)
 
 ```
 
-#### 4.1.1.2 QCEW Comparisons
+####  QCEW 
 
 As mentioned earlier, the advantage of using QCEW data is the ability to get greater industrial detail in addition to establishment counts and total wages. In the case of Virginia Avenue, the ability to isolate slightly more detailed industries, in this case food and drinking places (NAICS code 722) gives us a clearer idea of the growth in our industries of interest. Note, for example, that the growth in food and drinking places employment is more dramatic for Virginia Avenue but the overall pattern remains similar to the LEHD estimates. 
 
@@ -650,30 +653,30 @@ plot_grid(qc_idx1, qc_idx2, ncol = 1)
 
 ### 4.1.2 Difference-in-Difference Models
 
-#### 4.1.2.1 Difference-in-Difference (LEHD)
+####  LEHD
 
 The difference terms for the Virginia Ave corridors are all non-significant, except for the Shelby corridor accommodations employment that is borderline significant but does not meet our preferred significance level. The lack of statistically significant terms here leads us to believe there is not a causal relationship between the installation of the new bike lane and change in retail or accommodations employment for Virginia Ave. 
 
-#### 4.1.2.2 Difference-in-Difference (Sales Tax)
+####  Sales Tax
 
-The difference terms for the the Shelby and Prospect corridors are all large, negative and significant. While the difference term is negative, this actual signals a *positive* causal relationship between the infrastructure and sales tax receipts as Virginia Ave is the reference group in this model specification. This means that when compared to Virginia Prospect lost approxiately \$210k compared to Virginia.  
+The difference terms for the the Shelby and Prospect corridors are negative and significant. While the difference term is negative, this actual signals a *positive* causal relationship between the infrastructure and sales tax receipts as Virginia Ave is the reference group in this model specification. This means that when compared to Virginia Prospect lost approxiately \$210k compared to Virginia.  
 
-#### 4.1.2.3 Difference-in-Difference QCEW
+#### QCEW
 
 The difference terms for Prospect and Shelby are large, negative and significant, signaling a positive effect of bike lane installation on both employment and quarterly wages. Again, Virginia Ave is the reference term for the difference variable meaning that the coefficient estimates what would happen if one were to move from Virginia to Prospect or Shelby. In this case, holding all other things equal, Prospect grew by nearly 200 jobs less with a loss of nearly a million dollars in quarterly wages.   
 
 ### 4.1.3 Interrupted Time Series
 
-#### 4.1.3.1 ITS (LEHD)
+####  LEHD
 
 Across all three models both the pre_post term (the term that signals a potential level change in your unit of interest) and the time series-pre_post term (the term that signals a potential slope change in your unit of interest) are non-significant. The time series alone term for accommodations and the combined 'business' variable are significant and positive signaling a general positive growth trend over time that is not related to the installation of the new cycling infrastructure. 
 
 
-#### 4.1.3.2 ITS (Sales Tax)
+####  Sales Tax
 
 The sales tax ITS model was also non-significant given our specification with a marginally significant time series term signalling the effect of a general positive growth trend above and beyond the placement of new infrastructure. 
 
-### 4.1.3.3 ITS (QCEW)
+###  QCEW
 
 Our ITS model shows both a positive and significant effect of bike lane installation on Virginia Ave for both jobs and quarterly wages. This is primarily due to the overall positive time series term as the construction term is negative and significant. Recall that the pre_post term signals a potential level change in our unit of interest while the interaction time series and pre_post term estimates the change in slope, or rate of change, of our unit of interest over time. This result more cleanly follows our descriptive data that shows a clear positive growth of employment and wages over time before, during and after the construction period with accelerated growth post-construction.
 
@@ -704,20 +707,26 @@ mass_index <- agg_index_trend_table(indy_corridor, group = 2, construct_year = 2
 indy_index <- city_agg_index_trend_table(indy_lehd, construct_year = 2009)
 
 mass_index <- bind_rows(mass_index, indy_index)
+
+# mass_city_idx_retail_plot <- city_agg_index_trend_one_control_plot(df_plot = mass_index, industry = "Retail", corridor_name = "Massachusetts Ave.", control_corridor = "Massachusetts Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+# mass_city_idx_accom_plot <- city_agg_index_trend_one_control_plot(df_plot = mass_index, industry = "Accommodations", corridor_name = "Massachusetts Ave.", control_corridor = "Massachusetts Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+  
 mass_index <- mass_index %>% mutate(Type = if_else(Type == "city", "City", Type))
 
-mass_index$Type <- factor(mass_index$Type, 
-                        levels = c("Treatment","City", 
+
+mass_index$Type <- factor(mass_index$Type,
+                        levels = c("Treatment","City",
                                    "Control: Mass Ave"))
 
 construct_year <-  as.Date("2009-01-01","%Y-%m-%d")
 end_year <- as.Date("2010-01-01","%Y-%m-%d")
 
 
-mass_city_idx_retail_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = CNS07_sd, 
-                                group = Type, colour = Type, shape=Type)) + 
-    geom_rect(aes(xmin = as.Date("2009-01-01","%Y-%m-%d"), 
-                  xmax = as.Date("2010-01-01","%Y-%m-%d"), 
+mass_city_idx_retail_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = CNS07_sd,
+                                group = Type, colour = Type, shape=Type)) +
+    geom_rect(aes(xmin = as.Date("2009-01-01","%Y-%m-%d"),
+                  xmax = as.Date("2010-01-01","%Y-%m-%d"),
                   ymin = -Inf, ymax = Inf),
               fill = "#adff2f",linetype=0,alpha = 0.03) +
     geom_line()  +
@@ -728,10 +737,10 @@ mass_city_idx_retail_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y =
          caption = glue("Employment is indexed to 2009\n Shaded Area is Construction Period")) +
     guides(title = "Street Type")
 
-mass_city_idx_accom_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = CNS18_sd, 
-                                group = Type, colour = Type, shape=Type)) + 
-    geom_rect(aes(xmin = as.Date("2009-01-01","%Y-%m-%d"), 
-                  xmax = as.Date("2010-01-01","%Y-%m-%d"), 
+mass_city_idx_accom_plot <- ggplot(mass_index, aes(x = as.Date(year, "%Y"), y = CNS18_sd,
+                                group = Type, colour = Type, shape=Type)) +
+    geom_rect(aes(xmin = as.Date("2009-01-01","%Y-%m-%d"),
+                  xmax = as.Date("2010-01-01","%Y-%m-%d"),
                   ymin = -Inf, ymax = Inf),
               fill = "#adff2f",linetype=0,alpha = 0.03) +
     geom_line()  +
@@ -747,7 +756,7 @@ plot(mass_city_idx_accom_plot)
 ```
 
 
-#### 4.2.1.1 Sales tax comparison
+####  Sales tax 
 
 Given their proximal nature the sales tax between the Massachusetts corridors their similarity is to be expected. They both run parallel with each other until separation occurring approximately around 2013. Both ends of the corridor see a spike in sales tax receipts but the Massachusetts control section sees a much larger growth spike and maintains the lead over the rest of the corridor moving forward. Beyond that, the two halves of the corridor continue to mirror each other.
 
@@ -796,7 +805,7 @@ plot(ma_p1)
 
 ```
 
-#### 4.2.1.2 QCEW Comparisons
+#### QCEW 
 
 According to the QCEW data the treatment section of Massachusetts Avenue did not have any food and drinking establishments during the construction period. This does not mean there was no retail oriented employment, the LEHD data shows there was some kind of retail on Massachusetts, but that there was no food and drinking specific employment. While we do not have data covering the construction period it is still valuable to note the the robust growth in employment and wages for the treatment corridor over such a short period of time. While it is not possible using this particular data source to determine whether or not the cycling infrastructure played a causal role in this growth, it is still heartening to see robust employment and wage growth on a commercial corridor with cycling infrastructure. 
 
@@ -868,13 +877,13 @@ We did not run a DiD model for the Massachusetts Ave corridor because it violate
 
 ### 4.2.3 ITS 
 
-#### 4.2.3.1 (LEHD)
+#### LEHD
 
 The Massachusetts Ave corridor shows mixed results in its ITS specification. The pre_post term (the term that estimates the change in the level of your unit of interest) is significant and negative for accommodations and the combined 'business' employment variables. This means there was a sharp loss in jobs at the construction point in time. But the time series-pre_post term (the term that estimates the change in the slope of the level of interest) is positive and significant for all employment sectors. This means that the growth in employment in our sectors of interest is greater post-construction than it was before. This means that while construction may have temporarily resulted in employment loss (due to establishments closing during construction or releasing workers due to lower sales during construction) the corridors are now growing at a healthier rate than before. 
 
 This is a mixed result, but considering the construction of the corridor was still during the Great Recession, the fact that there was still robust growth five years after suggests that overall economic conditions have improved and that the construction of the lane may have had a positive effect on this new growth trajectory.
 
-#### 4.2.3.2 ITS (Sales Tax)
+#### Sales Tax
 
 In terms of the sales tax model, the pre_post term is negative and significant signaling a change in level of sales tax receipts due to the intervention but the pre_post and time series interaction term is non-significant. The lack of a significant interaction term means that we cannot attribute change in the growth of sales tax on Massachusetts to the placement of new cycling infrastructure. It should be noted, though, that this sales tax data starts in 2008 so we do not necessarily have enough pre-intervention data points to make a strong statement either way using this technique. That being said, given our model specification, the ITS model does not signal a causal relationship between the change in sales tax receipts and new cycling infrastructure. 
 
