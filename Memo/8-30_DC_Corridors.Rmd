@@ -133,7 +133,7 @@ dc_growth <- growth_rate(dc_corridor)
 
 # 3. Corridor Comparisons
 
-Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for Washington DC as a whole for the year before construction. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
+Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the District of Columbia as a whole. This  allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
 
 Due to the data limitations of the LODES data for Washington DC we can test only the L and M Street corridors as they were completed after 2010. [if and when we get ancillary data we can update this]
 
@@ -142,6 +142,10 @@ Due to the data limitations of the LODES data for Washington DC we can test only
 [insert map image here]
 
 Our first treatment corridor is L Street. Constructed in 2012, L runs from 14th to 25th St NW. It's comparator corridors are I and K streets running from 14th to 23rd St Nw. 
+
+### 3.1.1 Corridor Employment Counts
+
+The percentile table shows total, retail, and accommodations employment for L St. compared to I and K Streets based on their percentile ranks of employment compared to the city as a whole. In terms of total and accommodations employment, the corridors are similar in terms of their percentile values, but diverge when it comes to retail employment. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -204,26 +208,202 @@ t.test(fifteenth$ratio2, k_st_nw$ratio2)
 
 #t-tests growth rates...only two observations, can't run it----
 
-fifteenth_growth <- dc_growth %>%  
-  mutate(year=as.numeric(as.character(year))) %>% 
-  filter(Group==2, Type=="Improvement", year<=conyear) 
-
-i_st_growth <- dc_growth %>%  
-  mutate(year=as.numeric(as.character(year))) %>% 
-  filter(Group==2, Type== "Control: I St", year<=conyear) 
-
-k_st_growth <- dc_growth %>%  
-  mutate(year=as.numeric(as.character(year))) %>% 
-  filter(Group==2, Type== "Control: K St", year<=conyear) 
-
-
-t.test(fifteenth_growth$biz_growth,i_st_growth$biz_growth)
-t.test(fifteenth_growth$retail_growth,i_st_growth$retail_growth)
-t.test(fifteenth_growth$food_accom_growth,i_st_growth$food_accom_growth)
-
-t.test(fifteenth_growth$biz_growth,k_st_growth_growth$biz_growth)
-t.test(fifteenth_growth$retail_growth,k_st_growth_growth$retail_growth)
-t.test(fifteenth_growth$food_accom_growth,k_st_growth_growth$food_accom_growth)
+# fifteenth_growth <- dc_growth %>%  
+#   mutate(year=as.numeric(as.character(year))) %>% 
+#   filter(Group==2, Type=="Improvement", year<=conyear) 
+# 
+# i_st_growth <- dc_growth %>%  
+#   mutate(year=as.numeric(as.character(year))) %>% 
+#   filter(Group==2, Type== "Control: I St", year<=conyear) 
+# 
+# k_st_growth <- dc_growth %>%  
+#   mutate(year=as.numeric(as.character(year))) %>% 
+#   filter(Group==2, Type== "Control: K St", year<=conyear) 
+# 
+# 
+# t.test(fifteenth_growth$biz_growth,i_st_growth$biz_growth)
+# t.test(fifteenth_growth$retail_growth,i_st_growth$retail_growth)
+# t.test(fifteenth_growth$food_accom_growth,i_st_growth$food_accom_growth)
+# 
+# t.test(fifteenth_growth$biz_growth,k_st_growth_growth$biz_growth)
+# t.test(fifteenth_growth$retail_growth,k_st_growth_growth$retail_growth)
+# t.test(fifteenth_growth$food_accom_growth,k_st_growth_growth$food_accom_growth)
 
 
 ```
+
+
+ 
+
+| Corridor | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------|---------|------------|-----------|---------|------------|-----------|
+| L St.    | 2188    | 39         | 213       | 90-95   | 90-95      | 95-100    |
+| I St.    | 1295    | 4          | 103       | 85-90   | 60-65      | 85-90     |
+| K St.    | 1804    | 15         | 167       | 90-95   | 80-85      | 90-95     |
+
+Table 1:  L, I and K St. Employment Percentiles, 2011 employment numbers
+
+### 3.1.2 Corridor Average Employment Comparisons
+
+We performed t-tests on three metrics at the census block level: "business" employment, the sum of retail and accommodations employment; a "business share" metric that is the share of employment in a census block of business employment over the sum of other services industries such as professional/scientific services, public administration and educational services; finally, a second business share metric on a smaller share of services employment including professional/scientific services, administrative/waste management services and arts/accommodation services (check appendix for variable definitions).
+
+The t-test did return one significant result on the difference between L and I street retail employment. This means that the two streets may not be directly comparable for retail, but on all other metrics the t-tests were non-significant. Since the corridors have similar concentrations of employment across our sectors of interest, and largely have non-significant differences in their average employment this means that the corridors are comparable and are appropriate for continued testing.
+
+## 3.2 M St.
+
+[insert map image here]
+
+The M St. corridor was constructed in 2014 and runs parallel to the L St. corridor. M St.'s comparator corridors are also I and K St.
+
+### 3.2.1 Corridor Employment Counts
+
+The percentile table shows total, retail, and accommodations employment for M St. compared to I and K Streets based on their percentile ranks of employment compared to the city as a whole. In terms of total and accommodations employment, the corridors are similar in terms of their percentile values, but diverge when it comes to retail employment. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#comparisons-----
+
+# prepare city level data & block level corridor data at the year before construction
+conyear <- first(filter(dc_corridor, Group== 5, Type== "Improvement")$BuildStart)-1 
+
+dc_corridor$Type <- as.character(dc_corridor$Type)
+dc_corridor[dc_corridor$Name =="I St",]$Type <- "Control: I St"
+dc_corridor[dc_corridor$Name=="K St",]$Type <- "Control: K St"
+
+dc_corridor$Type <- as.factor(dc_corridor$Type)
+# find the year before construction
+
+
+dc_lehd_2013 <- dc_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+
+m_st <- dc_corridor %>% filter(Group == 5, Type =="Improvement", year==conyear) %>%  employ_ratio_test(.)
+
+i_st_nw <- dc_corridor %>% filter(Group == 5, Type == "Control: I St", year ==conyear) %>% employ_ratio_test(.)
+
+k_st_nw <- dc_corridor %>% filter(Group == 5, Type == "Control: K St", year ==conyear) %>% employ_ratio_test(.)
+
+
+# find quantile dataframe 
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(dc_lehd_2013$C000, 
+                                            probs = p, na.rm = TRUE),
+                       q_retail = quantile(dc_lehd_2013$CNS07, 
+                                           probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(dc_lehd_2013$CNS18, 
+                                               probs = p, na.rm = TRUE),
+                       probs = p)
+
+m_st %>% summarise(TotEmp = sum(C000)/nrow(fifteenth), RetailEmp = sum(CNS07)/nrow(fifteenth), AccomEmp = sum(CNS18)/nrow(fifteenth)) %>% as.data.frame()
+
+i_st_nw %>% summarise(TotEmp = sum(C000)/nrow(i_st_nw), RetailEmp = sum(CNS07)/nrow(i_st_nw), AccomEmp = sum(CNS18)/nrow(i_st_nw)) %>% 
+  as.data.frame
+
+
+k_st_nw %>% summarise(TotEmp = sum(C000)/nrow(k_st_nw), RetailEmp = sum(CNS07)/nrow(k_st_nw), AccomEmp = sum(CNS18)/nrow(k_st_nw)) %>% 
+  as.data.frame
+
+# t-test: compare retail, food_accom, business amount---
+t.test(m_st$Business, i_st_nw$Business)
+t.test(m_st$Retail, i_st_nw$Retail)
+t.test(m_st$Food_Accom, i_st_nw$Food_Accom)
+t.test(m_st$ratio1, i_st_nw$ratio1)
+t.test(m_st$ratio2, i_st_nw$ratio2)
+
+t.test(m_st$Business, k_st_nw$Business)
+t.test(m_st$Retail, k_st_nw$Retail)
+t.test(m_st$Food_Accom, k_st_nw$Food_Accom)
+t.test(m_st$ratio1, k_st_nw$ratio1)
+t.test(m_st$ratio2, k_st_nw$ratio2)
+
+#t-tests growth rates...only two observations, can't run it----
+
+# fifteenth_growth <- dc_growth %>%  
+#   mutate(year=as.numeric(as.character(year))) %>% 
+#   filter(Group==2, Type=="Improvement", year<=conyear) 
+# 
+# i_st_growth <- dc_growth %>%  
+#   mutate(year=as.numeric(as.character(year))) %>% 
+#   filter(Group==2, Type== "Control: I St", year<=conyear) 
+# 
+# k_st_growth <- dc_growth %>%  
+#   mutate(year=as.numeric(as.character(year))) %>% 
+#   filter(Group==2, Type== "Control: K St", year<=conyear) 
+# 
+# 
+# t.test(fifteenth_growth$biz_growth,i_st_growth$biz_growth)
+# t.test(fifteenth_growth$retail_growth,i_st_growth$retail_growth)
+# t.test(fifteenth_growth$food_accom_growth,i_st_growth$food_accom_growth)
+# 
+# t.test(fifteenth_growth$biz_growth,k_st_growth_growth$biz_growth)
+# t.test(fifteenth_growth$retail_growth,k_st_growth_growth$retail_growth)
+# t.test(fifteenth_growth$food_accom_growth,k_st_growth_growth$food_accom_growth)
+
+
+```
+
+| Corridor | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
+|----------|---------|------------|-----------|---------|------------|-----------|
+| 15th St. | 2188    | 39         | 213       | 90-95   | 90-95      | 95-100    |
+| I St.    | 1295    | 4          | 103       | 85-90   | 60-65      | 85-90     |
+| K St.    | 1804    | 15         | 167       | 90-95   | 80-85      | 90-95     |
+
+Table 2: M, I and K St. Employment Percentiles, 2013 employment numbers
+
+### 3.2.2 Corridor Average Employment Comparisons
+
+The t-test did return one significant result on the difference between M and I street average retail employment. This means that the two streets may not be directly comparable for retail, but on all other metrics the t-tests were non-significant. Since the corridors have similar concentrations of employment across our sectors of interest, and largely have non-significant differences in their average employment this means that the corridors are comparable and are appropriate for continued testing.
+
+# 4. Data Analysis
+
+## 4.1  L St.
+
+### 4.1.1 Trend Analysis
+
+#### LEHD
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+
+
+#L St index table and plot
+l_st_agg_idx <- agg_index_trend_table(dc_corridor, group = 2, construct_year = 2012)
+
+#city agg plots
+
+dc_agg <- city_agg_index_trend_table(dc_lehd, construct_year = 2012)
+
+l_st_agg_idx <- bind_rows(l_st_agg_idx, dc_agg)
+l_st_agg_idx <- l_st_agg_idx %>% filter(!is.na(year))
+
+
+
+# riverside_agg_idx <- riverside_agg_idx %>% 
+#   mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+#                           Type == "control" ~ "Control: Cedar Ave.",
+#                           Type == "city" ~ "City"))
+# 
+# riverside_agg_idx$Type <- factor(riverside_agg_idx$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
+
+
+# construct_year <- 2009
+# end_year <- 2010
+# 
+# construct_date <- as.character(paste0(construct_year, "-01-01"))
+# construct_date <- as.Date(construct_date, "%Y-%m-%d")
+#   
+#   
+# end_date <- as.character(paste0(end_year, "-01-01"))
+# end_date <- as.Date(end_date, "%Y-%m-%d")
+
+l_agg_retail <- city_agg_index_trend_one_control_plot(l_st_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+
+plot_grid(riverside_agg_retail, riverside_agg_accom, align = "h")
+
+```
+
