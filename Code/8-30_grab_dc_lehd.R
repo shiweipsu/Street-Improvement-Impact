@@ -38,5 +38,6 @@ dc_lehd <- dc_lehd %>% left_join(dc_blocks, by = c("geoid10" = "GEOID10"))
 dc_lehd <- dc_lehd %>% st_as_sf()
 
 dc_lehd <- dc_lehd %>% st_transform(crs = 5070)
+dc_lehd <- dc_lehd %>% rename(geom = geometry)
 
 st_write(dc_lehd, dsn = con,layer = "dc_lehd", delete_dsn = TRUE, overwrite = TRUE)

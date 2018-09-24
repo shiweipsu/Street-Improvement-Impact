@@ -147,7 +147,7 @@ Our first treatment corridor is L Street. Constructed in 2012, L runs from 14th 
 
 The percentile table shows total, retail, and accommodations employment for L St. compared to I and K Streets based on their percentile ranks of employment compared to the city as a whole. In terms of total and accommodations employment, the corridors are similar in terms of their percentile values, but diverge when it comes to retail employment. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 
 #comparisons-----
 
@@ -259,7 +259,7 @@ The M St. corridor was constructed in 2014 and runs parallel to the L St. corrid
 
 The percentile table shows total, retail, and accommodations employment for M St. compared to I and K Streets based on their percentile ranks of employment compared to the city as a whole. In terms of total and accommodations employment, the corridors are similar in terms of their percentile values, but diverge when it comes to retail employment. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 
 #comparisons-----
 
@@ -364,8 +364,9 @@ The t-test did return one significant result on the difference between M and I s
 
 #### LEHD
 
+L Street's growth patterns for both retail and accommodations employment slightly lag behind the city and the control corridors, but the trends remain relatively similar until later when the city and I St. pick up retail employment growth. For accommodations employment L Street largely follows its control corridors. Considering how closely the corridors seem to track one another it seems that there has not been a noticeable effect of the new infrastructure on retail or accommodations employment.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
 
 
 #L St index table and plot
@@ -378,32 +379,103 @@ dc_agg <- city_agg_index_trend_table(dc_lehd, construct_year = 2012)
 l_st_agg_idx <- bind_rows(l_st_agg_idx, dc_agg)
 l_st_agg_idx <- l_st_agg_idx %>% filter(!is.na(year))
 
+l_st_agg_idx <- l_st_agg_idx %>% 
+  mutate(Type = if_else(Type == "city", "City", Type))
 
 
-# riverside_agg_idx <- riverside_agg_idx %>% 
-#   mutate(Type = case_when(Type == "improvement" ~ "Treatment",
-#                           Type == "control" ~ "Control: Cedar Ave.",
-#                           Type == "city" ~ "City"))
-# 
-# riverside_agg_idx$Type <- factor(riverside_agg_idx$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
+l_agg_retail <- ggplot(l_st_agg_idx, aes(x = year, y = CNS07_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = "2012", 
+                  xmax = "2013", 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    theme_minimal() +
+    labs(title = glue("Retail Employment Comparison:\n L St."), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2012\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+l_agg_accom <- ggplot(l_st_agg_idx, aes(x = year, y = CNS18_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = "2012", 
+                  xmax = "2013", 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(size = 3, fill="white") +
+    theme_minimal() +
+    labs(title = glue("Accommodations Employment Comparison:\n L St."), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2012\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
 
 
-# construct_year <- 2009
-# end_year <- 2010
-# 
-# construct_date <- as.character(paste0(construct_year, "-01-01"))
-# construct_date <- as.Date(construct_date, "%Y-%m-%d")
-#   
-#   
-# end_date <- as.character(paste0(end_year, "-01-01"))
-# end_date <- as.Date(end_date, "%Y-%m-%d")
-
-l_agg_retail <- city_agg_index_trend_one_control_plot(l_st_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
-
-riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 
 
-plot_grid(riverside_agg_retail, riverside_agg_accom, align = "h")
+plot_grid(l_agg_retail, l_agg_accom, ncol = 1)
 
 ```
 
+####  Sales Tax
+
+####  QCEW
+
+##  4.2 M St.
+
+### 4.2.1 Trend Analysis
+
+####  LEHD
+
+The trends for M Street are more ambiguous compared to L primarily due to the fact that the construction period is too late to see any potential impacts. That being said, the pre-construction trends show M largely tracking with its controls with respect to retail employment. But M's accommodations employment trends diverge dramatically from its controls with an initial drop and then fairly smooth recovery and growth starting around 2013.  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
+
+
+#L St index table and plot
+m_st_agg_idx <- agg_index_trend_table(dc_corridor, group = 5, construct_year = 2014)
+
+#city agg plots
+
+dc_agg <- city_agg_index_trend_table(dc_lehd, construct_year = 2014)
+
+m_st_agg_idx <- bind_rows(m_st_agg_idx, dc_agg)
+m_st_agg_idx <- m_st_agg_idx %>% filter(!is.na(year))
+
+m_st_agg_idx <- m_st_agg_idx %>% 
+  mutate(Type = if_else(Type == "city", "City", Type))
+
+
+m_agg_retail <- ggplot(m_st_agg_idx, aes(x = year, y = CNS07_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = "2014", 
+                  xmax = "2015", 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    theme_minimal() +
+    labs(title = glue("Retail Employment Comparison:\n M St."), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2014\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+m_agg_accom <- ggplot(m_st_agg_idx, aes(x = year, y = CNS18_sd, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = "2014", 
+                  xmax = "2015", 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(size = 3, fill="white") +
+    theme_minimal() +
+    labs(title = glue("Accommodations Employment Comparison:\n M St."), x="Year",y="Employment Index",
+         caption = glue("Employment is indexed to 2014\n Shaded Area is Construction Period")) +
+    guides(title = "Street Type")
+
+
+
+
+plot_grid(m_agg_retail, m_agg_accom, ncol = 1)
+
+```
