@@ -479,3 +479,7 @@ m_agg_accom <- ggplot(m_st_agg_idx, aes(x = year, y = CNS18_sd,
 plot_grid(m_agg_retail, m_agg_accom, ncol = 1)
 
 ```
+
+#### Sales Tax
+
+####  QCEW
