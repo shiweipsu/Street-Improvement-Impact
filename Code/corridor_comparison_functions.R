@@ -487,8 +487,10 @@ city_agg_trend_plot <- function(df_plot, industry, corridor_name,
 
 
 dist_trend_plot <- function(df_plot, demo, corridor_name, 
-                           demo_code = c("low_inc_perc", "white_perc","black_perc","asian_perc","female_perc", "bach_col_perc"), 
-                           construct_year, end_year) {
+                           demo_code = c("low_inc_perc", "white_perc","black_perc","ameindian_perc", "asian_perc",
+                                         "hawaii_perc", "other_perc","hisch_under_perc", "hisch_perc", "col_perc",
+                                         "bach_perc","female_perc", "bach_col_perc"), 
+                           construct_year, end_year, ylim_low, ylim_high) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
   
@@ -517,13 +519,16 @@ dist_trend_plot <- function(df_plot, demo, corridor_name,
     geom_line()  +
     geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
               fill = "#adff2f",linetype=0,alpha = 0.03) +
-    geom_point(size = 3, fill="white") +
+    geom_point(aes(fill= Type),size=3) +
     scale_shape_manual(values=c(22,21,21,23))+
+    scale_fill_manual(values = c("white", "white", "white", "orchid"))+
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("Percentage of {demo} Employment:\n {corridor_name}"), x="Year",y="Percentage",
          caption = "Shaded area represents the construction period") +
-    guides(title = "Street Type")
+    guides(title = "Street Type") +
+    ylim(ylim_low, ylim_high) +
+    theme(legend.position = "bottom")
   
   
   return(ats_df)
