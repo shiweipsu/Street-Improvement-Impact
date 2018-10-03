@@ -27,4 +27,16 @@ portland_lehd <- portland_lehd %>% filter(!is.na(state)) %>% st_transform(5070)
 
 st_write(portland_lehd, dsn = con, overwrite = TRUE, "portland_lehd",geom_col="geometry")
 
+
+portland_rac <- nitc_rac(years = years, target_state = "OR", target_county = "Multnomah", 
+                           target_place = "Portland")
+
+portland_rac$BLOCKCE10 <- NULL
+
+names(portland_rac) <- tolower(names(portland_rac))
+
+portland_rac <- portland_rac %>% filter(!is.na(state)) %>% st_transform(5070)
+
+st_write(portland_rac, dsn = con, overwrite = TRUE, "portland_rac",geom_col="geometry")
+
 dbDisconnect(con)
