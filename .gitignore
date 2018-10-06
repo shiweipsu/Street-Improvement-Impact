@@ -1,3 +1,4 @@
+dir_to_ignore/Data
 .Rproj.user
 .Rhistory
 .RData
