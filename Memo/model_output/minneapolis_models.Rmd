@@ -210,4 +210,32 @@ stargazer(second_its_retail, type = "html",
 
 dbDisconnect(con)
 
+
+# qcew models-----------------------
+
+#riverside did
+
+minn_qcew <- tbl(con, "minneapolis_qcew_modified")
+
+riverside_qcew <- minn_qcew %>% filter(corridors == "Riverside Ave" | corridors == "Cedar Ave")
+
+riverside_qcew <- collect(riverside_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+          year_quarter = as.yearqtr(year_quarter))
+
+riverside_qcew <- riverside_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Cedar Ave"))
+
+riverside_qcew$street_type <- factor(riverside_qcew$street_type, 
+                                     levels = c("Treatment", "Control: Cedar Ave"))
+
+riverside_qcew <- riverside_qcew %>% 
+  mutate(pre_post = if_else(year_quarter >= "2009 Q1", 1, 0))
+
+river_qcew_did_emp <- lm(avg_emp ~ street_type + pre_post + street_type*pre_post, riverside_qcew)
+river_qcew_did_wages <- lm(total_wages ~ street_type + pre_post + street_type*pre_post, riverside_qcew)
+
+river_qcew_did_list <- list(river_qcew_did_emp, river_qcew_did_wages)
+
 ```

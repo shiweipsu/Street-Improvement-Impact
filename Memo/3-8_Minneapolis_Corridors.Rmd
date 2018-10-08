@@ -32,6 +32,8 @@ For this study we used multiple data sources to estimate the effect of new bike 
 
 This report also takes advantage of establishment level **Quarterly Census of Employment and Wages** (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
 
+Due to data suppression issues, we were unable to get disaggregated individual three-digit NAICS employment figures for the Minneapolis corridors. As a compromise, Minnesota's Department of Employment and Economic Development (DEED) aggregated all of the three-digit NAICS retail codes (NAICS 442-453). These aggregated numbers correspond closely to the LEHD codes used in the report, but with the advantage that the numbers are not "fuzzed" for confidentiality concerns, the data include total wages paid and average employment. And all of this data is available quarterly and goes back to the year 2000 dramatically increasing our sample size.
+
 Finally, we also collected **sales tax data**. Sales tax data allows us to estimate a more sensitive measure of economic activity than employment (as the decision to hire or fire for a firm is often an expensive one we expect employment to be a delayed response). Some drawbacks of sales tax data is that some states do not have a sales tax or, in states or cities that do have one, the sales tax data is not broken down by specific industry and it is difficult to accurately parse out accurate figures. But the benefits of sales tax data largely outweigh these issues and do offer a more sensitive metric than employment. 
 
 In terms of specific rates, Minneapolis sales tax is, at minimum, 8.025% (for example, buying a meal at a restaurant outside of downtown Minneapolis) up to 14.025% (for ordering a meal in a restaurant with live entertainment within the downtown taxing district). The minimal 8.025% rate includes the 6.875% state sales tax, a 0.5% transit tax for Hennepin County, an additional .15% Hennepin County tax and, finally, a 0.5% city sales/use tax. Additional entertainment and accommodations taxes may also be included.
@@ -481,24 +483,6 @@ riverside_agg_idx <- riverside_agg_idx %>% filter(!is.na(year))
 
 
 
-# riverside_agg_idx <- riverside_agg_idx %>% 
-#   mutate(Type = case_when(Type == "improvement" ~ "Treatment",
-#                           Type == "control" ~ "Control: Cedar Ave.",
-#                           Type == "city" ~ "City"))
-# 
-# riverside_agg_idx$Type <- factor(riverside_agg_idx$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
-
-
-# construct_year <- 2009
-# end_year <- 2010
-# 
-# construct_date <- as.character(paste0(construct_year, "-01-01"))
-# construct_date <- as.Date(construct_date, "%Y-%m-%d")
-#   
-#   
-# end_date <- as.character(paste0(end_year, "-01-01"))
-# end_date <- as.Date(end_date, "%Y-%m-%d")
-
 riverside_agg_retail <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 
 riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
@@ -607,9 +591,131 @@ plot_grid(riverside_agg_retail_idx_plot, riverside_agg_idx_accom_plot, ncol = 1)
 
 ```
 
-The indexed plots give us an alternative view of the corridors that reinfoece what the non-indexed plots have shown us. Retail sales values, indexed to 2009, hihglight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
+The indexed plots give us an alternative view of the corridors that reinforce what the non-indexed plots have shown us. Retail sales values, indexed to 2009, hihglight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
 
- 
+#### QCEW
+
+As mentioned earlier the QCEW data provided by the state will give us much more detail of changes over time as well as establishment counts and total wage data. While we do not have fully disaggregated data the increased sample size and detail on establishments and wages is still valuable and expands our understanding of the economic and business dynamics of our corridors.
+
+The Riverside Avenue trend analysis shows that there was a large jump in business activity on Riverside the first qurter of 2005 with consistent overall growth in employment and wages. This large jump in growth was related to the addition of a new, large establishment on the corridor as the total number of retail establishments grew from 4 to 5 in 2005. This large establishment is a clear driver in the growth of employment and wages. Also, note that there does not seem to be any immediately apparent relationship in employment or wage growth and the infrastructure construction period.  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
+
+minn_qcew <- tbl(con, "minneapolis_qcew_modified")
+
+riverside_qcew <- minn_qcew %>% filter(corridors == "Riverside Ave" | corridors == "Cedar Ave")
+
+riverside_qcew <- collect(riverside_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+          year_quarter = as.yearqtr(year_quarter))
+
+riverside_qcew <- riverside_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Cedar Ave"))
+
+riverside_qcew$street_type <- factor(riverside_qcew$street_type, 
+                                     levels = c("Treatment", "Control: Cedar Ave"))
+
+river_agg <- riverside_qcew %>% 
+ filter(year_quarter == "2009 Q1") %>% 
+  select(corridors, street_type, estab_base = establishments, base_wage = total_wages, 
+         base_avg_emp = avg_emp)
+
+riverside_qcew <- riverside_qcew %>% 
+  left_join(river_agg, by = c("corridors" = "corridors", "street_type" = "street_type"))
+
+riverside_qcew <- riverside_qcew %>% 
+  mutate(estab_idx = establishments/estab_base,
+         wage_idx = total_wages/base_wage,
+         avg_emp_idx = avg_emp/base_avg_emp)
+
+qc_1 <- ggplot(riverside_qcew, 
+              aes(x = year_quarter, y = avg_emp, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2009, 
+                  xmax = 2010, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Employment Change",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::comma) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_2 <- ggplot(riverside_qcew, 
+              aes(x = year_quarter, y = total_wages, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2009, 
+                  xmax = 2010, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Total Wages",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::dollar) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+plot_grid(qc_1, qc_2, ncol = 1)
+
+```
+
+The indexed employment and wage figures offer a clearer picture of the dramatic growth of Riverside Ave, even accounting for the large jump in employment in 2005. Principally, note that employment growth for Riverside and Cedar has recovered to 2009 levels with Riverside showing robust growth post-recession and a flattening in the past three years. Cedar, on the other hand, has stadily lost employment post recession after a large bump and is also now hovering around its 2009 employment levels.
+
+Wage growth, though, for both corridors has been on a largely positive trajectory from even before the construction period, though Riverside has seen higher wage growth, relative to its 2009 base year, than Cedar has. Again, note that there does not seem to be any immediately evident connection between wage growth and the corridor construction.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+qc_idx1 <- ggplot(riverside_qcew, 
+              aes(x = year_quarter, y = avg_emp_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2009, 
+                  xmax = 2010, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Employment Growth",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2009") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_idx2 <- ggplot(riverside_qcew, 
+              aes(x = year_quarter, y = wage_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2009, 
+                  xmax = 2010, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Total Wage Change",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2009") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+plot_grid(qc_idx1, qc_idx2,  ncol = 1)
+
+
+```
 
 ### 4.1.2 Difference-in-Difference
 
