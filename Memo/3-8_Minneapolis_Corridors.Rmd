@@ -604,6 +604,9 @@ The Riverside Avenue trend analysis shows that there was a large jump in busines
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
 minn_qcew <- tbl(con, "minneapolis_qcew_modified")
 
 riverside_qcew <- minn_qcew %>% filter(corridors == "Riverside Ave" | corridors == "Cedar Ave")
@@ -643,7 +646,8 @@ qc_1 <- ggplot(riverside_qcew,
     scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
     geom_point(size = 3, fill = "white") +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Employment Change",
+  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Employment Change",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::comma) +
@@ -661,7 +665,8 @@ qc_2 <- ggplot(riverside_qcew,
   scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
     geom_point(size = 3, fill = "white") +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Total Wages",
+  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Total Wages",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::dollar) +
@@ -690,7 +695,8 @@ qc_idx1 <- ggplot(riverside_qcew,
   scale_x_yearqtr() +
     scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Employment Growth",
+  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Employment Growth",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2009") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::percent) +
@@ -708,7 +714,8 @@ qc_idx2 <- ggplot(riverside_qcew,
   scale_x_yearqtr() +
   scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Food and Drinking Places\n Total Wage Change",
+  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Total Wage Change",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2009") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::percent) +
@@ -880,7 +887,8 @@ qc_franklin1 <- ggplot(franklin_qcew,
     scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
     geom_point(size = 3, fill = "white") +
-  labs(x = "Quarter", y = "", title = "Franklin Ave Food and Drinking Places\n Employment Change",
+  labs(x = "Quarter", y = "", title = "Franklin Ave Retail\n Employment Change",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::comma) +
@@ -898,7 +906,8 @@ qc_franklin2 <- ggplot(franklin_qcew,
   scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
     geom_point(size = 3, fill = "white") +
-  labs(x = "Quarter", y = "", title = "Franklin Ave Food and Drinking Places\n Total Wages",
+  labs(x = "Quarter", y = "", title = "Franklin Ave Retail\n Total Wages",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::dollar) +
@@ -925,7 +934,8 @@ qc_idx_emp_franklin <- ggplot(franklin_qcew,
   scale_x_yearqtr() +
     scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
-  labs(x = "Quarter", y = "", title = "Franklin Ave Food and Drinking Places\n Employment Growth",
+  labs(x = "Quarter", y = "", title = "Franklin Ave Retail\n Employment Growth",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2011") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::percent) +
@@ -943,7 +953,8 @@ qc_idx_franklin_wages <- ggplot(franklin_qcew,
   scale_x_yearqtr() +
   scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
-  labs(x = "Quarter", y = "", title = "Franklin Ave Food and Drinking Places\n Total Wage Change",
+  labs(x = "Quarter", y = "", title = "Franklin Ave Retail\n Total Wage Change",
+              subtitle = "QCEW NAICS 442-453",
        caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2011") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::percent) +
@@ -992,48 +1003,7 @@ central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = centra
 
 central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
-# central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: Cedar Ave.", "City"))
-# 
-# 
-# construct_year <- 2012
-# end_year <- 2013
-# 
-# construct_date <- as.character(paste0(construct_year, "-01-01"))
-# construct_date <- as.Date(construct_date, "%Y-%m-%d")
-#   
-#   
-# end_date <- as.character(paste0(end_year, "-01-01"))
-# end_date <- as.Date(end_date, "%Y-%m-%d")
-# 
-# central_agg_idx_retail <- ggplot(central_agg, aes(x = year, y = CNS07_sd, 
-#                                 group = Type, colour = Type, shape=Type)) + 
-#     geom_line()  +
-#     geom_rect(aes(xmin = as.Date("2012-01-01", "%Y-%m-%d"), 
-#                   xmax = as.Date("2013-01-01", "%Y-%m-%d"), 
-#                   ymin = -Inf, ymax = Inf),
-#               fill = "#adff2f",linetype=0,alpha = 0.03) +
-#     
-#     geom_point(size = 3, fill="white") +
-#     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-#     theme_minimal() +
-#     labs(title = "Retail Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
-#          caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
-#     guides(title = "Street Type")
-# 
-# central_agg_idx_accom <- ggplot(central_agg, aes(x = year, y = CNS18_sd, 
-#                                 group = Type, colour = Type, shape=Type)) + 
-#     geom_line()  +
-#     geom_rect(aes(xmin = as.Date("2012-01-01", "%Y"), 
-#                   xmax = as.Date("2013-01-01", "%Y"), 
-#                   ymin = -Inf, ymax = Inf),
-#               fill = "#adff2f",linetype=0,alpha = 0.03) +
-#     
-#     geom_point(size = 3, fill="white") +
-#     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-#     theme_minimal() +
-#     labs(title = "Accommodations Employment Comparison:\n Riverside Ave", x="Year",y="Employment Index",
-#          caption = "Employment is indexed to 2012\n Shaded Area is Construction Period") +
-#     guides(title = "Street Type")
+
 
 
 
@@ -1117,6 +1087,133 @@ plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, ncol = 1)
 
 ```
 
+#### QCEW
+
+Central Ave retail employment change was highly volatile in the early part of the 2000s, maintained a level around 200 jobs immediately before and through the recession and has seen fairly dramatic growth in the past few years. University Ave, on the other hand, has largely been down with respect to employment growth but saw a spike in employment starting during 2012, peaking in 2014, and has largely trended negatively since. Both corridors' total wages paid over time largely mirror their employment directly. For both, there is not an immediately apparent connection between the construction of new cycling infrastructure and employment or wage change. 
+
+```{r central_qcew_absolute, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+central_qcew <- minn_qcew %>% 
+  filter(corridors == "Central Ave" | corridors == "University Ave")
+
+central_qcew <- collect(central_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+          year_quarter = as.yearqtr(year_quarter))
+
+central_qcew <- central_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: University Ave"))
+
+central_qcew$street_type <- factor(central_qcew$street_type, 
+                                     levels = c("Treatment", "Control: University Ave"))
+
+central_agg <- central_qcew %>% 
+ filter(year_quarter == "2012 Q1") %>% 
+  select(corridors, street_type, estab_base = establishments, base_wage = total_wages, base_avg_emp = avg_emp)
+
+central_qcew <- central_qcew %>% 
+  left_join(central_agg, by = c("corridors" = "corridors", "street_type" = "street_type"))
+
+central_qcew <- central_qcew %>% 
+  mutate(estab_idx = establishments/estab_base,
+         wage_idx = total_wages/base_wage,
+         avg_emp_idx = avg_emp/base_avg_emp)
+
+#qcew absolute plots
+
+qc_central_emp <- ggplot(central_qcew, 
+              aes(x = year_quarter, y = avg_emp, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2012, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = "Central Ave Retail Employment\n Change",
+       subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::comma) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_central_wages <- ggplot(central_qcew, 
+              aes(x = year_quarter, y = total_wages, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2012, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = "Central Ave Retail\n Total Wages",
+       subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::dollar) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+plot_grid(qc_central_emp, qc_central_wages, ncol = 1)
+
+
+```
+
+The index plots show the dramatic growth of both Central and University Avenues over the past decade and a half with repsect to both retail employment and wages. One detail to note is that Central continues on a positive trajectory for both wages and employment in the last few years ultimately surpassing the much more volatile University in terms of growth. 
+
+```{r central_qcew_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+#qcew index plots
+
+qc_idx_emp_central <- ggplot(central_qcew, 
+              aes(x = year_quarter, y = avg_emp_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2012, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Central Ave Retail\n Employment Growth",
+              subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2012") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_idx_central_wages <- ggplot(central_qcew, 
+              aes(x = year_quarter, y = wage_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2012, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Central Ave Retail\n Total Wage Change",
+              subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2012") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+
+plot_grid(qc_idx_emp_central, qc_idx_central_wages,  ncol = 1)
+
+
+
+```
 ### 4.3.2 Difference-in-Difference
 
 Central Avenue's difference term is significant and negative for accommodations employment, though non-significant for retail. For Central Avenue, therefore, the installation of the new infrastructure is responsible for the loss of approximately 203 accommodations jobs compared to the control corridor. This result can be intuited if you revisit the aggregate employment graph for the Central Avenue corridors and you can see there is a large gap in the overall number of accommodations jobs between the treatment and control corridor. Additionally, the control corridor has more robust growth over time compared to the treatment.
@@ -1124,6 +1221,8 @@ Central Avenue's difference term is significant and negative for accommodations 
 [inset did table]
 
 In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. Overall, this model specification implies that new infrastructure construction is repsonible for an additional 7 million dollars in retail sales tax receipts and a loss of 5.7 million dollars in restaurant receipts.It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
+
+The QCEW DiD estimates for wages and employment both returned non-significant results. This makes intuitive sense when examining the employment and wage figures where there does not seem to be any visual signals that the construction period has any effect on either employment or wages. 
 
 ### 4.3.3 ITS
 
@@ -1133,9 +1232,13 @@ Central Avenue also has mixed results, but due to limited number of data points 
 
 The sales tax ITS analysis only reinforces the ambiguous results of the corridor with the *ts_year:pre_post* term being significant and positive for restaurant sales but non-significant for retail. Also note the large, negative and significant *pre-post* term for restaurant, signaling some kind of massive shock to the corridor, but with stronger growth post construction. The overall ambiguity here makes it difficult to definitively give a clear causal influence of the construction on employment or sales tax receipts in the corridor.
 
+The QCEW ITS models for Central Ave offer a mixed set of conclusions. For employment, the ITS has a negative and significant result for the level change but a non-significant result for a slope change. The wage model, on the other hand, shows a negative and significant result for the *pre_post* term and a positive and significant result for the *ts_year:pre_post* term showing a negative change in level but positive change in slope post construction.  
+
 ## 4.4 Lyndale Avenue South
 
-### 4.4.1 Employment Trend Comparisons
+### 4.4.1 Trend Analysis
+
+#### LEHD Data
 
 Retail employment on the Lyndale Avenue corridor looks to only have just recovered its employment since the recession though its growth pattern has been much more consistent than its comparison corridor. Interestingly, both the improved and control corridors saw a spike in retail employment in 2015. This is generally good news for the corridors though we the trend analysis does not show any real impact of the street improvement itself on retail employment. 
 
@@ -1164,7 +1267,7 @@ plot_grid(lyndale_idx_retail, lyndale_idx_accom, align = "h")
 
 In terms of accommodations employment, the treatment corridor shows no real effect due to construction showing only modest overall employment growth since 2008. 
 
-### 4.4.2 Sales Tax Comparison
+####  Sales Tax 
 
 The Lyndale Ave corridor also displays ambiguous impacts of new cycling infrastructure on retail and restaurant demand. There is a  minor bump post construction for retail that results in increased growth over time signaling a possible effect of construction. Restaurant sales tax growth, though, is clearly tied to some major increase in demand nearly a decade after construction. Additionally, the growth in restaurant sales tax receipts was less than that of its control corridor both in absolute and relative terms. 
 
@@ -1243,7 +1346,141 @@ plot_grid(lyndale_agg_idx_retail_plot, lyndale_agg_idx_accom_plot, ncol = 1)
 
 ```
 
-### 4.4.3 Difference-in-Difference
+
+#### QCEW
+
+Thought the baseline numbers differ drastically the absolute employment and wage values for Lyndale Ave still offer some enlightenment as to overall patterns of growth and the difference between Lyndale and Grand. First, while Lyndale starts from a much higher base employment both corridors see some growth immediately pre-recession, consistent employment loss during the recession and recovery after. Though note that Lyndale's recovery is more consistent post recession than Grand's which has a slight, though consistent fall in employment until nearly 2015.
+
+```{r lyndale_qcew_absolute, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+lyndale_qcew <- minn_qcew %>% 
+  filter(corridors == "Lyndale Ave S" | corridors == "Grand Ave")
+
+lyndale_qcew <- collect(lyndale_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+          year_quarter = as.yearqtr(year_quarter))
+
+lyndale_qcew <- lyndale_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Grand Ave"))
+
+lyndale_qcew$street_type <- factor(lyndale_qcew$street_type, 
+                                     levels = c("Treatment", "Control: Grand Ave"))
+
+lyndale_agg <- lyndale_qcew %>% 
+ filter(year_quarter == "2008 Q1") %>% 
+  select(corridors, street_type, estab_base = establishments, base_wage = total_wages, base_avg_emp = avg_emp)
+
+lyndale_qcew <- lyndale_qcew %>% 
+  left_join(lyndale_agg, by = c("corridors" = "corridors", "street_type" = "street_type"))
+
+lyndale_qcew <- lyndale_qcew %>% 
+  mutate(estab_idx = establishments/estab_base,
+         wage_idx = total_wages/base_wage,
+         avg_emp_idx = avg_emp/base_avg_emp)
+
+#qcew absolute plots
+
+qc_lyndale_emp <- ggplot(lyndale_qcew, 
+              aes(x = year_quarter, y = avg_emp, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = "Lyndale Ave S Retail Employment\n Change",
+       subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::comma) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_lyndale_wages <- ggplot(lyndale_qcew, 
+              aes(x = year_quarter, y = total_wages, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = "Lyndale Ave S Retail\n Total Wages",
+       subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::dollar) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+plot_grid(qc_lyndale_emp, qc_lyndale_wages, ncol = 1)
+
+
+```
+
+
+
+The indexed figures give us a better idea of the patterns of growth between the two corridors.  In particular, both for wages and employment the corridors have similar growth trajectories while Lyndale Ave is consistently less volatile and has a higher rate of growth, at least for employment, starting around 2012 and carrying through 2015 when Cedar Ave takes over. Again, note that there does not seem to be an immediately apparent relationship between the construction period and wage or employment growth. 
+
+
+
+```{r lyndale_qcew_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+#qcew index plots
+
+qc_idx_emp_lyndale <- ggplot(lyndale_qcew, 
+              aes(x = year_quarter, y = avg_emp_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Lyndale Ave S Retail\n Employment Growth",
+              subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2008") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_idx_lyndale_wages <- ggplot(lyndale_qcew, 
+              aes(x = year_quarter, y = wage_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "Lyndale Ave S Retail\n Total Wage Change",
+              subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2008") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+
+plot_grid(qc_idx_emp_lyndale, qc_idx_lyndale_wages,  ncol = 1)
+
+
+
+```
+
+
+### 4.4.2 Difference-in-Difference
 
 For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment and a non-significant result for retail employment. Again, the interpretation of the difference term is that "but for" the installation of the infrastructure Lyndale Avenue would have nearly 109 additional accommodations jobs. 
 
@@ -1251,7 +1488,7 @@ For Lyndale Avenue we find a statistically significant and negative effect of in
 
 The DiD specification for sales tax for Lyndale shows a non-significant effect of construction on restaurant sales tax receipts but a positive and significant effect on retail sales tax receipts. In this case, the model implies that the corridor construction was responsible for an additional 4 million dollars in receipts compared to the control corridor.  
 
-### 4.4.4 ITS
+### 4.4.3 ITS
 
 
 Lyndale exhibits a similar pattern to Central but with the construction completed in 2009 we have enough data post-treatment to have more valid results. In this case, there is a negative, statistically significant drop in the level of accommodations employment for the corridor but a positive, significant slope. Again, when examining the aggregate employment trend graphs we see a clear drop in employment in 2009 and 2010 and a seeming return to the pre-treatment level with a positive slope. The positive growth trend continues through 2015 but it is unclear if we will see a leveling off of new employment at a higher level or if employment will collapse again.
@@ -1268,7 +1505,7 @@ In terms of sales tax returns, Lyndale is similar to the other corridors in that
 
 All t-tests came back non-significant meaning that the corridors are acceptable comparators. 
 
-### 4.5.2 Employment Trend Comparisons
+### 4.5.2 Trend Analysis
 
 #### LEHD Data
 
@@ -1364,6 +1601,132 @@ plot(second_agg_idx_retail_plot)
 
 
 ```
+
+#### QCEW
+
+The absolute graphs show the general decline of North 2nd compared to Boradway over th elast two decades. After a high in the early part of the 2000s, North 2nd has largely been in decline with a slight uptick starting 2012/2013, but it is still far below its peak. Broadway, on the other hand, is defined by some pretty dramatic drops in employment and quick recoveries, though its last major fall during the recession has met with only a mild recovery. Note that for North 2nd there is not an immediately apparent relationship between the construction period and employment or wages.
+
+```{r north_2nd_qcew, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+north_qcew <- minn_qcew %>% 
+  filter(corridors == "North 2nd Street" | corridors == "Broadway Ave")
+
+north_qcew <- collect(north_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+          year_quarter = as.yearqtr(year_quarter))
+
+north_qcew <- north_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Broadway Ave"))
+
+north_qcew$street_type <- factor(north_qcew$street_type, 
+                                     levels = c("Treatment", "Control: Broadway Ave"))
+
+north_agg <- north_qcew %>% 
+ filter(year_quarter == "2011 Q1") %>% 
+  select(corridors, street_type, estab_base = establishments, base_wage = total_wages, base_avg_emp = avg_emp)
+
+north_qcew <- north_qcew %>% 
+  left_join(north_agg, by = c("corridors" = "corridors", "street_type" = "street_type"))
+
+north_qcew <- north_qcew %>% 
+  mutate(estab_idx = establishments/estab_base,
+         wage_idx = total_wages/base_wage,
+         avg_emp_idx = avg_emp/base_avg_emp)
+
+#qcew absolute plots
+
+qc_north_emp <- ggplot(north_qcew, 
+              aes(x = year_quarter, y = avg_emp, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2012, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = "North 2nd St. Retail Employment\n Change",
+       subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::comma) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_north_wages <- ggplot(north_qcew, 
+              aes(x = year_quarter, y = total_wages, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2012, 
+                  xmax = 2013, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = "North Second St. Retail\n Total Wages",
+       subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::dollar) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+plot_grid(qc_north_emp, qc_north_wages, ncol = 1)
+
+```
+
+The indexed figures reinforce what the above figures demonstrate but they do offer a clearer example of the mirrored growth trends between the corridors starting around 2006/2007. Both corridors are only just now starting to grow beyond their 2011 baseline values with North 2nd showing a greater growth rate than Broadway post-2015. Note that these figures also do not 
+
+```{r north_qcew_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+#qcew index plots
+
+qc_idx_emp_north <- ggplot(north_qcew, 
+              aes(x = year_quarter, y = avg_emp_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2012, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "North 2nd St. Retail\n Employment Growth",
+              subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2011") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+qc_idx_north_wages <- ggplot(north_qcew, 
+              aes(x = year_quarter, y = wage_idx, group = street_type, 
+                           colour = street_type, shape = street_type)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2012, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "", title = "North 2nd St. Retail\n Total Wage Change",
+              subtitle = "QCEW NAICS 442-453",
+       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2011") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+
+
+plot_grid(qc_idx_emp_north, qc_idx_north_wages,  ncol = 1)
+
+```
+
 
 ### 4.5.3 Difference-in-Difference
 
