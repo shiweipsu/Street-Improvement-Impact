@@ -1,0 +1,30 @@
+---
+title: "Pittsburgh Case Study"
+author: "Wei Shi"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  pdf_document:
+    includes:
+      in_header: header.tex
+    number_sections: yes
+=======
+  word_document: 
+    reference_docx: "docx_reference2.docx"
+    
+---
+
+```{r setup,include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+
+
+```
+
+# Introduction
+
+In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
+
+# Data Sources/Methodology
+
+## Data Sources
