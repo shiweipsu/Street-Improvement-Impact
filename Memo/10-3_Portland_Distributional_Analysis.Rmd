@@ -58,6 +58,7 @@ portland_lehd <- st_read(dsn = con, query = "SELECT * FROM portland_lehd") %>% a
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
 
+<<<<<<< HEAD
 
 portland_corridor_rac <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
 a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
@@ -88,6 +89,8 @@ portland_rac <- st_read(dsn = con, query = "SELECT * FROM portland_rac") %>% as.
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
 
+=======
+>>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
 portland_emp_ratio <- employ_ratio_test(portland_corridor)
 
 portland_growth <- growth_rate(portland_corridor)
@@ -251,6 +254,7 @@ start_end_race <- stark_race %>%
   group_by(Type) %>% 
   summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
 
+<<<<<<< HEAD
   
 # calculate year by year race categories percentage change  
 y_o_y_race <- stark_race %>% 
@@ -367,6 +371,9 @@ start_end_race <- stark_race %>%
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
   summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+=======
+  (is.numeric, funs(change = (last(.)-first(.))/first(.)))
+>>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
   
   
 # calculate year by year race categories percentage change  
@@ -377,6 +384,7 @@ y_o_y_race <- stark_race %>%
   summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
 
 ```
+<<<<<<< HEAD
       
 # distributional rac - edu table
 ```{r}
@@ -420,3 +428,6 @@ y_o_y_edu <- stark_edu %>%
   summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T))) 
 
 ```
+=======
+
+>>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
