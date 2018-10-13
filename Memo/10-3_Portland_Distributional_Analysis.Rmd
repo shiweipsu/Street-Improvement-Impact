@@ -250,7 +250,7 @@ start_end_race <- stark_race %>%
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
   summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
-  
+
   
 # calculate year by year race categories percentage change  
 y_o_y_race <- stark_race %>% 
