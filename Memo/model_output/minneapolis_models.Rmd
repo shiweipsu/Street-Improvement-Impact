@@ -10,12 +10,9 @@ output: html_document
 ```{r, echo=FALSE, results='asis'}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-<<<<<<< HEAD
-p_load(here, RPostgreSQL, sf, tidyr, ggplot2, ggthemes, dplyr, dbplyr, stargazer,cowplot)
-=======
+
 p_load(here, RPostgreSQL, sf, tidyr, ggplot2, ggthemes, dplyr, dbplyr, stargazer,cowplot, lubridate, zoo)
 
->>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
 source(here::here("Code/corridor_comparison_functions.R"))
 
 #query the corridors from bike_lanes
@@ -213,11 +210,6 @@ stargazer(second_its_retail, type = "html",
          title = "North 2nd Sales Tax ITS Estimates", 
           column.labels = c("Retail Sales"))  
 
-<<<<<<< HEAD
-dbDisconnect(con)
-
-```
-=======
 
 
 # qcew models-----------------------
@@ -363,4 +355,3 @@ dbDisconnect(con)
 
 ```
 
->>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
