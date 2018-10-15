@@ -56,6 +56,6 @@ qcew <- qcew %>%
   select(corridors, street_type, year = years, quarter = quarters ,establishments = Establishments, 
          total_wages = TotalWage, avg_emp = AvgEmp)
 
-copy_to(dest = con, df = qcew, name = "minneapolis_qcew_modified", overwrite = TRUE)
+dbWriteTable(conn = con, name = "minneapolis_qcew_modified", value = qcew, overwrite = TRUE)
 
 dbDisconnect(con)
