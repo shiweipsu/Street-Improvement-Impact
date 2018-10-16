@@ -37,7 +37,7 @@ source(here::here("Code/corridor_comparison_functions.R"))
 
 portland_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
 a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
-a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd02 as cd03, a.cd04 as cd04, b.streetname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd03 as cd03, a.cd04 as cd04, b.streetname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
 FROM portland_lehd a, portland_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
@@ -58,11 +58,10 @@ portland_lehd <- st_read(dsn = con, query = "SELECT * FROM portland_lehd") %>% a
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
 
-<<<<<<< HEAD
 
 portland_corridor_rac <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
 a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
-a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd02 as cd03, a.cd04 as cd04, b.streetname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd03 as cd03, a.cd04 as cd04, b.streetname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
 FROM portland_rac a, portland_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
@@ -89,8 +88,6 @@ portland_rac <- st_read(dsn = con, query = "SELECT * FROM portland_rac") %>% as.
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
 
-=======
->>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
 portland_emp_ratio <- employ_ratio_test(portland_corridor)
 
 portland_growth <- growth_rate(portland_corridor)
@@ -99,58 +96,6 @@ dbDisconnect(con)
 
 ```
 
-
-# distributional analysis
-```{r, fig.asp=1, fig.width=9.5}
-stark_dist <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  group_by(Type, year) %>% 
-  summarise(
-    low_income = sum(CE01), mid_income = sum(CE02), high_income = sum(CE03), white = sum(CR01), black = sum(CR02),
-    asian = sum(CR04), female = sum(CS02), bach = sum(CD04), col = sum(CD03), high_sch = sum(CD02), 
-    tot_emp = sum(C000)) %>% 
-  mutate(
-    low_inc_perc = low_income/tot_emp*100,
-    white_perc = white/tot_emp*100,
-    black_perc = black/tot_emp*100,
-    asian_perc = asian/tot_emp*100,
-    female_perc = female/tot_emp*100,
-    bach_col_perc = (bach+col)/tot_emp*100) 
-
-pdx_dist <- portland_lehd %>% 
-  group_by(year) %>% 
-  summarise(
-    low_income = sum(CE01), mid_income = sum(CE02), high_income = sum(CE03), white = sum(CR01),black = sum(CR02),
-    asian = sum(CR04), female = sum(CS02), bach = sum(CD04), col = sum(CD03), high_sch = sum(CD02), 
-    tot_emp = sum(C000)) %>% 
-  mutate(
-    low_inc_perc = low_income/tot_emp*100,
-    white_perc = white/tot_emp*100,
-    black_perc = black/tot_emp*100,
-    asian_perc = asian/tot_emp*100,
-    female_perc = female/tot_emp*100,
-    bach_col_perc = (bach+col)/tot_emp*100,
-    Type = "City") %>% 
-  select(Type, year:bach_col_perc)
-
-stark_dist <- rbind(as.data.frame(stark_dist), as.data.frame(pdx_dist))
-stark_dist[stark_dist == 0] <- NA
-stark_dist$Type <- as.factor(as.character(stark_dist$Type))
-  
-inc_plot <- dist_trend_plot(stark_dist,demo = "Low Income", demo_code = "low_inc_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 0, 30)
-
-white_plot <- dist_trend_plot(stark_dist,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 84, 90)
-
-black_plot <- dist_trend_plot(stark_dist,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 2, 6)
-
-asian_plot <- dist_trend_plot(stark_dist,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 3, 7)
-
-female_plot <- dist_trend_plot(stark_dist,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 40, 60)
-
-edu_plot <- dist_trend_plot(stark_dist,demo = "College Above Educated", demo_code = "bach_col_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 40,60)
-
-plot_grid(inc_plot, female_plot, white_plot, black_plot, asian_plot, edu_plot,nrow = 3)
-
-```
 
 
 # additional distributional analysis - income (bar graph)
@@ -218,17 +163,17 @@ stark_race[stark_race$year<2009,][,c(3:8,10:15)] <- NA
 stark_race$Type <- as.factor(as.character(stark_race$Type))
   
 
-white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 86, 90)
+white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 86, 90)
 
-black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 1,5)
+black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 1,5)
 
-ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 0,4)
+ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment",construct_year = 2009, end_year = 2010, 0,4)
 
-asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,3,7)
+asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,3,7)
 
-hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,0,4)
+hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,0,4)
 
-other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,0,4)
+other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,0,4)
 
 g_legend<-function(a.gplot){
   tmp <- ggplot_gtable(ggplot_build(a.gplot))
@@ -254,7 +199,6 @@ start_end_race <- stark_race %>%
   group_by(Type) %>% 
   summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
 
-<<<<<<< HEAD
   
 # calculate year by year race categories percentage change  
 y_o_y_race <- stark_race %>% 
@@ -293,13 +237,13 @@ stark_edu[stark_edu$year<2009,][,c(3:6,8:11)] <- NA
 stark_edu$Type <- as.factor(as.character(stark_edu$Type))
   
 
-hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 0, 15)
+hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 0, 10)
 
-hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 10, 25)
+hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 10, 20)
 
-col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 12, 27)
+col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 20, 30)
 
-bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,25,40)
+bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,27.6,37.6)
 
 g_legend<-function(a.gplot){
   tmp <- ggplot_gtable(ggplot_build(a.gplot))
@@ -315,7 +259,7 @@ grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch
              mylegend, nrow=3,heights=c(10, 1,1))
 ```
 
-# additional distributional analysis - race (table)
+# additional distributional analysis - edu (table)
 ```{r}
 start_end_edu <- stark_edu %>%
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
@@ -334,7 +278,7 @@ y_o_y_edu <- stark_edu %>%
 
 
 # distributional rac - race table
-```{r}
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
 stark_race <- portland_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
   group_by(Type, year) %>% 
   summarise(
@@ -366,14 +310,37 @@ stark_race <- rbind(as.data.frame(stark_race), as.data.frame(pdx_race))
 stark_race[stark_race$year<2009,][,c(3:8,10:15)] <- NA
 stark_race$Type <- as.factor(as.character(stark_race$Type))
 
+white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010, 79, 91)
+
+black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010, 1,13)
+
+ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Avenue",cat = "Residence", construct_year = 2009, end_year = 2010, 0,12)
+
+asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue",cat = "Residence", construct_year = 2009, end_year = 2010,0,12)
+
+hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010,0,12)
+
+other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Avenue",cat = "Residence", construct_year = 2009, end_year = 2010,0,12)
+
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+
 start_end_race <- stark_race %>%
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
   summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
-=======
-  (is.numeric, funs(change = (last(.)-first(.))/first(.)))
->>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
   
   
 # calculate year by year race categories percentage change  
@@ -384,10 +351,10 @@ y_o_y_race <- stark_race %>%
   summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
 
 ```
-<<<<<<< HEAD
+
       
 # distributional rac - edu table
-```{r}
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
 stark_edu <- portland_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
   group_by(Type, year) %>% 
   summarise(
@@ -397,7 +364,7 @@ stark_edu <- portland_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>
          col_perc = col/tot_emp*100,
          bach_perc = bach/tot_emp*100) 
 
-pdx_edu <- portland_lehd %>% 
+pdx_edu <- portland_rac %>% 
   group_by(year) %>% 
   summarise(
     hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
@@ -412,6 +379,27 @@ pdx_edu <- portland_lehd %>%
 stark_edu <- rbind(as.data.frame(stark_edu), as.data.frame(pdx_edu))
 stark_edu[stark_edu$year<2009,][,c(3:6,8:11)] <- NA
 stark_edu$Type <- as.factor(as.character(stark_edu$Type))
+
+hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010, 0, 15)
+
+hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Avenue", cat = "Redidence", construct_year = 2009, end_year = 2010, 10, 25)
+
+col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010, 12, 27)
+
+bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010,20,35)
+
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
   
 start_end_edu <- stark_edu %>%
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
@@ -428,6 +416,55 @@ y_o_y_edu <- stark_edu %>%
   summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T))) 
 
 ```
-=======
 
->>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
+
+# gender
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+stark_gender <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+pdx_gender <- portland_lehd %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+stark_gender <- rbind(as.data.frame(stark_gender), as.data.frame(pdx_gender))
+stark_gender[stark_gender$year<2009,][,c(3,5)] <- NA
+stark_gender$Type <- as.factor(as.character(stark_gender$Type))
+
+gender_plot <- dist_trend_plot(stark_gender,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 30, 60)
+
+stark_gender_rac <- portland_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+pdx_gender_rac <- portland_rac %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+stark_gender_rac <- rbind(as.data.frame(stark_gender_rac), as.data.frame(pdx_gender_rac))
+stark_gender_rac[stark_gender_rac$year<2009,][,c(3,5)] <- NA
+stark_gender_rac$Type <- as.factor(as.character(stark_gender_rac$Type))
+
+gender_rac_plot <- dist_trend_plot(stark_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Avenue", cat = "Residence", construct_year = 2009, end_year = 2010, 30, 60)
+
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+mylegend<-g_legend(gender_plot)
+
+grid.arrange(arrangeGrob(gender_plot + theme(legend.position="none"), gender_rac_plot + theme(legend.position="none"),
+                         nrow = 1),
+             mylegend, nrow=2,heights=c(10,1))
+```
