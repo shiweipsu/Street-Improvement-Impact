@@ -489,7 +489,7 @@ riverside_agg_idx <- riverside_agg_idx %>% filter(!is.na(year))
 
 riverside_agg_retail <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 
-riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
 
 plot_grid(riverside_agg_retail, riverside_agg_accom, align = "h")
@@ -1492,6 +1492,8 @@ For Lyndale Avenue we find a statistically significant and negative effect of in
 
 The DiD specification for sales tax for Lyndale shows a non-significant effect of construction on restaurant sales tax receipts but a positive and significant effect on retail sales tax receipts. In this case, the model implies that the corridor construction was responsible for an additional 4 million dollars in receipts compared to the control corridor.  
 
+The QCEW difference-in-difference results were mixed Lyndale. The difference term was non-significant for the employment model but was significant and negative for the wages model. Because the reference level for the street type variable is Lyndale the negative value means moving from Lyndale to Grand loses wages so this is an argument in support of the positive influence of cycling infrastructure on wages. But looking back at the trend graphs it is clear that the growth in both employment and wages largely occurs well after the construction period.
+
 
 ###ITS
 
@@ -1501,13 +1503,10 @@ Lyndale exhibits a similar pattern to Central but with the construction complete
 
 In terms of sales tax returns, Lyndale is similar to the other corridors in that there are statistically significant and negative effects on the *level* of receipts when comparing pre and post-construction periods but also positive and significant changes in the *slope*, or rate of growth, of receipts. While the initial level drop is worrisome, robust growth across both restaurant and retail sales signals a potential positive effect of the infrastructure placement.
 
-
+The ITS results are also mixed. In terms of employment, the ITS model has a negative and significant level change (the pre_post term) and a non-significant slope change. The wages model has a negative slope change coefficient but it is significant at the 90% level and does not meet our required threshold.  
 
 ## North 2nd Street
 
-###1 Corridor Employment Comparisons
-
-All t-tests came back non-significant meaning that the corridors are acceptable comparators. 
 
 ### Trend Analysis
 
@@ -1741,6 +1740,8 @@ Our difference-in-difference estimation shows a positive and significant effect 
 
 Due to missing data we only ran a difference-in-difference model for the retail sales tax receipts. As the table shows, the difference term for North Second Ave is negative but non-significant indicating there is not a causal relationship between the change in retail sales tax receipts and new infrastructure placement compared to the control. 
 
+The difference term for employment is positive and significant meaning that but for the construction of the new cycling infrastructure North 2nd would have had an additional 38 jobs. In this instance, the new infrastructure is estimated to have hurt corridor job growth. But the difference term for the wages model is non-significant. 
+
 
 ### ITS
 
@@ -1748,7 +1749,7 @@ North 2nd Avenue also has mixed ITS results. The corridor has a large, negative 
 
 The mixed results are also reflected when looking at the corridor's sales tax receipts. There is a large, negative and significant drop in the level of receipts but a positive, and significant, change in the rate of growth of receipts post-construction. Assuming this rate of growth continues, the corridor should ultimately see more sales post-construction, but, again, it is hard to make a definitive statement on the causal nature of the relationship between the construction and the receipts.
 
-
+For the QCEW models only the slope change term in the total wages model is significant and positive. This means that the rate of wage growth increased after the cycling infrastructure was installed. The other terms and the other model all return coefficients significant at the 90% level which does not meet our thresholds.
 
 #  Conclusion
 

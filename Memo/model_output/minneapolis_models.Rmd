@@ -2,7 +2,9 @@
 title: "minneapolis models"
 author: "Jamaal Green"
 date: "May 29, 2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 #minneapolis model outputs...DiD and ITS
