@@ -20,7 +20,5 @@ dir_to_ignore/Data
 git_token.txt
 *.pgpss
 7-17_indy_salestax_raw*
-<<<<<<< HEAD
-=======
-~/city_maps/
->>>>>>> ca96e0fe213d8c8a684af900c043e54958e3fb3f
+
+/city_maps/

@@ -346,7 +346,81 @@ lyndale_qcew$street_type <- factor(lyndale_qcew$street_type,
                                      levels = c("Treatment", "Control: Grand Ave"))
 
 lyndale_qcew <- lyndale_qcew %>% 
-  mutate(pre_post = if_else(year_quarter >= "2008 Q1"))
+  mutate(pre_post = if_else(year_quarter >= "2008 Q1", 1, 0))
+
+
+lyndale_qc_emp_did <- lm(avg_emp ~ pre_post + street_type + pre_post*street_type, data = lyndale_qcew)
+lyndale_qc_wages_did <- lm(total_wages ~ pre_post + street_type + pre_post*street_type, 
+                           data = lyndale_qcew)
+
+lyndale_qc_did_list <- list(lyndale_qc_emp_did, lyndale_qc_wages_did)
+
+stargazer(lyndale_qc_did_list[[1]], lyndale_qc_did_list[[2]], title = "Lyndale Ave. S. QCEW Difference-in-Difference Estimates", column.labels = c("Average Employment", "Total Wages"), type = "html")
+
+#lyndale ave ITS
+
+lyndale_qcew_its <- lyndale_qcew %>% 
+  filter(street_type == "Treatment")
+
+lyndale_qcew_its <- lyndale_qcew_its %>% 
+  group_by(year) %>% 
+  summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+            tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2008, 1, 0))
+
+lyndale_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_qcew_its)
+lyndale_qcew_its_wages <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_qcew_its)
+
+lyndale_qcew_its_list <- list(lyndale_qcew_its_emp, lyndale_qcew_its_wages)
+
+stargazer(lyndale_qcew_its_list[[1]], lyndale_qcew_its_list[[2]], title = "Lyndale Ave. S. QCEW ITS Estimates", column.labels = c("Average Employment", "Total Wages"), type = "html")
+
+#north second DiD
+
+north_qcew <- minn_qcew %>% 
+  filter(corridors == "North 2nd Street" | corridors == "Broadway Ave")
+
+north_qcew <- collect(north_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+          year_quarter = as.yearqtr(year_quarter))
+
+north_qcew <- north_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Broadway Ave"))
+
+north_qcew$street_type <- factor(north_qcew$street_type, 
+                                     levels = c("Treatment", "Control: Broadway Ave"))
+
+north_qcew <- north_qcew %>% 
+  mutate(pre_post = if_else(year_quarter >= "2009 Q1", 1, 0))
+
+
+north_qc_emp_did <- lm(avg_emp ~ pre_post + street_type + pre_post*street_type, data = north_qcew)
+north_qc_wages_did <- lm(total_wages ~ pre_post + street_type + pre_post*street_type, 
+                           data = north_qcew)
+
+north_qcew_did_list <- list(north_qc_emp_did, north_qc_wages_did)
+
+
+stargazer(north_qcew_did_list[[1]], north_qcew_did_list[[2]], title = "North 2nd Ave QCEW Difference in Difference Estimates", column.labels = c("Average Employment", "Total Wages"), type = "html")
+
+#north second ITS
+
+north_qcew_its <- north_qcew %>% 
+  filter(street_type == "Treatment")
+
+north_qcew_its <- north_qcew_its %>% 
+  group_by(year) %>% 
+  summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+            tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2009, 1, 0))
+
+north_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post, data = north_qcew_its)
+north_qcew_its_wages <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post, data = north_qcew_its)
+
+north_qcew_its_list <- list(north_qcew_its_emp, north_qcew_its_wages)
+
+stargazer(north_qcew_its_list[[1]], north_qcew_its_list[[2]], title = "North 2nd St. QCEW ITS Estimates", column.labels = c("Average Employment", "Total Wages"), type = "html")
 
 ```
 
