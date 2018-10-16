@@ -486,7 +486,7 @@ city_agg_trend_plot <- function(df_plot, industry, corridor_name,
 # plot for distributional analysis
 
 
-dist_trend_plot <- function(df_plot, demo, corridor_name, 
+dist_trend_plot <- function(df_plot, demo, corridor_name, cat,
                            demo_code = c("low_inc_perc", "white_perc","black_perc","ameindian_perc", "asian_perc",
                                          "hawaii_perc", "other_perc","hisch_under_perc", "hisch_perc", "col_perc",
                                          "bach_perc","female_perc", "bach_col_perc"), 
@@ -524,7 +524,7 @@ dist_trend_plot <- function(df_plot, demo, corridor_name,
     scale_fill_manual(values = c("white", "white", "white", "orchid"))+
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("Percentage of {demo} Employment:\n {corridor_name}"), x="Year",y="Percentage",
+    labs(title = glue("Percentage of {demo} {cat}:\n {corridor_name}"), x="Year",y="Percentage",
          caption = "Shaded area represents the construction period") +
     guides(title = "Street Type") +
     ylim(ylim_low, ylim_high) +
