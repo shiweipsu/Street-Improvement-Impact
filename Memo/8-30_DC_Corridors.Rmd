@@ -3,11 +3,8 @@ title: "Washington DC"
 author: "Jamaal Green"
 date: "September 4, 2018"
 output:
-  word_document: default
-  pdf_document:
-    includes:
-      in_header: header.tex
-    number_sections: true
+  word_document: 
+    reference_docx: "docx_reference2.docx"
 fig_width: 7
 fig_height: 5
 ---
@@ -16,7 +13,7 @@ fig_height: 5
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-# 1. Introduction
+# Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
@@ -24,9 +21,9 @@ DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
 [insert city-wide map of DC here]
 
-# 2. Data Sources/Methodology
+# Data Sources/Methodology
 
-## 2.1 Data Sources
+## Data Sources
 
 For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the **Longitudinal Employer-Household Dynamics Dataset** (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This data set tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. Some disadvantages of the LODES data set are that in order to guarantee confidentiality block level data is "fuzzed" so the numbers are not exactly the number of jobs, but they are accurate estimates. Additionally, though we get industrial data, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate specific retail or service employment such as restaurant workers. That being said, the LODES data set is comprehensive, offers unprecedented geographic detail, and longitudinal allowing for consistent comparisons over time. Unfortunately for Washington DC, though, the city does not have WAC data available to it until 2010, limiting the scope of what we can see with the LODES data.
 
@@ -36,21 +33,21 @@ Finally, we also collected **sales tax data**. Sales tax data allows us to estim
 
 Washington DC has a general 5.75% sales tax for all businesses with a variety of additional taxes dependent upon use and services rendered. For example, the city imposes a 10% liquor sales tax, a 10% restaurant and rental vehicle tax, and a 14.8% hotel tax. This gives a range of 5.75-20.55% sales tax rates in the city. 
 
-## 2.2 Methodology
+##  Methodology
 
 We have applied three methods in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an integrated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis. 
 
-### 2.2.1 Corridor Comparison Selection
+###  Corridor Comparison Selection
 
 In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed. Ideally, these corridors are made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and accommodations related jobs. Additionally, we will only use corridors where street improvements were installed between 2008 and 2013 in order to guarantee with have sufficient data to track pre and post-treatment employment trends. 
 
 Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment in the year before construction of our corridor of interest, by block, for each corridor is similar to the other.
 
-### 2.2.2 Aggregated Trend Comparison
+### Aggregated Trend Comparison
 
 This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
 
-### 2.2.3 Difference-in-Difference
+###  Difference-in-Difference
 
 The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between improved and comparison corridors within the same time period. This is known as a difference-in-difference (DID) approach. It is a designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved.  It requires data from pre/post intervention such as panel data (individual level data overtime) or cross-sectional data (individual or group level). The approach looks at the change in the variable of interest in the treatment group before and after it is treated. In this case this means looking at some time period before and after a street improvement. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods will give an unbiased estimate of the effect of the treatment. DID is a useful technique when randomization on the individual level is not possible. This approach removes biases in the second period comparisons between the treatment group and control group that could be result from permanent differences between those groups, as well as biases from comparisons over time in the treatment group that could be the result of trends. A key assumption of DID estimate is that the differences between control group and treatment group would have remained constant in the absence of treatment. 
 
@@ -65,7 +62,7 @@ $\beta_3$ is the DID estimate of the treatment effect
 
 If the DID estimate $\beta_3$  is significant and positive, then that indicates a positive effect of the street improvement. Conversely if the estimate is significant and negative that indicates a negative effect of the improvement. Finally, a non-significant result indicates the improvement had no statistically discernible effect. 
 
-### 2.2.4 Interrupted Time Series
+### Interrupted Time Series
 
 Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. This approach tracks the treatment corridor over time and estimates the impact by the treatment by looking at the change of the corridor growth trend after the treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where an intervention, such as installation of new bicycled facility happens.  
 
@@ -243,19 +240,19 @@ t.test(fifteenth$ratio2, k_st_nw$ratio2)
 
 Table 1:  L, I and K St. Employment Percentiles, 2011 employment numbers
 
-### 3.1.2 Corridor Average Employment Comparisons
+###  Corridor Average Employment Comparisons
 
 We performed t-tests on three metrics at the census block level: "business" employment, the sum of retail and accommodations employment; a "business share" metric that is the share of employment in a census block of business employment over the sum of other services industries such as professional/scientific services, public administration and educational services; finally, a second business share metric on a smaller share of services employment including professional/scientific services, administrative/waste management services and arts/accommodation services (check appendix for variable definitions).
 
 The t-test did return one significant result on the difference between L and I street retail employment. This means that the two streets may not be directly comparable for retail, but on all other metrics the t-tests were non-significant. Since the corridors have similar concentrations of employment across our sectors of interest, and largely have non-significant differences in their average employment this means that the corridors are comparable and are appropriate for continued testing.
 
-## 3.2 M St.
+## M St.
 
 [insert map image here]
 
 The M St. corridor was constructed in 2014 and runs parallel to the L St. corridor. M St.'s comparator corridors are also I and K St.
 
-### 3.2.1 Corridor Employment Counts
+###  Corridor Employment Counts
 
 The percentile table shows total, retail, and accommodations employment for M St. compared to I and K Streets based on their percentile ranks of employment compared to the city as a whole. In terms of total and accommodations employment, the corridors are similar in terms of their percentile values, but diverge when it comes to retail employment. 
 
@@ -352,15 +349,15 @@ t.test(m_st$ratio2, k_st_nw$ratio2)
 
 Table 2: M, I and K St. Employment Percentiles, 2013 employment numbers
 
-### 3.2.2 Corridor Average Employment Comparisons
+### Corridor Average Employment Comparisons
 
 The t-test did return one significant result on the difference between M and I street average retail employment. This means that the two streets may not be directly comparable for retail, but on all other metrics the t-tests were non-significant. Since the corridors have similar concentrations of employment across our sectors of interest, and largely have non-significant differences in their average employment this means that the corridors are comparable and are appropriate for continued testing.
 
-# 4. Data Analysis
+#  Data Analysis
 
-## 4.1  L St.
+##   L St.
 
-### 4.1.1 Trend Analysis
+###  Trend Analysis
 
 #### LEHD
 
@@ -420,6 +417,10 @@ plot_grid(l_agg_retail, l_agg_accom, ncol = 1)
 ####  Sales Tax
 
 ####  QCEW
+
+
+### Difference-in-Difference
+
 
 ##  4.2 M St.
 
