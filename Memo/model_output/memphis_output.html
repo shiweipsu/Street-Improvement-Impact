@@ -163,10 +163,19 @@ memphis_corridor$Type &lt;- as.factor(memphis_corridor$Type)
 memphis_corridor &lt;- memphis_corridor %&gt;%
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group,
-         BuildStart = buildstart, BuildEnd = buildend, Name = name)</code></pre>
+         BuildStart = buildstart, BuildEnd = buildend, Name = name)
+
+
+memphis_sales &lt;- tbl(con, &quot;memphis_sales_tax&quot;) %&gt;% 
+  collect()%&gt;% 
+  mutate(year = format(pctym, &quot;%Y&quot;),
+         Type = paste(street_type, district_name, sep=&quot;: &quot;)) %&gt;% 
+  group_by(year,district_name, street_type, street_group, Type) %&gt;% 
+  summarise(business = mean(businesses),
+            gross_sales = sum(gross_sales))</code></pre>
+<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
 <div id="lehd-data" class="section level1">
 <h1>LEHD data</h1>
-<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
 <table style="text-align:center">
 <caption>
 <strong>Madison Ave. Corridor Difference-in-Difference Estimates</strong>
@@ -609,26 +618,26 @@ Accomodations Emp.
 ts_year
 </td>
 <td>
-7.618
+14.679
 </td>
 <td>
--16.382<sup>***</sup>
+-10.464
 </td>
 <td>
--8.764
+4.214
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(6.764)
+(8.921)
 </td>
 <td>
-(4.652)
+(7.065)
 </td>
 <td>
-(7.132)
+(7.643)
 </td>
 </tr>
 <tr>
@@ -646,26 +655,26 @@ ts_year
 prepost
 </td>
 <td>
-36.200
+174.579
 </td>
 <td>
--1,778.800<sup>**</sup>
+-1,152.114<sup>***</sup>
 </td>
 <td>
--1,742.600
+-977.536<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(1,000.936)
+(276.696)
 </td>
 <td>
-(688.520)
+(219.143)
 </td>
 <td>
-(1,055.450)
+(237.068)
 </td>
 </tr>
 <tr>
@@ -683,26 +692,26 @@ prepost
 ts_year:prepost
 </td>
 <td>
--10.618
+-26.979
 </td>
 <td>
-174.382<sup>**</sup>
+115.264<sup>***</sup>
 </td>
 <td>
-163.764
+88.286<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(87.142)
+(27.350)
 </td>
 <td>
-(59.943)
+(21.661)
 </td>
 <td>
-(91.888)
+(23.433)
 </td>
 </tr>
 <tr>
@@ -720,26 +729,26 @@ ts_year:prepost
 Constant
 </td>
 <td>
-430.800<sup>***</sup>
+406.821<sup>***</sup>
 </td>
 <td>
-590.800<sup>***</sup>
+570.714<sup>***</sup>
 </td>
 <td>
-1,021.600<sup>***</sup>
+977.536<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(41.967)
+(45.047)
 </td>
 <td>
-(28.868)
+(35.677)
 </td>
 <td>
-(44.252)
+(38.595)
 </td>
 </tr>
 <tr>
@@ -775,13 +784,13 @@ Observations
 R<sup>2</sup>
 </td>
 <td>
-0.199
+0.290
 </td>
 <td>
-0.813
+0.780
 </td>
 <td>
-0.482
+0.697
 </td>
 </tr>
 <tr>
@@ -789,13 +798,13 @@ R<sup>2</sup>
 Adjusted R<sup>2</sup>
 </td>
 <td>
--0.102
+0.024
 </td>
 <td>
-0.743
+0.698
 </td>
 <td>
-0.288
+0.584
 </td>
 </tr>
 <tr>
@@ -803,13 +812,13 @@ Adjusted R<sup>2</sup>
 Residual Std. Error (df = 8)
 </td>
 <td>
-61.433
+57.812
 </td>
 <td>
-42.258
+45.787
 </td>
 <td>
-64.779
+49.532
 </td>
 </tr>
 <tr>
@@ -817,13 +826,13 @@ Residual Std. Error (df = 8)
 F Statistic (df = 3; 8)
 </td>
 <td>
-0.661
+1.091
 </td>
 <td>
-11.584<sup>***</sup>
+9.472<sup>***</sup>
 </td>
 <td>
-2.485
+6.145<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -1507,6 +1516,869 @@ F Statistic (df = 3; 8)
 <em>Note:</em>
 </td>
 <td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+</div>
+<div id="sales" class="section level1">
+<h1>Sales</h1>
+<table style="text-align:center">
+<caption>
+<strong>Madison Ave. Corridor Difference-in-Difference Estimates</strong>
+</caption>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="1" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+gross_sales
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Jackson Ave
+</td>
+<td>
+-139,705,555.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(10,122,521.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: S Cooper St
+</td>
+<td>
+-90,151,456.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(10,122,521.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: S Highland St
+</td>
+<td>
+-106,100,132.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(10,122,521.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Union Ave
+</td>
+<td>
+20,952,570.000<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(10,122,521.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+prepost
+</td>
+<td>
+24,907,011.000<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(10,122,521.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Jackson Ave:prepost
+</td>
+<td>
+-19,682,404.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(14,315,407.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: S Cooper St:prepost
+</td>
+<td>
+-2,714,756.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(14,315,407.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: S Highland St:prepost
+</td>
+<td>
+-18,361,986.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(14,315,407.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Union Ave:prepost
+</td>
+<td>
+-18,079,759.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(14,315,407.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+150,648,061.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(7,157,703.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.953
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.942
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+16,005,111.000 (df = 40)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+90.010<sup>***</sup> (df = 9; 40)
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Madison Ave. Corridor Time Series Estimates</strong>
+</caption>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="1" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+gross_sales
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+-1,413,730.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(9,654,733.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+prepost
+</td>
+<td>
+-28,836,034.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(84,719,939.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:prepost
+</td>
+<td>
+6,130,489.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(13,653,854.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+91,888,335.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(32,021,127.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.015
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.049
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+68,269,272.000 (df = 46)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+0.241 (df = 3; 46)
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Broad Ave. Corridor Difference-in-Difference Estimates</strong>
+</caption>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="1" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+gross_sales
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Central Ave
+</td>
+<td>
+10,012,101.000<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(4,785,404.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: S Cooper St
+</td>
+<td>
+56,674,377.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(4,785,404.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+prepost
+</td>
+<td>
+4,171,963.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(4,368,456.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Central Ave:prepost
+</td>
+<td>
+3,094,667.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6,177,930.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: S Cooper St:prepost
+</td>
+<td>
+14,484,859.000<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6,177,930.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+3,724,262.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(3,383,792.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+30
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.958
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.950
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+6,767,583.000 (df = 24)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+110.284<sup>***</sup> (df = 5; 24)
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<caption>
+<strong>Broad Ave. Corridor Time Series Estimates</strong>
+</caption>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="1" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+gross_sales
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+-1,655,791.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(8,024,194.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+prepost
+</td>
+<td>
+-16,723,207.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(39,640,464.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:prepost
+</td>
+<td>
+4,671,196.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(9,098,581.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+30,092,565.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(21,975,162.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+30
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.047
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.063
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+31,077,572.000 (df = 26)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+0.429 (df = 3; 26)
+</td>
+</tr>
+<tr>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td style="text-align:right">
 <sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
 </td>
 </tr>

@@ -39,6 +39,15 @@ memphis_corridor <- memphis_corridor %>%
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group,
          BuildStart = buildstart, BuildEnd = buildend, Name = name)
+
+
+memphis_sales <- tbl(con, "memphis_sales_tax") %>% 
+  collect()%>% 
+  mutate(year = format(pctym, "%Y"),
+         Type = paste(street_type, district_name, sep=": ")) %>% 
+  group_by(year,district_name, street_type, street_group, Type) %>% 
+  summarise(business = mean(businesses),
+            gross_sales = sum(gross_sales))
 ```
 
 # LEHD data
@@ -54,7 +63,7 @@ stargazer(madison_agg_did[[1]], madison_agg_did[[2]], madison_agg_did[[3]],
           title = "Madison Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
 
-madison_agg_its <- agg_its_analysis(memphis_corridor, group = 1, endyear = 2013)
+madison_agg_its <- agg_its_analysis(memphis_corridor, group = 1, endyear = 2011)
 stargazer(madison_agg_its[[1]], madison_agg_its[[2]], madison_agg_its[[3]], 
           title = "Madison Ave. Corridor Interrupted Time Series Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
@@ -75,3 +84,39 @@ stargazer(broad_agg_its[[1]], broad_agg_its[[2]], broad_agg_its[[3]],
 
 ```
 
+
+# Sales
+```{r, echo=FALSE, results='asis'}
+
+#madison ave
+madison_sales <- memphis_sales %>% 
+  filter(street_group == 1) %>% 
+  mutate(prepost = ifelse(as.numeric(year)>2011,1,0),
+         ts_year = as.numeric(year)-2006)
+
+madison_sales$Type <- factor(madison_sales$Type)
+madison_sales$Type <- relevel(madison_sales$Type, ref = 5)
+
+madison_agg_did <- lm(gross_sales ~ Type + prepost + Type*prepost, data=madison_sales)
+madison_agg_its <- lm(gross_sales ~ ts_year + prepost + ts_year*prepost, data=madison_sales)
+stargazer(madison_agg_did, title = "Madison Ave. Corridor Difference-in-Difference Estimates", type = "html")
+stargazer(madison_agg_its, title = "Madison Ave. Corridor Time Series Estimates", type = "html")
+
+
+
+#broad ave
+broad_sales <- memphis_sales %>% 
+  filter(street_group == 2) %>% 
+  mutate(prepost = ifelse(as.numeric(year)>2010,1,0),
+         ts_year = as.numeric(year)-2006)
+
+broad_sales$Type <- factor(broad_sales$Type)
+broad_sales$Type <- relevel(broad_sales$Type, ref = 3)
+
+broad_agg_did <- lm(gross_sales ~ Type + prepost + Type*prepost, data=broad_sales)
+broad_agg_its <- lm(gross_sales ~ ts_year + prepost + ts_year*prepost, data=broad_sales)
+stargazer(broad_agg_did, title = "Broad Ave. Corridor Difference-in-Difference Estimates", type = "html")
+stargazer(broad_agg_its, title = "Broad Ave. Corridor Time Series Estimates", type = "html")
+
+
+```
