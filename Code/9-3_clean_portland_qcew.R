@@ -3,12 +3,6 @@ library(gdata)
 library(tidyverse)
 options(scipen=999)
 
-library(foreign)
-library(dplyr)
-library(reshape)
-library(maptools)
-library(rgdal)
-
 # read data ---------------------------------------------
 
 # read files
@@ -278,3 +272,4 @@ corridor_2007 <- corridor_2007 %>%
 stark_corridor_annual <- rbind(as.data.frame(stark_corridor_annual), as.data.frame(as.data.frame(corridor_2007)[,2:6])) %>% 
   arrange(name, busi_type, year)
 
+rm(list= ls()[!(ls() %in% c('stark_corridor_annual'))])
