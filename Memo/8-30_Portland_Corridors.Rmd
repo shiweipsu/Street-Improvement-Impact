@@ -144,266 +144,15 @@ t.test(stark_growth$food_accom_growth,everett_growth$food_accom_growth)
 
 stark_agg <- agg_trend_table(portland_corridor, group = 1)
 
-agg_retail_trend_plot <- agg_trend_plot(stark_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2011, end_year = 2012)
+agg_retail_trend_plot <- agg_trend_plot(stark_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
 
-agg_food_trend_plot <- agg_trend_plot(stark_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Stark & Oak Avenue", construct_year = 2011, end_year = 2012)
+agg_food_trend_plot <- agg_trend_plot(stark_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
 
 plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 ```
 
 
-
-# distributional analysis
-```{r, fig.asp=1, fig.width=9.5}
-stark_dist <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  group_by(Type, year) %>% 
-  summarise(
-    low_income = sum(CE01), mid_income = sum(CE02), high_income = sum(CE03), white = sum(CR01), black = sum(CR02),
-    asian = sum(CR04), female = sum(CS02), bach = sum(CD04), col = sum(CD03), high_sch = sum(CD02), 
-    tot_emp = sum(C000)) %>% 
-  mutate(
-    low_inc_perc = low_income/tot_emp*100,
-    white_perc = white/tot_emp*100,
-    black_perc = black/tot_emp*100,
-    asian_perc = asian/tot_emp*100,
-    female_perc = female/tot_emp*100,
-    bach_col_perc = (bach+col)/tot_emp*100) 
-
-pdx_dist <- portland_lehd %>% 
-  group_by(year) %>% 
-  summarise(
-    low_income = sum(CE01), mid_income = sum(CE02), high_income = sum(CE03), white = sum(CR01),black = sum(CR02),
-    asian = sum(CR04), female = sum(CS02), bach = sum(CD04), col = sum(CD03), high_sch = sum(CD02), 
-    tot_emp = sum(C000)) %>% 
-  mutate(
-    low_inc_perc = low_income/tot_emp*100,
-    white_perc = white/tot_emp*100,
-    black_perc = black/tot_emp*100,
-    asian_perc = asian/tot_emp*100,
-    female_perc = female/tot_emp*100,
-    bach_col_perc = (bach+col)/tot_emp*100,
-    Type = "City") %>% 
-  select(Type, year:bach_col_perc)
-
-stark_dist <- rbind(as.data.frame(stark_dist), as.data.frame(pdx_dist))
-stark_dist[stark_dist == 0] <- NA
-stark_dist$Type <- as.factor(as.character(stark_dist$Type))
-  
-inc_plot <- dist_trend_plot(stark_dist,demo = "Low Income", demo_code = "low_inc_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 0, 30)
-
-white_plot <- dist_trend_plot(stark_dist,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 84, 90)
-
-black_plot <- dist_trend_plot(stark_dist,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 2, 6)
-
-asian_plot <- dist_trend_plot(stark_dist,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 3, 7)
-
-female_plot <- dist_trend_plot(stark_dist,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 40, 60)
-
-edu_plot <- dist_trend_plot(stark_dist,demo = "College Above Educated", demo_code = "bach_col_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 40,60)
-
-plot_grid(inc_plot, female_plot, white_plot, black_plot, asian_plot, edu_plot,nrow = 3)
-
-```
-
-# additional distributional analysis - income (bar graph)
-```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
-stark_inc <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  mutate(Type = factor(Type, levels = c("Treatment", "Control: Alder", "Control: Everett"))) %>% 
-  group_by(Type, year) %>% 
-  summarise(low_income = sum(CE01), 
-            mid_income = sum(CE02), 
-            high_income = sum(CE03)) %>% 
-  group_by(Type) %>% 
-  gather(income_level, employment,low_income, mid_income, high_income) %>% 
-  mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
-         income_level = factor(income_level, levels=c("high_income", "mid_income", "low_income")),
-         n = case_when(Type == "Treatment" ~ 38,
-                       Type == "Control: Everett" ~30,
-                       Type == "Control: Alder" ~ 25)) 
-
-ggplot(data=stark_inc, aes(x=year, y=employment/n)) +
-  geom_bar(aes(fill=income_level),stat = "identity")+
-  facet_wrap(~Type)+
-  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  labs(title="Income Composition Trend Among Corridors", x="Year", y ="Employment per block", 
-       caption = "Bike lane is constructed in 2009") +
-  theme(legend.position = "bottom") +
-  scale_fill_discrete(name="Income Level",
-                      breaks=c("high_income", "mid_income", "low_income"),
-                      labels=c("High income", "Middle income", "Low income"))
-  
-
-```
-
-# additional distributional analysis - race (bar graph)
-```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
-stark_race_bar <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  mutate(Type = factor(Type, levels = c("Treatment", "Control: Alder", "Control: Everett"))) %>% 
-  group_by(Type, year) %>% 
-  summarise(white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
-            hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
-  group_by(Type) %>% 
-  gather(race, employment, white, black, asian, ameindian, hawaii, other) %>% 
-  mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
-         race = factor(race, levels=c("white", "black", "asian", "ameindian", "hawaii", "other")),
-         n = case_when(Type == "Treatment" ~ 38,
-                       Type == "Control: Everett" ~30,
-                       Type == "Control: Alder" ~ 25)) 
-
-ggplot(data=stark_race_bar, aes(x=year, y=employment/n)) +
-  geom_bar(aes(fill=race),stat = "identity")+
-  facet_wrap(~Type)+
-  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  labs(title="Race Composition Trend Among Corridors", x="Year", y ="Employment per block", 
-       caption = "Bike lane is constructed in 2009") +
-  theme(legend.position = "bottom") +
-  scale_fill_discrete(name="Race categories",
-                      breaks=c("white", "black", "asian", "ameindian", "hawaii", "other"),
-                      labels=c("White", "Black", "Asian", "American Indian", "Hawaiian", "Other"))
-  
-
-```
-
-# additional distributional analysis - race (line chart)
-```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
-stark_race <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  group_by(Type, year) %>% 
-  summarise(
-    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
-    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
-  mutate(white_perc = white/tot_emp*100,
-         black_perc = black/tot_emp*100,
-         ameindian_perc = ameindian/tot_emp*100,
-         asian_perc = asian/tot_emp*100,
-         hawaii_perc = hawaii/tot_emp*100,
-         other_perc = other/tot_emp*100) 
-
-pdx_race <- portland_lehd %>% 
-  group_by(year) %>% 
-  summarise(
-    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
-    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
-  mutate(white_perc = white/tot_emp*100,
-         black_perc = black/tot_emp*100,
-         ameindian_perc = ameindian/tot_emp*100,
-         asian_perc = asian/tot_emp*100,
-         hawaii_perc = hawaii/tot_emp*100,
-         other_perc = other/tot_emp*100,
-         Type = "City") %>% 
-  select(Type, year:other_perc)
-
-
-stark_race <- rbind(as.data.frame(stark_race), as.data.frame(pdx_race))
-stark_race[stark_race$year<2009,] <- NA
-stark_race$Type <- as.factor(as.character(stark_race$Type))
-  
-
-white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 86, 90)
-
-black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 1,5)
-
-ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 0,4)
-
-asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,3,7)
-
-hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,0,4)
-
-other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,0,4)
-
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
-
-mylegend<-g_legend(white_plot)
-
-grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
-                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
-                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
-                         nrow=3),
-             mylegend, nrow=4,heights=c(10, 1,1,1))
-```
-
-# additional distributional analysis - edu (bar graph)
-```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
-stark_edu_bar <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  mutate(Type = factor(Type, levels = c("Treatment", "Control: Alder", "Control: Everett"))) %>% 
-  group_by(Type, year) %>% 
-  summarise(hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
-  group_by(Type) %>% 
-  gather(edu, employment, hisch_under, hisch, col, bach) %>% 
-  mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
-         edu = factor(edu, levels=c("hisch_under", "hisch", "col", "bach")),
-         n = case_when(Type == "Treatment" ~ 38,
-                       Type == "Control: Everett" ~30,
-                       Type == "Control: Alder" ~ 25)) 
-
-ggplot(data=stark_edu_bar, aes(x=year, y=employment/n)) +
-  geom_bar(aes(fill=edu),stat = "identity")+
-  facet_wrap(~Type)+
-  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  labs(title="Education Composition Composition Trend Among Corridors", x="Year", y ="Employment per block", 
-       caption = "Bike lane is constructed in 2009") +
-  theme(legend.position = "bottom") +
-  scale_fill_discrete(name="Education attainment categories",
-                      breaks=c("hisch_under", "hisch", "col", "bach"),
-                      labels=c("Less than high school", "High school", "College", "Bachelor or above"))
-  
-
-```
-
-# additional distributional analysis - education (line chart)
-```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
-stark_edu <- portland_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  group_by(Type, year) %>% 
-  summarise(
-    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
-  mutate(hisch_under_perc = hisch_under/tot_emp*100,
-         hisch_perc = hisch/tot_emp*100,
-         col_perc = col/tot_emp*100,
-         bach_perc = bach/tot_emp*100) 
-
-pdx_edu <- portland_lehd %>% 
-  group_by(year) %>% 
-  summarise(
-    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
-  mutate(hisch_under_perc = hisch_under/tot_emp*100,
-         hisch_perc = hisch/tot_emp*100,
-         col_perc = col/tot_emp*100,
-         bach_perc = bach/tot_emp*100,
-         Type = "City") %>% 
-  select(Type, year:bach_perc)
-
-
-stark_edu <- rbind(as.data.frame(stark_edu), as.data.frame(pdx_edu))
-stark_edu[stark_edu$year<2009,] <- NA
-stark_edu$Type <- as.factor(as.character(stark_edu$Type))
-  
-
-hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 0, 15)
-
-hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 10, 25)
-
-col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, 12, 27)
-
-bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010,25,40)
-
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
-
-mylegend<-g_legend(hisch_plot)
-
-grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
-                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
-                         nrow=2),
-             mylegend, nrow=3,heights=c(10, 1,1))
-```
-
-## trend analysis
+## trend analysis - plot
 ```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
 
 stark_agg <- agg_index_trend_table(portland_corridor, group = 1, construct_year = 2009)
@@ -412,18 +161,30 @@ portland <- portland_lehd %>% group_by(year) %>%
   summarise(CNS07 = sum(CNS07),
             CNS18 = sum(CNS18),
             business = CNS07 + CNS18) %>%
-  mutate(CNS07_sd = CNS07/309.39,
-         CNS18_sd = CNS18/301.37,
-         business_sd = business/610.76,
+  mutate(CNS07_sd = CNS07/242.452,
+         CNS18_sd = CNS18/225.31,
+         business_sd = business/467.76,
          Type = "City") %>%
   select(Type, year, CNS07_sd, CNS18_sd, business_sd)
 stark_agg <- rbind(as.data.frame(stark_agg), as.data.frame(portland))
 stark_agg$Type <- as.factor(as.character(stark_agg$Type))
 
-stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2011)
+stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 stark_agg_food_plot <- agg_index_trend_plot(stark_agg, industry = "Food/Accommodations", corridor_name = "Stark & Oak Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
 plot_grid(stark_agg_retail_plot,stark_agg_food_plot)
+```
+
+## trend analysis - table
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+
+# compute post change table compare to base year
+post_change <- stark_agg %>% 
+  filter (year %in% c(2008, 2009, 2010, 2011)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07_sd/lag(CNS07_sd)-1)*100,
+         food_accom_growth = (CNS18_sd/lag(CNS18_sd)-1)*100)
+  
 ```
 
 
@@ -451,6 +212,9 @@ stargazer(stark_agg_its[[1]], stark_agg_its[[2]], stark_agg_its[[3]],
 ## trend analysis
 ```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
 
+# source(here::here("Code/9-3_clean_portland_qcew.R"))
+# cannot source by code, need manual source
+
 stark_corridor1 <- stark_corridor_annual %>%
   mutate(Type = case_when(name=="Stark & Oak" ~ "Treatment",
                           name=="Alder"~ "Control:Alder",
@@ -461,24 +225,40 @@ stark_corridor1 <- stark_corridor_annual %>%
   spread(busi_type,emp) %>% 
   rename(CNS07=Retail, CNS18=Food)
 
+# number of blocks: Stark 37, alder 26, everett 27
+stark_corridor1 <- stark_corridor1 %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment" ~ CNS07/37,
+                              Type == "Control:Alder"~ CNS07/26,
+                              Type == "Control:Everett" ~ CNS07/27),
+         CNS18_pb = case_when(Type == "Treatment" ~ CNS18/37,
+                              Type == "Control:Alder"~ CNS18/26,
+                              Type == "Control:Everett" ~ CNS18/27))
+
 stark_agg <- agg_index_trend_table(stark_corridor1, group = 1, construct_year = 2009)
 stark_agg$Type <- as.character(stark_agg$Type)
 portland <- portland_lehd %>% group_by(year) %>%
   summarise(CNS07 = sum(CNS07),
             CNS18 = sum(CNS18),
             business = CNS07 + CNS18) %>%
-  mutate(CNS07_sd = CNS07/309.39,
-         CNS18_sd = CNS18/301.37,
-         business_sd = business/610.76,
+  mutate(CNS07_sd = CNS07/242.45,
+         CNS18_sd = CNS18/225.31,
+         business_sd = business/467.76,
          Type = "City") %>%
   select(Type, year, CNS07_sd, CNS18_sd, business_sd)
 stark_agg <- rbind(as.data.frame(stark_agg), as.data.frame(portland))
 stark_agg$Type <- as.factor(as.character(stark_agg$Type))
 
-stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2011)
+stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 stark_agg_food_plot <- agg_index_trend_plot(stark_agg, industry = "Food/Accommodations", corridor_name = "Stark & Oak Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
 plot_grid(stark_agg_retail_plot,stark_agg_food_plot)
+
+# number of blocks: Stark 37, alder 26, everett 27
+post_change <- stark_agg %>% 
+  filter (year %in% c(2008, 2009, 2010, 2011)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07_sd/lag(CNS07_sd)-1)*100,
+         food_accom_growth = (CNS18_sd/lag(CNS18_sd)-1)*100)
 ```
 
 # model
