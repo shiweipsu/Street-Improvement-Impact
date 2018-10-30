@@ -39,9 +39,19 @@ dc_corridor <- dc_corridor %>% rename(Type = GROUPTYPE, year = YEAR, Group = COR
 
 #LEHD----------------------
 
-#L street
+## L street DiD...won't run ITS, not enough time past
 
-l_st <- dc_corridor %>% filter(Group == 2)
+l_did <- did_agg_analysis(dc_corridor, group = 2, endyear = 2012)
+
+stargazer(l_did[[1]], l_did[[2]], l_did[[3]], title = "L St. Corridor Difference-in-Difference Estimates", column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."), type = "html")
+
+## M Street DiD
+
+m_did <- did_agg_analysis(dc_corridor, group = 5, endyear = 2014)
+
+stargazer(m_did[[1]], m_did[[2]], m_did[[3]], title = "M St. Corridor Difference-in-Difference Estimates", column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."), type = "html")
+
+
 
 
 ```

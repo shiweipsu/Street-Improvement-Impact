@@ -10,7 +10,7 @@ output: html_document
 ```{r, echo=FALSE, results='asis'}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, forcats, dplyr,dbplyr,RPostgreSQL, zoo)
+p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, forcats, dplyr,dbplyr,RPostgreSQL, zoo, forcats)
 
 user <- "jamgreen"
 host <- "pgsql102.rc.pdx.edu"
