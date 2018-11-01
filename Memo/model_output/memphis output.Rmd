@@ -94,13 +94,18 @@ madison_sales <- memphis_sales %>%
   mutate(prepost = ifelse(as.numeric(year)>2011,1,0),
          ts_year = as.numeric(year)-2006)
 
+madison_sales <- madison_sales[madison_sales$Type!="Control: Jackson Ave",]
 madison_sales$Type <- factor(madison_sales$Type)
-madison_sales$Type <- relevel(madison_sales$Type, ref = 5)
+madison_sales$Type <- relevel(madison_sales$Type, ref = 4)
 
-madison_agg_did <- lm(gross_sales ~ Type + prepost + Type*prepost, data=madison_sales)
-madison_agg_its <- lm(gross_sales ~ ts_year + prepost + ts_year*prepost, data=madison_sales)
-stargazer(madison_agg_did, title = "Madison Ave. Corridor Difference-in-Difference Estimates", type = "html")
-stargazer(madison_agg_its, title = "Madison Ave. Corridor Time Series Estimates", type = "html")
+
+madison_agg_did_sales <- lm(gross_sales ~ Type + prepost + Type*prepost, data=madison_sales)
+madison_agg_did_business <- lm(business ~ Type + prepost + Type*prepost, data=madison_sales)
+stargazer(madison_agg_did_sales,madison_agg_did_business, title = "Madison Ave. Corridor Difference-in-Difference Estimates", type = "html")
+
+madison_agg_its_sales <- lm(gross_sales ~ ts_year + prepost + ts_year*prepost, data=filter(madison_sales, street_type == "Treatment"))
+madison_agg_its_business <- lm(business ~ ts_year + prepost + ts_year*prepost, data=filter(madison_sales, street_type == "Treatment"))
+stargazer(madison_agg_its_sales,madison_agg_its_business, title = "Madison Ave. Corridor Time Series Estimates", type = "html")
 
 
 
@@ -113,10 +118,13 @@ broad_sales <- memphis_sales %>%
 broad_sales$Type <- factor(broad_sales$Type)
 broad_sales$Type <- relevel(broad_sales$Type, ref = 3)
 
-broad_agg_did <- lm(gross_sales ~ Type + prepost + Type*prepost, data=broad_sales)
-broad_agg_its <- lm(gross_sales ~ ts_year + prepost + ts_year*prepost, data=broad_sales)
-stargazer(broad_agg_did, title = "Broad Ave. Corridor Difference-in-Difference Estimates", type = "html")
-stargazer(broad_agg_its, title = "Broad Ave. Corridor Time Series Estimates", type = "html")
+broad_agg_did_sales <- lm(gross_sales ~ Type + prepost + Type*prepost, data=broad_sales)
+broad_agg_did_business <- lm(business ~ Type + prepost + Type*prepost, data=broad_sales)
+stargazer(broad_agg_did_sales, broad_agg_did_business, title = "Broad Ave. Corridor Difference-in-Difference Estimates", type = "html")
+
+broad_agg_its_sales <- lm(gross_sales ~ ts_year + prepost + ts_year*prepost, data=filter(broad_sales, street_type == "Treatment"))
+broad_agg_its_business <- lm(business ~ ts_year + prepost + ts_year*prepost, data=filter(broad_sales, street_type == "Treatment"))
+stargazer(broad_agg_its_sales, broad_agg_its_business, title = "Broad Ave. Corridor Time Series Estimates", type = "html")
 
 
 ```
