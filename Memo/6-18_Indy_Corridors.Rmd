@@ -19,7 +19,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 
-# 1. Introduction
+#  Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
@@ -28,9 +28,9 @@ DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 ![Indianapolis Corridor](images/indy_corridors_whole.png)
 
 
-# 2. Data Sources/Methodology
+#  Data Sources/Methodology
 
-## 2.1 Data Sources
+##  Data Sources
 
 For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the **Longitudinal Employer-Household Dynamics Dataset** (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This data set tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.  As such, LEHD provides geographically granular detail about American’s jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. Some disadvantages of the LODES data set are that in order to guarantee confidentiality block level data is "fuzzed" so the numbers are not exactly the number of jobs, but they are accurate estimates. Additionally, though we get industrial data, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate specific retail or service employment such as restaurant workers. That being said, the LODES data set is comprehensive, offers unprecedented geographic detail, and longitudinal allowing for consistent comparisons over time.
 
@@ -40,21 +40,21 @@ Finally, we also collected **sales tax data**. Sales tax data allows us to estim
 
 Indiana has a general 7% sales tax for all businesses with a variety of additional taxes dependent upon use and the city/county a particular establishment is located. For example, Marion County, the home county of Indianapolis, has an additional 2% food and beverage tax as well as a 10% accommodations tax. This gives a range of 7-19% sales tax rates in the city. 
 
-## 2.2 Methodology
+##  Methodology
 
 We have applied three methods in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an integrated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis. 
 
-### 2.2.1 Corridor Comparison Selection
+###  Corridor Comparison Selection
 
 In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed. Ideally, these corridors are made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and accommodations related jobs. Additionally, we will only use corridors where street improvements were installed between 2008 and 2013 in order to guarantee with have sufficient data to track pre and post-treatment employment trends. 
 
 Once corridors are selected based on these criteria we require further testing in order to discern how similar the proposed treatment and control corridors. Finding corridors that are as similar as possible to each other except for the construction of new bicycle/pedestrian infrastructure allows us to approximate true experimental conditions. We will use a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment in the year before construction of our corridor of interest, by block, for each corridor is similar to the other.
 
-### 2.2.2 Aggregated Trend Comparison
+###  Aggregated Trend Comparison
 
 This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
 
-### 2.2.3 Difference-in-Difference
+###  Difference-in-Difference
 
 The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between improved and comparison corridors within the same time period. This is known as a difference-in-difference (DID) approach. It is a designed to answer the "but for" question of what a corridor's economic trajectory would look like had it streets not been improved.  It requires data from pre/post intervention such as panel data (individual level data overtime) or cross-sectional data (individual or group level). The approach looks at the change in the variable of interest in the treatment group before and after it is treated. In this case this means looking at some time period before and after a street improvement. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods will give an unbiased estimate of the effect of the treatment. DID is a useful technique when randomization on the individual level is not possible. This approach removes biases in the second period comparisons between the treatment group and control group that could be result from permanent differences between those groups, as well as biases from comparisons over time in the treatment group that could be the result of trends. A key assumption of DID estimate is that the differences between control group and treatment group would have remained constant in the absence of treatment. 
 
@@ -144,11 +144,11 @@ indy_growth <- growth_rate(indy_corridor)
 ```
 
 
-# 3. Corridor Comparisons
+#  Corridor Comparisons
 
 Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the city of Indianapolis as a whole for the year before construction. This is allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
 
-## 3.1 Virginia Avenue
+##  Virginia Avenue
 
 ![Virginia Avenue Corridor](images/indy_va_corridors.png)
 
@@ -245,7 +245,7 @@ t.test(virginia_growth$food_accom_growth,shelby_growth$food_accom_growth)
 ```
 
 
-### 3.1.1 Corridor employment amount
+###  Corridor employment amount
 
 Comparing 'business' related employment, we find the Meridian St Corridor has much more 'business' employment than the Virginia Ave corridor. The other two comparison corridors have similar levels of business employment amount, though, the Virginia Ave corridor has relatively less retail employment. 
 
@@ -258,13 +258,13 @@ Comparing 'business' related employment, we find the Meridian St Corridor has mu
 
 Table 1: Virginia Avenue Corridor and Control Corridors Employment Percentiles
 
-### 3.1.2 Employment number comparison
+###  Employment number comparison
 
 We also performed a series of t-tests in order to determine whether the average employment levels per block between the treatment and control corridors are statistically significantly different. A statistically significant results here would suggest that the corridors are not necessarily comparable. The Meridian corridor mean 'business' and food employment per block is significantly different than the Virginia corridor blocks, according to our t-tests. Additionally, we performed a second set of t-tests on the business/service employment ratios between the two corridors. In this case, all of the comparison corridors t-tests came back non-significant indicating the corridors have a similar structure of 'business' versus service jobs.
 
 
 
-## 3.2 Mass Avenue
+##  Mass Avenue
 
 ![Mass Avenue Corridor](images/indy_mass_corridors.png)
 
@@ -326,7 +326,7 @@ mass_con_growth <- indy_growth %>%
 ```
 
 
-### 3.2.1 Corridor employment amount
+###  Corridor employment amount
 
 The treatment and control corridors have a relatively similar amount of employment before the street improvement. The total employment is around 50-55 percentile for treatment corridor, and 60-65 percentile for control corridor. They both have smaller amounts of retail employment along the corridors, but have a lot of food/accommodation stores along the corridors.
 
@@ -337,10 +337,11 @@ The treatment and control corridors have a relatively similar amount of employme
 
 Table 2: Mass Avenue Corridor and Control Corridor Employment Percentiles
 
-### 3.2.2 Employment number comparison
+###  Employment number comparison
+
 According to t-test, the two corridors are comparable in terms of business activity level and business/service structure. The t-tests are all non-significant.
 
-## 3.3 Corridor Comparison Summary
+##  Corridor Comparison Summary
 
 The Prospect and Shelby corridors seem appropriate comparators for Virginia Avenue in terms of trends comparisons and t-test scores. While the Mass Ave corridors are technically comparable because they are two legs of the same length of street they will not be suitable for all follow up tests, particularly, difference-in-difference. 
 
@@ -351,15 +352,15 @@ The Prospect and Shelby corridors seem appropriate comparators for Virginia Aven
 
 
 
-# 4. Analysis
+# Data Analysis
 
 This section presents the results of the econometric models for the appropriate corridors. We will run two different models, a difference-in-difference and interrupted time series. The difference-in-difference (DiD) approach aims to estimate the difference between the control and treatment corridors at two points in time (pre and post-treatment). The "difference" term is the interaction between the pre/post and treatment/control indicator variables. The interrupted time series (ITS) model tracks the change in our outcome of interest only for the treatment corridor. The main variables in the model are a time series variable that gives an estimate of the general trend of our outcome variable, a pre/post-treatment indicator variable that signals the change in the *level* of our outcome variable attributable to the treatment, and the interaction term between the time series and pre/post-treatment term that gives an estimate of the *slope*, or rate of change, of our outcome after treatment. 
 
-## 4.1 Virginia Avenue
+##  Virginia Avenue
 
-### 4.1.1 Trend Analysis
+### Aggregated Trend Analysis
 
-#### LEHD Data
+#### LEHD 
 
 In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Meridian corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Prospect and Shelby corridors while the Meridian corridor shows much more volatility over the study period.
 
@@ -376,7 +377,7 @@ plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
 
 Indexing the employment figures allows us to examine the change in the growth of employment on the same scale. For Virginia Ave, indexing employment to 2011, the beginning of construction, shows us some interesting patterns before and after installation. The retail plot shows that Virginia roughly followed the patterns of its comparator corridors with positive employment growth,  collapse during the recession and then rebounding in the late 2000s/early 2010s. The treatment corridor does not track any particular comparator corridor that closely but it is much closer to Meridian, and the city as a whole, post-construction than the others.
 
-The indexed accommodations employment chart shows a much tighter relationship among the corridors and the city. This should be expected given the relatively small amounts of accommmodations employment across the corridors, but Virginia Ave's clear, consistent growth starting after 2007 is tracked only by Prospect. 
+The indexed accommodations employment chart shows a much tighter relationship among the corridors and the city. This should be expected given the relatively small amounts of accommodations employment across the corridors, but Virginia Ave's clear, consistent growth starting after 2007 is tracked only by Prospect. 
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width= 9.5, fig.asp=.5}
@@ -651,7 +652,7 @@ plot_grid(qc_idx1, qc_idx2, ncol = 1)
 ```
 
 
-### 4.1.2 Difference-in-Difference Models
+###  Difference-in-Difference 
 
 ####  LEHD
 
@@ -659,13 +660,13 @@ The difference terms for the Virginia Ave corridors are all non-significant, exc
 
 ####  Sales Tax
 
-The difference terms for the the Shelby and Prospect corridors are negative and significant. While the difference term is negative, this actual signals a *positive* causal relationship between the infrastructure and sales tax receipts as Virginia Ave is the reference group in this model specification. This means that when compared to Virginia Prospect lost approxiately \$210k compared to Virginia.  
+The difference terms for the the Shelby and Prospect corridors are negative and significant. While the difference term is negative, this actual signals a *positive* causal relationship between the infrastructure and sales tax receipts as Virginia Ave is the reference group in this model specification. This means that when compared to Virginia Prospect lost approximately \$210k compared to Virginia.  
 
 #### QCEW
 
 The difference terms for Prospect and Shelby are large, negative and significant, signaling a positive effect of bike lane installation on both employment and quarterly wages. Again, Virginia Ave is the reference term for the difference variable meaning that the coefficient estimates what would happen if one were to move from Virginia to Prospect or Shelby. In this case, holding all other things equal, Prospect grew by nearly 200 jobs less with a loss of nearly a million dollars in quarterly wages.   
 
-### 4.1.3 Interrupted Time Series
+###  Interrupted Time Series
 
 ####  LEHD
 
@@ -676,13 +677,13 @@ Across all three models both the pre_post term (the term that signals a potentia
 
 The sales tax ITS model was also non-significant given our specification with a marginally significant time series term signalling the effect of a general positive growth trend above and beyond the placement of new infrastructure. 
 
-###  QCEW
+####  QCEW
 
 Our ITS model shows both a positive and significant effect of bike lane installation on Virginia Ave for both jobs and quarterly wages. This is primarily due to the overall positive time series term as the construction term is negative and significant. Recall that the pre_post term signals a potential level change in our unit of interest while the interaction time series and pre_post term estimates the change in slope, or rate of change, of our unit of interest over time. This result more cleanly follows our descriptive data that shows a clear positive growth of employment and wages over time before, during and after the construction period with accelerated growth post-construction.
 
-## 4.2 Massachusetts Avenue
+##  Massachusetts Avenue
 
-### 4.2.1 Employment trend comparison
+###  Aggregated Trend Analysis
 
 The employment trend graphs of two corridors are presented below. In terms of retail employment, the two corridors  experienced a significant employment drop around 2007 (with retail employment dropping to zero in 2009) due to recession and are in the midst of a recovery but with the treatment corridor lagging in terms of new employment growth. In terms of food/accommodation sector, both show pre-constructions drops in employment with rebounds in employment in the years after. Given the proximity of the corridors, this is to be expected and is reflected by the non-significant t-test results. 
 
@@ -871,11 +872,12 @@ plot_grid(qc3, qc4, ncol = 1)
 ```
 
 
-### 4.2.2 Difference in Difference
+###  Difference in Difference
 
-We did not run a DiD model for the Massachusetts Ave corridor because it violated too many assumptions of the model and its results would therefore be meaningless.
+We did not run a DiD model for the Massachusetts Ave corridor because it violated too many assumptions of the model.
 
-### 4.2.3 ITS 
+###  ITS 
+
 
 #### LEHD
 
@@ -887,13 +889,13 @@ This is a mixed result, but considering the construction of the corridor was sti
 
 In terms of the sales tax model, the pre_post term is negative and significant signaling a change in level of sales tax receipts due to the intervention but the pre_post and time series interaction term is non-significant. The lack of a significant interaction term means that we cannot attribute change in the growth of sales tax on Massachusetts to the placement of new cycling infrastructure. It should be noted, though, that this sales tax data starts in 2008 so we do not necessarily have enough pre-intervention data points to make a strong statement either way using this technique. That being said, given our model specification, the ITS model does not signal a causal relationship between the change in sales tax receipts and new cycling infrastructure. 
 
-# 5. Summary and Conclusion
+# Conclusion
 
 Overall, the results show a rather mixed set of conclusions regarding the effect of new bike lane infrastructure placement on employment, wages and sales tax in Indianapolis. Descriptive data for both corridors, but particularly the Virginia Ave corridor shows a generally positive growth trend in all metrics over time. When modeling these effects using the DiD and ITS models we have mixed, though largely positive, results. The DiD specifications are generally positive for both corridors while the ITS specifications are non-significant or positive. Overall, this signals a positive causal effect of bike lane infrastructure placement in the city, at least for Virginia Ave. 
 
 While this is an overall positive result, we should warn that the results are still mixed and our models are not perfect. First, while the results are a mix of positive and non-significant, no corridor shows a primarily *negative* result of new cycling infrastructure on employment, sales tax receipts or wages. This offers supportive evidence that such infrastructure is, at minimum, not harmful to local business, and in the case of Virginia Ave, we have evidence that the new bike lane has a positive causal effect on commercial growth. With these corridors and specifications, at least, there is simply not the evidence that cycling infrastructure harms local business. Second, while we have evidence of a positive causal relationship, our models are still relatively simple and do not account for all potential determinants of growth. Virginia Ave, in particular, has robust employment and wage growth starting before and during the construction period, though its growth accelerates afterwards. Further investigation into the corridors is warranted to account for any additional variables not covered in our model. Greater transportation data, for example, would help us determine whether corridors saw increased traffic, both auto and non-auto, and to see whether or not such flows had a noticeable effect on business. 
 
-## 5.1 Key Takeaways
+##  Key Takeaways
 
 * New Cycling infrastructure on Virginia Ave. has a positive, causal relationship to business and sales tax growth
 * Cycling infrastructure DOES NOT have a negative, causal effect on business dynamics for either of the corridors
@@ -910,3 +912,9 @@ dbDisconnect(con)
 
 
 # Technical Appendix
+
+##  LEHD Models
+
+##  Sales Tax Models
+
+##  QCEW Models

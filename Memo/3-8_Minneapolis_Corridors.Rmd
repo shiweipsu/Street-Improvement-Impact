@@ -466,7 +466,7 @@ Table 5: North 2nd Street and Broadway Corridors Employment Profile
 
 ### Trend Analysis
 
-#### LEHD Data
+#### LEHD
 
 Riverside retail employment trends seem to suggest a possible positive effect of the bike infrastructure installation with a major jump in employment in the two years immediately after construction and positively trending employment growth since the initial jumps. The comparison corridor's (Cedar Avenue) employment remains basically unchanged except for a minor bump between 2010 and 2011 where employment returns to 2009 levels. 
 
@@ -595,13 +595,13 @@ plot_grid(riverside_agg_retail_idx_plot, riverside_agg_idx_accom_plot, ncol = 1)
 ```
 
 
-The indexed plots give us an alternative view of the corridors that reinforce what the non-indexed plots have shown us. Retail sales values, indexed to 2009, hihglight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
+The indexed plots give us an alternative view of the corridors that reinforce what the non-indexed plots have shown us. Retail sales values, indexed to 2009, highlight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
 
 #### QCEW
 
 As mentioned earlier the QCEW data provided by the state will give us much more detail of changes over time as well as establishment counts and total wage data. While we do not have fully disaggregated data the increased sample size and detail on establishments and wages is still valuable and expands our understanding of the economic and business dynamics of our corridors.
 
-The Riverside Avenue trend analysis shows that there was a large jump in business activity on Riverside the first qurter of 2005 with consistent overall growth in employment and wages. This large jump in growth was related to the addition of a new, large establishment on the corridor as the total number of retail establishments grew from 4 to 5 in 2005. This large establishment is a clear driver in the growth of employment and wages. Also, note that there does not seem to be any immediately apparent relationship in employment or wage growth and the infrastructure construction period.  
+The Riverside Avenue trend analysis shows that there was a large jump in business activity on Riverside the first quarter of 2005 with consistent overall growth in employment and wages. This large jump in growth was related to the addition of a new, large establishment on the corridor as the total number of retail establishments grew from 4 to 5 in 2005. This large establishment is a clear driver in the growth of employment and wages. Also, note that there does not seem to be any immediately apparent relationship in employment or wage growth and the infrastructure construction period.  
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
@@ -677,7 +677,7 @@ plot_grid(qc_1, qc_2, ncol = 1)
 
 ```
 
-The indexed employment and wage figures offer a clearer picture of the dramatic growth of Riverside Ave, even accounting for the large jump in employment in 2005. Principally, note that employment growth for Riverside and Cedar has recovered to 2009 levels with Riverside showing robust growth post-recession and a flattening in the past three years. Cedar, on the other hand, has stadily lost employment post recession after a large bump and is also now hovering around its 2009 employment levels.
+The indexed employment and wage figures offer a clearer picture of the dramatic growth of Riverside Ave, even accounting for the large jump in employment in 2005. Principally, note that employment growth for Riverside and Cedar has recovered to 2009 levels with Riverside showing robust growth post-recession and a flattening in the past three years. Cedar, on the other hand, has steadily lost employment post recession after a large bump and is also now hovering around its 2009 employment levels.
 
 Wage growth, though, for both corridors has been on a largely positive trajectory from even before the construction period, though Riverside has seen higher wage growth, relative to its 2009 base year, than Cedar has. Again, note that there does not seem to be any immediately evident connection between wage growth and the corridor construction.
 
@@ -736,7 +736,7 @@ The Riverside/Cedar Avenue treatment corridor exhibits a statistically significa
 
 In terms of sales tax, the corridor shows some mixed results. The *pre_post* construction term is positive and significant for both restaurant and retail showing positive sales tax receipt growth post-construction, but the difference term is negative and significant for retail sales signaling a negative impact of the new construction on retail sales tax receipts. This result largely mirrors what we saw in the visual trend analysis with that dramatic drop in sales in 2013/2014. Given that drop is well after construction there are likely additional reasons for the drop than just the placement of new infrastructure.
 
-The QCEW difference-in-difference results largely parallels the LEHD results. According to our specification, there is a negative and significant effect of infrastrucuture construction on average employment and total wages. Because the reference level for the treatment dummy variable is Riverside, the treated corridor, the negative value represents what would occur had Riverside not received treatment. So, in this case, the negative value signals the positive effect of construction.   
+The QCEW difference-in-difference results largely parallels the LEHD results. According to our specification, there is a negative and significant effect of infrastructure construction on average employment and total wages. Because the reference level for the treatment dummy variable is Riverside, the treated corridor, the negative value represents what would occur had Riverside not received treatment. So, in this case, the negative value signals the positive effect of construction.   
 
 ### ITS
 
@@ -753,7 +753,7 @@ The QCEW ITS estimates are mixed. For employment, the ITS estimates show a posit
 
 ### Trend Analysis
 
-#### LEHD Data
+#### LEHD
 
 Retail employment does show consistent, though moderate, growth for the improvement corridor though the control corridor has a dramatic spike in employment between 2014 and 2015. In terms of overall trends, the control corridor has consistently higher year over year growth compared to the treatment corridor. 
 
@@ -780,7 +780,7 @@ In terms of accommodations employment the trend analysis is relatively ambiguous
 
 #### Sales Tax 
 
-It was not imposisble to parse out the sales tax differences between the two sections of Franklin Avenue due to their proximity so these figures are excluded from the study.
+It was not impossible to parse out the sales tax differences between the two sections of Franklin Avenue due to their proximity so these figures are excluded from the study.
 
 ```{r franklin_sales, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
@@ -982,13 +982,13 @@ Franklin Avenue exhibits mixed results. For accommodations employment the corrid
 
 ITS models were not run for Franklin using the sales tax data due to data consolidation issue. 
 
-The QCEW ITS models largely do not find an effect of construction except for the slope change term for total wages. In the case of total wages, the ITS estimate finds a positive significant value. But considering that the empployment model is non-significant across all terms and the lvel change term is negative and non-significant for wages this does not support a causal relationship between new cycling infrastructure and retail employment or wages. 
+The QCEW ITS models largely do not find an effect of construction except for the slope change term for total wages. In the case of total wages, the ITS estimate finds a positive significant value. But considering that the employment model is non-significant across all terms and the level change term is negative and non-significant for wages this does not support a causal relationship between new cycling infrastructure and retail employment or wages. 
 
 ## Central Avenue
 
-### Trend Analysis
+### Aggregated Trend Analysis
 
-####  LEHD Data
+####  LEHD
 
 Central Avenue shows a clear positive retail employment trend post-construction for the treatment corridor that eventually overtakes the control corridor in the latest period. Note that both corridors have positive employment trends post-construction though the control corridor has its most dramatic year to year growth during the construction period. 
 
@@ -1014,7 +1014,7 @@ The accommodations employment trend is more ambiguous. The treatment corridor sa
 
 #### Sales Tax 
 
-Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or the other. While Central's receipts, overall, have grown for bothe retail and restaurant sales, the posiive growth trends for both industries start either before or at the beginning of the construction period.  The rate of change in growth, though, in restaurant receipts for both Central accelarates post-construction. While not definitive, the restaurant receipts hint at a potential relationship with the new infrastructure that our econometric models will be better able to explore.   
+Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or the other. While Central's receipts, overall, have grown for both retail and restaurant sales, the positive growth trends for both industries start either before or at the beginning of the construction period.  The rate of change in growth, though, in restaurant receipts for both Central accelerates post-construction. While not definitive, the restaurant receipts hint at a potential relationship with the new infrastructure that our econometric models will be better able to explore.   
 
 
 ```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
@@ -1051,7 +1051,7 @@ plot_grid(central_agg_retail_plot, central_agg_accom_plot, ncol = 1)
 
 ```
 
-The index value plots bring the difference in growth rates between the two corridors into stark relief. Central has fared much better over thecourse of the study period exhibiting robust growth in retail and restaurant sales. The post-construction growth bump is especially apparent in the restaurant sales indexed plot. University Ave's flattened growth in both restaurant and retail sales is especially striking in comparison to niversity's consistent growth. 
+The index value plots bring the difference in growth rates between the two corridors into stark relief. Central has fared much better over the course of the study period exhibiting robust growth in retail and restaurant sales. The post-construction growth bump is especially apparent in the restaurant sales indexed plot. University Ave's flattened growth in both restaurant and retail sales is especially striking in comparison to university's consistent growth. 
 
 ```{r central_sales_tax_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
 
@@ -1165,7 +1165,7 @@ plot_grid(qc_central_emp, qc_central_wages, ncol = 1)
 
 ```
 
-The index plots show the dramatic growth of both Central and University Avenues over the past decade and a half with repsect to both retail employment and wages. One detail to note is that Central continues on a positive trajectory for both wages and employment in the last few years ultimately surpassing the much more volatile University in terms of growth. 
+The index plots show the dramatic growth of both Central and University Avenues over the past decade and a half with respect to both retail employment and wages. One detail to note is that Central continues on a positive trajectory for both wages and employment in the last few years ultimately surpassing the much more volatile University in terms of growth. 
 
 ```{r central_qcew_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
@@ -1221,14 +1221,14 @@ Central Avenue's difference term is significant and negative for accommodations 
 
 [inset did table]
 
-In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. Overall, this model specification implies that new infrastructure construction is repsonible for an additional 7 million dollars in retail sales tax receipts and a loss of 5.7 million dollars in restaurant receipts.It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
+In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. Overall, this model specification implies that new infrastructure construction is responsible for an additional 7 million dollars in retail sales tax receipts and a loss of 5.7 million dollars in restaurant receipts.It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
 
 
 The QCEW DiD estimates for wages and employment both returned non-significant results. This makes intuitive sense when examining the employment and wage figures where there does not seem to be any visual signals that the construction period has any effect on either employment or wages. 
 
 ### ITS
 
-Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope singaling an overall positive growth trend. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accommodations employment term.
+Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope signaling an overall positive growth trend. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accommodations employment term.
 
 [insert its table]
 
@@ -1238,9 +1238,9 @@ The QCEW ITS models for Central Ave offer a mixed set of conclusions. For employ
 
 ## Lyndale Avenue South
 
-### Trend Analysis
+### Aggregated Trend Analysis
 
-#####LEHD Data
+#### LEHD
 
 Retail employment on the Lyndale Avenue corridor looks to only have just recovered its employment since the recession though its growth pattern has been much more consistent than its comparison corridor. Interestingly, both the improved and control corridors saw a spike in retail employment in 2015. This is generally good news for the corridors though we the trend analysis does not show any real impact of the street improvement itself on retail employment. 
 
@@ -1351,7 +1351,7 @@ plot_grid(lyndale_agg_idx_retail_plot, lyndale_agg_idx_accom_plot, ncol = 1)
 ```
 
 
-####QCEW
+#### QCEW
 
 Thought the baseline numbers differ drastically the absolute employment and wage values for Lyndale Ave still offer some enlightenment as to overall patterns of growth and the difference between Lyndale and Grand. First, while Lyndale starts from a much higher base employment both corridors see some growth immediately pre-recession, consistent employment loss during the recession and recovery after. Though note that Lyndale's recovery is more consistent post recession than Grand's which has a slight, though consistent fall in employment until nearly 2015.
 
@@ -1495,7 +1495,7 @@ The DiD specification for sales tax for Lyndale shows a non-significant effect o
 The QCEW difference-in-difference results were mixed Lyndale. The difference term was non-significant for the employment model but was significant and negative for the wages model. Because the reference level for the street type variable is Lyndale the negative value means moving from Lyndale to Grand loses wages so this is an argument in support of the positive influence of cycling infrastructure on wages. But looking back at the trend graphs it is clear that the growth in both employment and wages largely occurs well after the construction period.
 
 
-###ITS
+### ITS
 
 
 Lyndale exhibits a similar pattern to Central but with the construction completed in 2009 we have enough data post-treatment to have more valid results. In this case, there is a negative, statistically significant drop in the level of accommodations employment for the corridor but a positive, significant slope. Again, when examining the aggregate employment trend graphs we see a clear drop in employment in 2009 and 2010 and a seeming return to the pre-treatment level with a positive slope. The positive growth trend continues through 2015 but it is unclear if we will see a leveling off of new employment at a higher level or if employment will collapse again.
@@ -1508,9 +1508,9 @@ The ITS results are also mixed. In terms of employment, the ITS model has a nega
 ## North 2nd Street
 
 
-### Trend Analysis
+### Aggregated Trend Analysis
 
-#### LEHD Data
+#### LEHD
 
 
 North 2nd Street's employment trends point towards a probable impact of street improvement as the overall trend was negative before construction, with a minor rebound immediately pre-construction, a dip during construction, and then rebound in all periods post-construction.
@@ -1542,9 +1542,9 @@ plot_grid(north_retail_idx, north_accom_idx, align = "h")
 Accommodations employment growth is quite robust for the treatment corridor but its growth trend starts at the beginning of the construction period and continues afterwards. 
 
 
-#####Sales Tax 
+#### Sales Tax 
 
-At first glance, North 2nd potential offers dramatic evidence of a positive effect of new infrastructure construction, but the extreme jump in sales tax receipts signals some greater change probably affected the corridor, such as the opening of multiple new establishments or one especially large establishment. Initial jump aside, the consintued growth after the large spike in growth is a positive sign of the overall health of retail on the corridor. 
+At first glance, North 2nd potential offers dramatic evidence of a positive effect of new infrastructure construction, but the extreme jump in sales tax receipts signals some greater change probably affected the corridor, such as the opening of multiple new establishments or one especially large establishment. Initial jump aside, the continued growth after the large spike in growth is a positive sign of the overall health of retail on the corridor. 
 
 We do not include the restaurant sales tax values because no restaurant sales tax was collected on North 2nd until 2014.
 
@@ -1609,7 +1609,7 @@ plot(second_agg_idx_retail_plot)
 
 #### QCEW
 
-The absolute graphs show the general decline of North 2nd compared to Boradway over th elast two decades. After a high in the early part of the 2000s, North 2nd has largely been in decline with a slight uptick starting 2012/2013, but it is still far below its peak. Broadway, on the other hand, is defined by some pretty dramatic drops in employment and quick recoveries, though its last major fall during the recession has met with only a mild recovery. Note that for North 2nd there is not an immediately apparent relationship between the construction period and employment or wages.
+The absolute graphs show the general decline of North 2nd compared to Broadway over the last two decades. After a high in the early part of the 2000s, North 2nd has largely been in decline with a slight uptick starting 2012/2013, but it is still far below its peak. Broadway, on the other hand, is defined by some pretty dramatic drops in employment and quick recoveries, though its last major fall during the recession has met with only a mild recovery. Note that for North 2nd there is not an immediately apparent relationship between the construction period and employment or wages.
 
 ```{r north_2nd_qcew, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
 
@@ -1734,6 +1734,7 @@ plot_grid(qc_idx_emp_north, qc_idx_north_wages,  ncol = 1)
 
 
 ### Difference-in-Difference
+
 Our difference-in-difference estimation shows a positive and significant effect of treatment responsible for approximately 247 accommodations jobs while retail has a negative but non-significant effect. 
 
 [insert d-i-d table]
@@ -1761,7 +1762,7 @@ More importantly, while these results are interesting they should be taken with 
 #  Key Take Aways
 
 * The impact of new cycling infrastructure on *employment* is mixed but is generally positive and significant
-* The impact of new cycling ifnrastructure on retail *sales tax* is negative
+* The impact of new cycling infrastructure on retail *sales tax* is negative
 * The LEHD and sales tax data contradict each other here requiring further research into why they diverge
 
 ```{r, include=FALSE}
@@ -1770,7 +1771,13 @@ More importantly, while these results are interesting they should be taken with 
 
 ```
 
+# Technical Appendix
 
+##  LEHD
+
+##  Sales Tax
+
+##  QCEW
 
 
 
