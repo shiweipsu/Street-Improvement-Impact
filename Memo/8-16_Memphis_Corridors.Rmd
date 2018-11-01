@@ -104,6 +104,10 @@ b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a
 FROM memphis_lehd a, memhpis_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
 
+cooper <- memphis_corridor %>% filter(name == "Cooper Street") %>% mutate(corridor_group =1)
+
+memphis_corridor <-rbind(memphis_corridor, cooper)
+
 memphis_corridor$Type <- ifelse(is.na(memphis_corridor$buildstart),"Control", "Treatment")
 memphis_corridor[memphis_corridor$name =="Central Avenue",]$Type <- "Control: Central"
 memphis_corridor[memphis_corridor$name=="Cooper Street",]$Type <- "Control: Cooper"
@@ -134,6 +138,11 @@ memphis_sales <- tbl(con, "memphis_sales_tax") %>%
   summarise(business = mean(businesses),
             gross_sales = sum(gross_sales))
 
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
 
 dbDisconnect(con)
 
@@ -164,6 +173,8 @@ memphis_lehd_2010 <- memphis_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
 
 madison <- memphis_corridor %>% filter(Group ==1, Type =="Treatment", year==conyear) %>% employ_ratio_test(.)
 
+cooper <- memphis_corridor %>% filter(Group ==1, Type =="Control: Cooper", year ==conyear) %>% employ_ratio_test(.)
+
 highland <- memphis_corridor %>% filter(Group ==1, Type =="Control: Highland", year ==conyear) %>% employ_ratio_test(.)
 
 jackson <- memphis_corridor %>% filter(Group ==1, Type =="Control: Jackson", year ==conyear) %>% employ_ratio_test(.)
@@ -181,6 +192,8 @@ quant_df <- data.frame(q_tot_emp = quantile(memphis_lehd_2010$C000, probs = p, n
 
 madison %>% summarise(TotEmp = sum(C000)/nrow(madison), RetailEmp = sum(CNS07)/nrow(madison),
                                      AccomEmp = sum(CNS18)/nrow(madison)) %>% as.data.frame()
+cooper %>% summarise(TotEmp = sum(C000)/nrow(highland), RetailEmp = sum(CNS07)/nrow(highland),
+                                     AccomEmp = sum(CNS18)/nrow(highland)) %>% as.data.frame
 highland %>% summarise(TotEmp = sum(C000)/nrow(highland), RetailEmp = sum(CNS07)/nrow(highland),
                                      AccomEmp = sum(CNS18)/nrow(highland)) %>% as.data.frame
 jackson %>% summarise(TotEmp = sum(C000)/nrow(jackson), RetailEmp = sum(CNS07)/nrow(jackson),
@@ -191,6 +204,12 @@ union %>% summarise(TotEmp = sum(C000)/nrow(union), RetailEmp = sum(CNS07)/nrow(
  
 
 # t-test: compare retail, food_accom, business amount---
+t.test(madison$Business, cooper$Business)
+t.test(madison$Retail, cooper$Retail)
+t.test(madison$Food_Accom, cooper$Food_Accom)
+t.test(madison$ratio1, cooper$ratio1)
+t.test(madison$ratio2, cooper$ratio2)
+
 t.test(madison$Business, highland$Business)
 t.test(madison$Retail, highland$Retail)
 t.test(madison$Food_Accom, highland$Food_Accom)
@@ -215,6 +234,9 @@ t.test(madison$ratio2, union$ratio2)
 madison_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
   filter(Group==1, Type=="Treatment", year<=conyear) 
+cooper_growth <- memphis_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, Type=="Control: Cooper", year<=conyear) 
 highland_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
   filter(Group==1, Type=="Control: Highland", year<=conyear) 
@@ -224,6 +246,10 @@ jackson_growth <- memphis_growth %>%
 union_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
   filter(Group==1, Type=="Control: Union", year<=conyear) 
+
+t.test(madison_growth$biz_growth,cooper_growth$biz_growth)
+t.test(madison_growth$retail_growth,cooper_growth$retail_growth)
+t.test(madison_growth$food_accom_growth,cooper_growth$food_accom_growth)
 
 t.test(madison_growth$biz_growth,highland_growth$biz_growth)
 t.test(madison_growth$retail_growth,highland_growth$retail_growth)
@@ -246,6 +272,7 @@ Comparing ‘business’ related employment, we find the Highland Street Corrido
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
 | Madison Ave.   | 68      | 16         | 17        | 65-70   | 80-85      | 80-85     |
+| Cooper St.     | 125     | 6          | 13        | 75-80   | 70-75      | 75-80     |
 | Highland St.   | 77      | 10         | 25        | 70-75   | 70-75      | 85-90     |
 | Jackson Ave.   | 8       | 2          | 1         | 25-30   | 50-55      | 45-50     |
 | Union Ave.     | 140     | 12         | 16        | 95-100  | 75-80      | 80-85     |
@@ -258,17 +285,17 @@ We also performed a series of t-tests in order to determine whether the average 
 
 ### Employment trend comparison
 
-In terms of retail performance, the treatment corridor's retail employment experienced some declines around 2008 and 2011, this trend tracks the other control corridors fairly closely. In terms of the food/accommodation sector, the treatment corridor has an apparent drop starting 2011 and recovers after 2014, while other control corridors have opposite trent that increase during reccession period. Due to limited total employment in Jackson corridor compared to other corridors, its trend is not apparent in this graph.
+In terms of retail performance, the treatment corridor's retail employment experienced some declines around 2008 and 2011, this trend tracks the other control corridors fairly closely. The trend is generally increase from the starting year to the year of bike lane installation. However, Cooper St experienced a continued declined trend. In terms of the food/accommodation sector, the treatment corridor has an apparent drop starting 2011 and recovers after 2014, while other control corridors have opposite trent that increase during reccession period. Due to limited total employment in Jackson corridor compared to other corridors, its trend is not apparent in this graph.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
 madison_agg <- agg_trend_table(memphis_corridor, group = 1)
 
-agg_retail_trend_plot <- agg_trend_plot(madison_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012)
+madison_retail_trend_plot <- agg_trend_plot(madison_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012)
 
-agg_food_trend_plot <- agg_trend_plot(madison_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Madision Avenue .", construct_year = 2011, end_year = 2012)
+madison_food_trend_plot <- agg_trend_plot(madison_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Madision Avenue .", construct_year = 2011, end_year = 2012)
 
-plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
+plot_grid(madison_retail_trend_plot, madison_food_trend_plot)
 ```
 
 
@@ -393,7 +420,7 @@ The table in the following shows the summary of above similarity analysis for tr
 Trend analysis is a descriptive approach compares the trends of treatment and control corridors, or even city-wide trends over the full time period, to identify the impact of street improvement corridor.
 
 #### LEHD Data
-The bike facility installation has taken place in 2011. In terms of retail employment, there is an increase after bike lane installation on Madison corridor, however, with continuing drop after that. This performance is better than one control corridor, Union Avenue, but worse than the other control corridor, Highland Street. In addition, city-wide retail employment performs better than the treatment corridor, indicating the street improvement on Madison might have negative impact on retail employment. With respect to food & accommodation sector, there is a significant drop after bike lane installation, however, it recovers dramatically after two year. The control corridors experienced either significant drop or slow increase, while the city-level trend more likely remains flat. Therefore, bike lane installation might have positive impact on food & accommodation employment.
+The bike facility installation has taken place in 2011. In terms of retail employment, there is an increase after bike lane installation on Madison corridor, however, with continuing drop after that. This performance is better than one control corridor, Union Avenue, but worse than the other control corridor, Highland Street and Cooper Street. In addition, city-wide retail employment performs better than the treatment corridor, indicating the street improvement on Madison might have negative impact on retail employment. With respect to food & accommodation sector, there is a significant drop after bike lane installation, however, it recovers significantly after two year. While Cooper corridor experienced dramatic changes during the recent decade, the other two control corridors experienced either significant drop or slow increase after 2011, and the city-level trend more likely remains flat. Therefore, bike lane installation on Madison Avenue might have positive impact on food & accommodation employment.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
 
@@ -412,21 +439,66 @@ memphis <- memphis_lehd %>% group_by(year) %>%
 madison_agg <- rbind(as.data.frame(madison_agg), as.data.frame(memphis))
 madison_agg$Type <- as.factor(madison_agg$Type)
 
-madison_agg_retail_plot <- agg_index_trend_plot(madison_agg, industry = "Retail", corridor_name = "Madison Ave.",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
-madison_agg_food_plot <- agg_index_trend_plot(madison_agg, industry = "Food/Accommodations", corridor_name = "Madison Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
-plot_grid(madison_agg_retail_plot,madison_agg_food_plot)
+agg_lehd_trend_plot <- function(df_plot, industry, corridor_name, 
+                                 industry_code = c("CNS07", "CNS18", "CNS07_sd", "CNS18_sd"), 
+                                 construct_year, end_year) {
+  
+  df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+ 
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(size = 3, fill="white") +
+    scale_shape_manual(values=c(22,21,21,21,23))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
+         caption = "Shaded area represents the construction period") +
+    guides(title = "Street Type") +
+    theme(legend.position = "bottom")
+  
+  
+  return(ats_df)
+}
+
+
+madison_index_retail_plot <- agg_lehd_trend_plot(madison_agg_indexed, industry = "Retail", corridor_name = "Madison Ave.",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+madison_index_food_plot <- agg_lehd_trend_plot(madison_agg_indexed, industry = "Food/Accommodations", corridor_name = "Madison Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+mylegend<-g_legend(madison_index_retail_plot)
+grid.arrange(arrangeGrob(madison_index_retail_plot + theme(legend.position="none"),
+                         madison_index_food_plot + theme(legend.position="none"),nrow=1),
+             mylegend, nrow=2,heights=c(10, 1))
+
 
 ```
 
 
 #### Sales
+From the retail sales and establishment analysis, we can uncover more about the business performance after bike lane installation in 2011. Compared with control corridors, treatment corridor has more establishments opening after street improvement, with the indexed retail gross sales increase faster than two control corridors except Cooper Street. However, in terms of gross sale per establishment, the treatment corridor tracks the control corridors closes. Therefore, the bike lane installation on Madison Avenue has a positive impact on gross retail sales, mostly due to more establishments opening along the corridor.
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=1}
 
 madison_agg <- filter (memphis_sales, street_group == 1)
+madison_agg <- madison_agg[madison_agg$Type!="Control: Jackson Ave",]
 
 madison_agg$Type <- factor(madison_agg$Type)
 madison_agg$year <- as.numeric(madison_agg$year)
+madison_agg$sales_pest <- madison_agg$gross_sales/madison_agg$business
 
 agg_sale_index_trend_table <- function(df, group, construct_year) {
   
@@ -451,7 +523,7 @@ agg_sale_index_trend_table <- function(df, group, construct_year) {
 madison_agg_indexed <- agg_sale_index_trend_table(madison_agg, group = 1, construct_year = 2011)
 
 agg_sales_trend_plot <- function(df_plot, industry, corridor_name, 
-                                 industry_code = c("business", "gross_sales", "business_sd", "sales_sd"), 
+                                 industry_code = c("business", "gross_sales", "business_sd", "sales_sd", "sales_pest"),
                                  construct_year, end_year) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
@@ -477,7 +549,7 @@ agg_sales_trend_plot <- function(df_plot, industry, corridor_name,
     scale_shape_manual(values=c(22,21,21,21,21))+
     scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("{industry} Comparison:\n {corridor_name}"), x="Year",y="Employment",
+    labs(title = glue("{industry} Comparison:\n {corridor_name}"), x="Year",y="Sales",
          caption = "Shaded area represents the construction period") +
     guides(title = "Street Type") +
     theme(legend.position = "bottom")
@@ -486,28 +558,58 @@ agg_sales_trend_plot <- function(df_plot, industry, corridor_name,
   return(ats_df)
 }
 
+agg_est_trend_plot <- function(df_plot, industry, corridor_name, 
+                                 industry_code = c("business", "gross_sales", "business_sd", "sales_sd", "sales_pest"),
+                                 construct_year, end_year) {
+  
+  df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+ 
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(size = 3, fill="white") +
+    scale_shape_manual(values=c(22,21,21,21,21))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Comparison:\n {corridor_name}"), x="Year",y="Establishments",
+         caption = "Shaded area represents the construction period") +
+    guides(title = "Street Type") +
+    theme(legend.position = "bottom")
+  
+  
+  return(ats_df)
+}
 
-madison_estb_plot <- agg_sales_trend_plot(madison_agg, industry = "Retail Establishment Numbers", corridor_name = "Madison Ave.",industry_code = "business", construct_year = 2011, end_year = 2012)
-
-madison_estb_indexed_plot <- agg_sales_trend_plot(madison_agg_indexed, industry = "Indexed Retail Establishment Numbers", corridor_name = "Madison Ave.",industry_code = "business_sd", construct_year = 2011, end_year = 2012)
+madison_estb_plot <- agg_est_trend_plot(madison_agg, industry = "Retail Establishment Numbers", corridor_name = "Madison Ave.",industry_code = "business", construct_year = 2011, end_year = 2012)
 
 
 madison_sales_plot <- agg_sales_trend_plot(madison_agg, industry = "Retail Gross Sales", corridor_name = "Madison Ave.",industry_code = "gross_sales", construct_year = 2011, end_year = 2012)
 
+madison_sales_pest_plot <- agg_sales_trend_plot(madison_agg, industry = "Retail Sales per Establishment", corridor_name = "Madison Ave.",industry_code = "sales_pest", construct_year = 2011, end_year = 2012)
+
 madison_sales_indexed_plot <- agg_sales_trend_plot(madison_agg_indexed, industry = "Indexed Retail Gross Sales", corridor_name = "Madison Ave.",industry_code = "sales_sd", construct_year = 2011, end_year = 2012)
 
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
 
 mylegend<-g_legend(madison_estb_plot)
 
 grid.arrange(arrangeGrob(madison_estb_plot + theme(legend.position="none"),
-                         madison_estb_indexed_plot + theme(legend.position="none"),
                          madison_sales_plot + theme(legend.position="none"), 
-                         madison_sales_indexed_plot + theme(legend.position="none"),nrow=2),
+                         madison_sales_indexed_plot + theme(legend.position="none"),
+                         madison_sales_pest_plot + theme(legend.position="none"),nrow=2),
              mylegend, nrow=3,heights=c(10, 1,1))
 
 
@@ -519,9 +621,10 @@ grid.arrange(arrangeGrob(madison_estb_plot + theme(legend.position="none"),
 As mentioned in the introduction, difference-in-difference (DID) is a linear modeling approach that infers causal relationship. The causal effect is estimated through the difference between changes in the variable of interest in the treatment group before and after it is treated compared with the corresponding change in control group.
 
 #### LEHD Data
-Three models, using retail employment, food/accommodation employment and business employment (sum of the previous two) as dependent variable, are estimated. The key interest term in the table (in Appendix) is Control:prepost variable, which is the DID estimator. The DID estimators are non-significant for all three models, indicating the effect of the treatment is not statistically significant, although the trend analysis indicates some preliminary result.
+Three models, using retail employment, food/accommodation employment and business employment (sum of the previous two) as dependent variables, are estimated. The key interest term in the table (in Appendix) is Control:prepost variable, which is the DID estimator. The DID estimators are non-significant for all three models, indicating the effect of the treatment is not statistically significant, although the trend analysis indicates some preliminary result.
 
 #### Sales Data
+Similarly, two models, using retail gross sales and number of establishments as dependent variables, are estimated. The key interest term in the table (in Appendix) is Control:prepost variable, which is the DID estimator. The DID estimators are non-significant for both models, indicating the effect of the treatment is not statistically significant, although the trend analysis indicates some preliminary result.
 
 ### Interrupted Time Series (ITS) Analysis
 Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where the installation of new bicycled facility happens. The estimation of pre-post parameter indicates the impact of interruption on change of interested outcome variable, while the estimation of ts_year:prepost parameter indicates the impact of interruption on slope change.
@@ -530,7 +633,7 @@ Interrupted time series is an econometric technique that estimates how street im
 Similar as DID analysis, three models, using retail employment, food/accommodation employment and business employment (sum of the previous two) as dependent variable, are estimated. Only food/accommodation employment model shows statistically significant result. It indicates bike lane installation causes the food /accommodation employment significant level drop after the project, but with greater slope change, that is growth rate.
 
 #### Sales Data
-
+Similar as DID analysis, two models, using retail gross sales and number of establishments as dependent variables, are estimated. However, both the level change and slope change specification are non-significant, indicating no causal relationship between bike lane installation and retail sales growth.
 
 ## Broad Avenue Corridor
 ### Trend Analysis
@@ -562,21 +665,23 @@ plot_grid(broad_agg_retail_plot,broad_agg_food_plot)
 ```
 
 #### Sales Data
+Similar as observed in Madison Avenue, Broad Avenue also experience more establishments opening after bike lane installation in 2010. As a consequence, the retail gross sales increase dramatically compared to two other control corridor. However, the sales per establishment is relatively constant after the street improvement, indicating similar types of establishment opened that doesn’t change unit sales much. Thus, we can conclude that bike lane installation on Broad Avenue substantially increase the number of establishments opening along the corridor, and increase gross sales as well.
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=1}
 broad_agg <- filter (memphis_sales, street_group == 2)
 
 broad_agg$Type <- factor(broad_agg$Type)
 broad_agg$year <- as.numeric(broad_agg$year)
+broad_agg$sales_pest <- broad_agg$gross_sales/broad_agg$business
 
 broad_agg_indexed <- agg_sale_index_trend_table(broad_agg, group = 2, construct_year = 2010)
 
 
-broad_estb_plot <- agg_sales_trend_plot(broad_agg, industry = "Retail Establishment Numbers", corridor_name = "Broad Ave.",industry_code = "business", construct_year = 2011, end_year = 2012)
-
-broad_estb_indexed_plot <- agg_sales_trend_plot(broad_agg_indexed, industry = "Indexed Retail Establishment Numbers", corridor_name = "Broad Ave.",industry_code = "business_sd", construct_year = 2010, end_year = 2011)
+broad_estb_plot <- agg_est_trend_plot(broad_agg, industry = "Retail Establishment Numbers", corridor_name = "Broad Ave.",industry_code = "business", construct_year = 2010, end_year = 2011)
 
 
 broad_sales_plot <- agg_sales_trend_plot(broad_agg, industry = "Retail Gross Sales", corridor_name = "Broad Ave.",industry_code = "gross_sales", construct_year = 2010, end_year = 2011)
+
+broad_sales_pest_plot <- agg_sales_trend_plot(broad_agg, industry = "Retail Sales per Establishment", corridor_name = "Broad Ave.",industry_code = "sales_pest", construct_year = 2010, end_year = 2011)
 
 broad_sales_indexed_plot <- agg_sales_trend_plot(broad_agg_indexed, industry = "Indexed Retail Gross Sales", corridor_name = "Broad Ave.",industry_code = "sales_sd", construct_year = 2010, end_year = 2011)
 
@@ -584,10 +689,11 @@ broad_sales_indexed_plot <- agg_sales_trend_plot(broad_agg_indexed, industry = "
 mylegend<-g_legend(broad_estb_plot)
 
 grid.arrange(arrangeGrob(broad_estb_plot + theme(legend.position="none"),
-                         broad_estb_indexed_plot + theme(legend.position="none"),
                          broad_sales_plot + theme(legend.position="none"), 
-                         broad_sales_indexed_plot + theme(legend.position="none"),nrow=2),
+                         broad_sales_indexed_plot + theme(legend.position="none"),
+                         broad_sales_pest_plot + theme(legend.position="none"),nrow=2),
              mylegend, nrow=3,heights=c(10, 1,1))
+
 ```
 
 
