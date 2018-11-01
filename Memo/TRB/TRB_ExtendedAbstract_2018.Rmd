@@ -1,0 +1,90 @@
+---
+title: The Economic and Business Impacts of Street Improvements for Bicycle and Pedestrian
+  Mobility
+author:
+- affiliation: Portland State University
+  name: Jenny Liu, PhD
+- affiliation: Portland State University
+  name: Wei Shi
+- affiliation: Portland State University
+  name: Jamaal Green
+date: "October 31, 2018"
+output:
+  word_document: default
+  pdf_document:
+    template: trb_template.tex
+csl: transportation-research-record.csl
+bibliography: TRB_2018_references.bib
+---
+
+#  Introduction
+
+In the face of growing concerns over climate change, rising social inequality and what can loosely be described as an emerging urban ethic, active transportation policy is currently experiencing significant growth. In cities across the country, advocates are arguing for robust bicycle infrastructure and expanded public transit. The call for better infrastructure is even more urgent given the rise of bike-, and now scooter-, share companies that offer people the opportunity to ride and to seriously consider non-auto forms of transport without the commitment of ownership. While these are largely positive trends, placing new, robust bicycle infrastructure on major travel thoroughfares still garners intense political backlash in some cities. In particular, local business owners are often opposed to the installation of new active transportation infrastructure if it requires narrowing travel lanes, or worse, removing parking. 
+
+In response, active transportation advocates often claim that new multimodal infrastructure will actually economically benefit business owners. The underlying logic is that improved corridors will increase the number of customers that can arrive from a variety of modes beyond automobiles, and, ultimately, result in greater revenue and employment growth. While there is some suggestive evidence of this [@jaffeCompleteBusinessCase2015; @roweBikenomicsMeasuringEconomic2013]  to comparing sales trends over time on affected blocks [@fluscheBicyclingMeansBusiness2012; @nycdotEconomicBenefitsSustainable2014]. While suggestive, these papers are largely descriptive, or exploratory, in nature as opposed to experimental. This paper will fill the current technical gap in bicycle infrastructure evaluation studies by  describing an ongoing six city project to estimat the business and economic impacts of new cycling infrastructure. 
+
+# Methodology and Data
+
+## Data Sources
+
+We use a combination of data sources from public, proprietary and private distributors. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the Longitudinal Employer-Household Dynamics Dataset (LEHD).  It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S employment. This data set tracks Workplace Area Characteristics (WAC), census blocks where people work as opposed to where workers live, for all the census blocks between 2002 and 2015 for most of the states in the US.
+
+Following the LEHD, we also use public, but confidential, Quarterly Census of Employment and Wages (QCEW) data from the individual study states. Reported at the establishment level, QCEW data, also known as ES-202 data, is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. Unfortunately, due to indiosyncratic state rules on disclosure the QCEW data had to be pre-processed for all cities with varying levels of restriction on data disclosure. That being said, the QCEW still offers a more detailed industrial breakdown than what you can get with the LEHD.
+
+Finally, we collected sales tax data from each city. These are also public, though proprietary, datasets and required pre-processing before we were allowed to receive the data. Depending on the city, we received either sales tax receipts or taxable sales on either a quartlery or annual basis for retail and restaurant establishments, depending upon data suppression issues. 
+
+##  Methodology
+
+### Corridor Selection
+
+A primary validity concern in evaluation studies is the choice of the evaluation unit. In this project, we relied upon the expertise of local transportation planners to nominate potential corridor sets. Those local experts used a general set of rules regarding corridor selection we provided: the corridors should, ideally, be a minimum of 10 blocks long; have a reasonable number of retail and commercial establishments; and, finally, for treatment blocks, that the street improvement construction was beteen 2008 and 2013 in order to make sure we have sufficient data to measure pre and post-construction trends. 
+
+Once corridors were nominated by our city partners we performed further testing in order to discern how similar the treated and untreated corridors were. We use a combination of descriptive statistics- comparing individual census block employment in each corridor to city level employment quantiles- and t-tests in order to determine if the average employment, by block, is similar between the proposed corridors.
+
+### Aggregated Trend Comparison
+
+Our first analysis methodology follows that of the NYCDOT [-@nycdotEconomicBenefitsSustainable2014]. They tracked the business performance of firms on treated and  untreated streets. We do the same tracking changes in employment and sales tax over the full study period for treated and untreated streets. If treated corridors show greater increases in employment or sales tax, then we have one signal that the new infrastructure had a positive effect on business performance. While straightforward and intuitive, it is a purely descriptive analysis.
+
+### Difference-in-Difference 
+
+We next apply a difference-in-difference approach modeling employment and sales tax on the standard difference terms. The general format includes the dependent variable (either employment or sales tax sales or receipts), a dummy variable for whether a corridor is treated or not, a second dummy variable for pre and post-construction time periods and an interaction term of the two. The basic formula is expressed as:
+
+DID is a linear modeling approach and its basic formula is expressed as:
+
+$$ Y_{it} = \beta_0 + \beta_1T_{it} + \beta_2A_{it} + \beta_3T_{it}A_{it} +\varepsilon_{it} $$
+
+$Y_{it}$ is the observed outcome in groups i and t (in this case change in employment or sales tax revenue)
+$T_{it}$ is a dummy variable set to 1 if the observation is from the treatment group
+$A_{it}$ is a dummy variable set to 1 if the observation is from the post treatment period i either groups
+$\beta_3$ is the DID estimate of the treatment effect
+
+### Interrupted Time Series
+
+Interrupted time series is an econometric technique that estimates the impact of an intervention on a treated unit over time by examining the difference in growth patterns pre and post-treatment. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. An advatnage of interrupted time series modeling is that it only requires the treated units precluding the need for a comparator.
+
+The interrupted time-series analysis equation can be expressed as: 
+
+$$ Y_t = \beta_0 + \beta_1T_1 + \beta_2X_1 + \beta_3T_1X_1 +\varepsilon_{it} $$
+
+$Y_t$ is the observed business outcome in time period t
+$T_t$ indicates the number of quarters from start to finish of the series
+$X_t$ is the treatment dummy variable taking values of 0 in the pre-intervention period and 1 in the post-intervention period
+$\beta_0$ is the model intercept or baseline level at T = 0
+$\beta_1$ represents the change in the outcome with a time unit increase (the pre-intervention trend)
+$\beta_2$ is the level change following the intervention
+$\beta_3$ indicates the slope change following the intervention 
+
+# Findings
+
+Though individual corridor findings are varied, on average, we have the following conclusions: in most of our cities new cycling infrastructure had a non-significant effect on employment and sales tax; a select few corridors showed positive effects of new infrastructure for either retail or restaurant/accommodations employment or sales tax but not both simultaneously; there were even fewer corridors that had any statistically significant negative effects of new bicycling infrastructure. 
+
+Generally, the multiple data sources mirrored each other adding to the internal validity of our conclusions and demonstrating the strength in, if possible, collecting multiple data sources in evaluation studies. The magnitude of individual coefficients varied greatly across corridors and models so it is not possible to give a single average effect of new infrastructure on employment or sales tax, but it is possible to say that where there is an effect it is generally positive. 
+
+# Conclusion
+
+Using six cities, we evaluated the impact of new bicycle infrastructure on the economic and business dynamics of a select set of corridors. Using a variety of data sources in addition to a variety of models were able to come to a rigorous set of conclusions using both descriptive and quasi-experimental methods. The overall conclusion from this combination of datasets and models is that new bicycling infrastructure, as it is currently built in the US, generally has no effect on overall business or economic activity. In corridors where there is a statistically significant effectm generally, we find mix of positive and negative significant results depending upon the model and data source used. Some results had both positive and negative results leaving final conclusions ambiguous. 
+
+This study offers evidence that new bicycle infrastructure does not harm existing businesses nor does it necessarily provide a dramatically increased new source of customers contra the claims of some advocates. While suggestive, the mixed results require further research and additional data. Getting accurate travel data or additional physical infrastructure information, for example, would be quite useful and add robustness to models.  
+
+
+# References

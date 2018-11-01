@@ -1488,11 +1488,10 @@ plot_grid(qc_idx_emp_lyndale, qc_idx_lyndale_wages,  ncol = 1)
 
 For Lyndale Avenue we find a statistically significant and negative effect of infrastructure installation for accommodations employment and a non-significant result for retail employment. Again, the interpretation of the difference term is that "but for" the installation of the infrastructure Lyndale Avenue would have nearly 109 additional accommodations jobs. 
 
-[insert d-i-d]
 
 The DiD specification for sales tax for Lyndale shows a non-significant effect of construction on restaurant sales tax receipts but a positive and significant effect on retail sales tax receipts. In this case, the model implies that the corridor construction was responsible for an additional 4 million dollars in receipts compared to the control corridor.  
 
-The QCEW difference-in-difference results were mixed Lyndale. The difference term was non-significant for the employment model but was significant and negative for the wages model. Because the reference level for the street type variable is Lyndale the negative value means moving from Lyndale to Grand loses wages so this is an argument in support of the positive influence of cycling infrastructure on wages. But looking back at the trend graphs it is clear that the growth in both employment and wages largely occurs well after the construction period.
+The QCEW difference-in-difference results were mixed with Lyndale. The difference term was non-significant for the employment model but was significant and negative for the wages model. Because the reference level for the street type variable is Lyndale the negative value means moving from Lyndale to Grand loses wages so this is an argument in support of the positive influence of cycling infrastructure on wages. But looking back at the trend graphs it is clear that the growth in both employment and wages largely occurs well after the construction period.
 
 
 ### ITS
@@ -1737,8 +1736,6 @@ plot_grid(qc_idx_emp_north, qc_idx_north_wages,  ncol = 1)
 
 Our difference-in-difference estimation shows a positive and significant effect of treatment responsible for approximately 247 accommodations jobs while retail has a negative but non-significant effect. 
 
-[insert d-i-d table]
-
 Due to missing data we only ran a difference-in-difference model for the retail sales tax receipts. As the table shows, the difference term for North Second Ave is negative but non-significant indicating there is not a causal relationship between the change in retail sales tax receipts and new infrastructure placement compared to the control. 
 
 The difference term for employment is positive and significant meaning that but for the construction of the new cycling infrastructure North 2nd would have had an additional 38 jobs. In this instance, the new infrastructure is estimated to have hurt corridor job growth. But the difference term for the wages model is non-significant. 
@@ -1750,7 +1747,7 @@ North 2nd Avenue also has mixed ITS results. The corridor has a large, negative 
 
 The mixed results are also reflected when looking at the corridor's sales tax receipts. There is a large, negative and significant drop in the level of receipts but a positive, and significant, change in the rate of growth of receipts post-construction. Assuming this rate of growth continues, the corridor should ultimately see more sales post-construction, but, again, it is hard to make a definitive statement on the causal nature of the relationship between the construction and the receipts.
 
-For the QCEW models only the slope change term in the total wages model is significant and positive. This means that the rate of wage growth increased after the cycling infrastructure was installed. The other terms and the other model all return coefficients significant at the 90% level which does not meet our thresholds.
+For the QCEW models the slope change term in the total wages model is significant and positive while the level change term is significant and negative. This follows the other two data sources in an ultimately mixed result but generally positive growth effect of the new infrastructure. 
 
 #  Conclusion
 
