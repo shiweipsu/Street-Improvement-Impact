@@ -1,0 +1,561 @@
+---
+title: "San Francisco Corridors"
+author: "Wei Shi"
+date: "November 5, 2018"
+output:
+  word_document: default
+  pdf_document:
+    includes:
+      in_header: header.tex
+    number_sections: true
+fig_width: 7
+fig_height: 5
+---
+
+```{r setup,include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## load data
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, gridExtra)
+
+#query the corridors from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+sf_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd02 as cd03, a.cd04 as cd04, b.type as Type, b.FULLNAME as name, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+FROM sf_lehd a, sf_corridor b
+WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
+sf_corridor[sf_corridor$name =="Polk St",]$type <- "Treatment"
+sf_corridor[sf_corridor$name=="Van Ness Ave",]$type <- "Control: Van Ness"
+sf_corridor$type <- as.factor(sf_corridor$type)
+
+sf_corridor <- sf_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,
+         Group=corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+
+sf_lehd <- st_read(dsn = con, query = "SELECT * FROM sf_lehd") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+sf_corridor_rac <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd03 as cd03, a.cd04 as cd04, b.fullname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+FROM sf_rac a, sf_corridor b
+WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
+sf_corridor_rac[sf_corridor_rac$name =="Van Ness Ave",]$type <- "Control: Van Ness"
+sf_corridor_rac[sf_corridor_rac$name=="Polk St",]$type <- "Treatment: Polk"
+sf_corridor_rac$type <- as.factor(sf_corridor_rac$type)
+
+sf_corridor_rac <- sf_corridor_rac %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,
+         Group=corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+
+
+sf_rac <- st_read(dsn = con, query = "SELECT * FROM sf_rac") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+sf_emp_ratio <- employ_ratio_test(sf_corridor)
+
+sf_growth <- growth_rate(sf_corridor)
+
+dbDisconnect(con)
+
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+```
+
+
+# corridor comparison
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+#comparisons-----
+
+# prepare city level data & block level corridor data at the year before construction
+conyear <- first(filter(sf_corridor, Group== 1, Type== "Treatment: Polk")$BuildStart)-1 
+# find the year before construction
+
+sf_lehd_2008 <- sf_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
+
+polk <- sf_corridor %>% filter(Group ==1, Type =="Treatment: Polk", year==conyear) %>% employ_ratio_test(.)
+
+vanness <- sf_corridor %>% filter(Group ==1, Type =="Control: Van Ness", year ==conyear) %>% employ_ratio_test(.)
+
+
+# find quantile dataframe 
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(sf_lehd_2008$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(sf_lehd_2008$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(sf_lehd_2008$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
+
+polk %>% summarise(TotEmp = sum(C000)/nrow(polk), RetailEmp = sum(CNS07)/nrow(polk),
+                                     AccomEmp = sum(CNS18)/nrow(polk)) %>% as.data.frame()
+vanness %>% summarise(TotEmp = sum(C000)/nrow(vanness), RetailEmp = sum(CNS07)/nrow(vanness),
+                                     AccomEmp = sum(CNS18)/nrow(vanness)) %>% as.data.frame
+
+# get employment at block level, divided by nrow()
+ 
+
+# t-test: compare retail, food_accom, business amount---
+t.test(polk$Business, vanness$Business)
+t.test(polk$Retail, vanness$Retail)
+t.test(polk$Food_Accom, vanness$Food_Accom)
+t.test(polk$ratio1, vanness$ratio1)
+t.test(polk$ratio2, vanness$ratio2)
+
+# t-tests: growth rate----
+
+polk_growth <- sf_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Treatment: Polk", year<=conyear) 
+vanness_growth <- sf_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Type=="Control: Van Ness", year<=conyear) 
+
+t.test(polk_growth$biz_growth,vanness_growth$biz_growth)
+t.test(polk_growth$retail_growth,vanness_growth$retail_growth)
+t.test(polk_growth$food_accom_growth,vanness_growth$food_accom_growth)
+
+```
+
+# plot trend
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+polk_agg <- agg_trend_table(sf_corridor, group = 1)
+
+agg_retail_trend_plot <- agg_trend_plot(polk_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Polk Street", construct_year = 2009, end_year = 2010)
+
+agg_food_trend_plot <- agg_trend_plot(polk_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Polk Street", construct_year = 2009, end_year = 2010)
+
+plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
+```
+
+## trend analysis - plot
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+
+polk_agg <- agg_index_trend_table(sf_corridor, group = 1, construct_year = 2009)
+polk_agg$Type <- as.character(polk_agg$Type)
+sf <- sf_lehd %>% group_by(year) %>%
+  summarise(CNS07 = sum(CNS07),
+            CNS18 = sum(CNS18),
+            business = CNS07 + CNS18) %>%
+  mutate(CNS07_sd = CNS07/380.6,
+         CNS18_sd = CNS18/520.04,
+         business_sd = business/900.64,
+         Type = "City") %>%
+  select(Type, year, CNS07_sd, CNS18_sd, business_sd)
+polk_agg <- rbind(as.data.frame(polk_agg), as.data.frame(sf))
+polk_agg$Type <- as.factor(as.character(polk_agg$Type))
+
+polk_agg_retail_plot <- agg_index_trend_plot(polk_agg, industry = "Retail", corridor_name = "Polk Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+polk_agg_food_plot <- agg_index_trend_plot(polk_agg, industry = "Food/Accommodations", corridor_name = "Polk Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+plot_grid(polk_agg_retail_plot,polk_agg_food_plot)
+```
+
+## trend analysis - table
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+
+# compute post change table compare to base year
+post_change <- polk_agg %>% 
+  filter (year %in% c(2008, 2009, 2010, 2011)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07_sd/lag(CNS07_sd)-1)*100,
+         food_accom_growth = (CNS18_sd/lag(CNS18_sd)-1)*100)
+  
+```
+
+
+# model
+```{r, echo=FALSE, results='asis'}
+
+sf_corridor$Type <- relevel(sf_corridor$Type,ref = "Treatment")
+
+#polk ave
+
+polk_agg_did <- did_agg_analysis(sf_corridor, group = 1, endyear = 2010)
+stargazer(polk_agg_did[[1]], polk_agg_did[[2]], polk_agg_did[[3]], 
+          title = "Polk Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+polk_agg_its <- agg_its_analysis(sf_corridor, group = 1, endyear = 2010)
+stargazer(polk_agg_its[[1]], polk_agg_its[[2]], polk_agg_its[[3]], 
+          title = "Polk Ave. Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "text")
+
+```
+
+
+
+# Distributional analysis
+## additional distributional analysis - income (bar graph)
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+polk_inc <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  mutate(Type = factor(Type, levels = c("Treatment: Polk", "Control: Van Ness"))) %>% 
+  group_by(Type, year) %>% 
+  summarise(low_income = sum(CE01), 
+            mid_income = sum(CE02), 
+            high_income = sum(CE03)) %>% 
+  group_by(Type) %>% 
+  gather(income_level, employment,low_income, mid_income, high_income) %>% 
+  mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
+         income_level = factor(income_level, levels=c("high_income", "mid_income", "low_income")),
+         n = case_when(Type == "Treatment: Polk" ~ 28,
+                       Type == "Control: Van Ness" ~36)) 
+
+ggplot(data=polk_inc, aes(x=year, y=employment/n)) +
+  geom_bar(aes(fill=income_level),stat = "identity")+
+  facet_wrap(~Type)+
+  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+  labs(title="Income Composition Trend Among Corridors", x="Year", y ="Employment per block", 
+       caption = "Bike lane is constructed in 2009") +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete(name="Income Level",
+                      breaks=c("high_income", "mid_income", "low_income"),
+                      labels=c("High income", "Middle income", "Low income"))
+  
+
+```
+
+
+## additional distributional analysis - race (line chart)
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
+polk_race <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100) 
+
+pdx_race <- sf_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:other_perc)
+
+
+polk_race <- rbind(as.data.frame(polk_race), as.data.frame(pdx_race))
+polk_race[polk_race$year<2009,][,c(3:8,10:15)] <- NA
+polk_race$Type <- as.factor(as.character(polk_race$Type))
+  
+
+white_plot <- dist_trend_plot(polk_race,demo = "White", demo_code = "white_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 58, 79)
+
+black_plot <- dist_trend_plot(polk_race,demo = "Black", demo_code = "black_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 0,20)
+
+ameindian_plot <- dist_trend_plot(polk_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Polk Street", cat = "Employment",construct_year = 2009, end_year = 2010, 0,20)
+
+asian_plot <- dist_trend_plot(polk_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,12,32)
+
+hawaii_plot <- dist_trend_plot(polk_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,20)
+
+other_plot <- dist_trend_plot(polk_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,20)
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+```
+
+
+# additional distributional analysis - race (table)
+```{r}
+start_end_race <- polk_race %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+
+  
+# calculate year by year race categories percentage change  
+y_o_y_race <- polk_race %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+
+```
+
+# additional distributional analysis - education (line chart)
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+polk_edu <- sf_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100) 
+
+pdx_edu <- sf_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:bach_perc)
+
+
+polk_edu <- rbind(as.data.frame(polk_edu), as.data.frame(pdx_edu))
+polk_edu[polk_edu$year<2009,][,c(3:6,8:11)] <- NA
+polk_edu$Type <- as.factor(as.character(polk_edu$Type))
+  
+
+hisch_under_plot <- dist_trend_plot(polk_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 0, 10)
+
+hisch_plot <- dist_trend_plot(polk_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 10, 20)
+
+col_plot <- dist_trend_plot(polk_edu,demo = "College", demo_code = "col_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 20, 30)
+
+bach_plot <- dist_trend_plot(polk_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,27.6,37.6)
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
+```
+
+# additional distributional analysis - edu (table)
+```{r}
+start_end_edu <- polk_edu %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_edu <- polk_edu %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+```
+
+# distributional rac - race table
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
+polk_race <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100) 
+
+pdx_race <- sf_rac %>% 
+  group_by(year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:other_perc)
+
+
+polk_race <- rbind(as.data.frame(polk_race), as.data.frame(pdx_race))
+polk_race[polk_race$year<2009,][,c(3:8,10:15)] <- NA
+polk_race$Type <- as.factor(as.character(polk_race$Type))
+
+white_plot <- dist_trend_plot(polk_race,demo = "White", demo_code = "white_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010, 79, 91)
+
+black_plot <- dist_trend_plot(polk_race,demo = "Black", demo_code = "black_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010, 1,13)
+
+ameindian_plot <- dist_trend_plot(polk_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Polk Street",cat = "Residents", construct_year = 2009, end_year = 2010, 0,12)
+
+asian_plot <- dist_trend_plot(polk_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Polk Street",cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
+
+hawaii_plot <- dist_trend_plot(polk_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
+
+other_plot <- dist_trend_plot(polk_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Polk Street",cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+
+start_end_race <- polk_race %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_race <- polk_race %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+
+```
+
+# distributional rac - edu table
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+polk_edu <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100) 
+
+pdx_edu <- sf_rac %>% 
+  group_by(year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:bach_perc)
+
+
+polk_edu <- rbind(as.data.frame(polk_edu), as.data.frame(pdx_edu))
+polk_edu[polk_edu$year<2009,][,c(3:6,8:11)] <- NA
+polk_edu$Type <- as.factor(as.character(polk_edu$Type))
+
+hisch_under_plot <- dist_trend_plot(polk_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010, 0, 15)
+
+hisch_plot <- dist_trend_plot(polk_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Polk Street", cat = "Redidents", construct_year = 2009, end_year = 2010, 10, 25)
+
+col_plot <- dist_trend_plot(polk_edu,demo = "College", demo_code = "col_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010, 12, 27)
+
+bach_plot <- dist_trend_plot(polk_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010,20,35)
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
+  
+start_end_edu <- polk_edu %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_edu <- polk_edu %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T))) 
+
+```
+
+# gender
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+polk_gender <- sf_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+pdx_gender <- sf_lehd %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+polk_gender <- rbind(as.data.frame(polk_gender), as.data.frame(pdx_gender))
+polk_gender[polk_gender$year<2009,][,c(3,5)] <- NA
+polk_gender$Type <- as.factor(as.character(polk_gender$Type))
+
+gender_plot <- dist_trend_plot(polk_gender,demo = "Female", demo_code = "female_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 30, 60)
+
+polk_gender_rac <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+pdx_gender_rac <- sf_rac %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+polk_gender_rac <- rbind(as.data.frame(polk_gender_rac), as.data.frame(pdx_gender_rac))
+polk_gender_rac[polk_gender_rac$year<2009,][,c(3,5)] <- NA
+polk_gender_rac$Type <- as.factor(as.character(polk_gender_rac$Type))
+
+gender_rac_plot <- dist_trend_plot(polk_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010, 30, 60)
+
+mylegend<-g_legend(gender_plot)
+
+grid.arrange(arrangeGrob(gender_plot + theme(legend.position="none"), gender_rac_plot + theme(legend.position="none"),
+                         nrow = 1),
+             mylegend, nrow=2,heights=c(10,1))
+```
+
