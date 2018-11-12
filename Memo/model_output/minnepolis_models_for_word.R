@@ -1,0 +1,484 @@
+#minneapolis models to insert into word doc
+
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+
+p_load(here, RPostgreSQL, sf, tidyr, ggplot2, ggthemes, dplyr, dbplyr, stargazer,cowplot, lubridate, zoo)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+#query the corridors from bike_lanes
+user <- "jamgreen"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+minn_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+                         a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+                         a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+                         b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+                         b.type as grouptype,  a.year as year, a.geometry as geometry
+                         FROM minneapolis_lehd a, minneapolis_corridors b
+                         WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+names(minn_corridor) <- toupper(names(minn_corridor)) 
+
+minn_corridor <- minn_corridor %>% rename(Type = GROUPTYPE, year = YEAR, Group = CORRIDOR_GROUP)
+
+# minn_corridor <- st_read(here::here("Data/minneapolis/minn_corridor_lehd_wgs84.geojson"))
+
+#riverside
+
+riverside_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 1, endyear = 2009)
+stargazer(riverside_agg_did[[1]], riverside_agg_did[[2]], riverside_agg_did[[3]], 
+          title = "Riverside Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here:here("Memo/model_output/minneapolis/riverside_lehd_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+riverside_agg_its <- agg_its_analysis(df_its = minn_corridor, group = 1, endyear = 2009)
+stargazer(riverside_agg_its[[1]], riverside_agg_its[[2]], riverside_agg_its[[3]], type = "html", 
+          title = "Interrupted Time Series- Riverside Ave.", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."),
+          out = here:here("Memo/model_output/minneapolis/riverside_lehd_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#franklin
+franklin_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 2, endyear = 2011)
+stargazer(franklin_agg_did[[1]], franklin_agg_did[[2]],franklin_agg_did[[3]],         title = "Franklin Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), 
+          type = "html",out = here:here("Memo/model_output/minneapolis/franklin_lehd_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+
+franklin_its <- agg_its_analysis(df_its = minn_corridor,  group = 2, endyear = 2011)
+stargazer(franklin_its[[1]], franklin_its[[2]], franklin_its[[3]], 
+          type = "html", title = "Interrupted Time Series- Franklin Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
+          out = here:here("Memo/model_output/minneapolis/franklin_lehd_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#central
+
+
+central_did <- did_agg_analysis(df_did = minn_corridor, group = 3, endyear = 2012)
+stargazer(central_did[[1]], central_did[[2]], central_did[[3]], 
+          title = "Central Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here:here("Memo/model_output/minneapolis/central_lehd_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+central_its <- agg_its_analysis(df_its = minn_corridor, group = 3, endyear = 2012)
+stargazer(central_its[[1]], central_its[[2]], central_its[[3]], 
+          type = "html", title = "Interrupted Time Series- Central Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
+          out = here:here("Memo/model_output/minneapolis/central_lehd_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#lyndale
+
+lyndale_did <- did_agg_analysis(df_did = minn_corridor, group = 4, endyear = 2009)
+stargazer(lyndale_did[[1]], lyndale_did[[2]], lyndale_did[[3]], 
+          title = "Lyndale Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here:here("Memo/model_output/minneapolis/lyndale_lehd_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+lyndale_its <- agg_its_analysis(minn_corridor, group = 4, endyear = 2009)
+stargazer(lyndale_its[[1]], lyndale_its[[2]], lyndale_its[[3]], 
+          type = "html", title = "Interrupted Time Series- Lyndale Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
+          out = here:here("Memo/model_output/minneapolis/lyndale_lehd_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#north 2nd
+
+
+north_did <- did_agg_analysis(df_did = minn_corridor, group = 5, endyear = 2011)
+stargazer(north_did[[1]], north_did[[2]], north_did[[3]], 
+          title = "North Second St.Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here:here("Memo/model_output/minneapolis/north2nd_lehd_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+north_its <- agg_its_analysis( minn_corridor, group = 5, endyear = 2011)
+stargazer(north_its[[1]], north_its[[2]], north_its[[3]], type = "html",
+          title = "Interrupted Time Series- North 2nd Ave.", 
+          column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
+          out = here:here("Memo/model_output/minneapolis/north2nd_lehd_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE )
+
+
+# sales tax models-----------------------------------
+
+
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
+
+minn_sale$Type <- stringr::str_trim(minn_sale$Type, side = "both")
+
+#riverside
+
+riverside_sale <- minn_sale %>% filter(Group == 1) %>% 
+  mutate(pre_post = if_else(year >= 2009, 1, 0))
+
+riverside_did_rest <- lm(Restaurant ~ Type + pre_post + Type*pre_post, data = riverside_sale)
+riverside_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = riverside_sale)
+
+stargazer(riverside_did_rest, riverside_did_retail, type = "html",
+          title = "Riverside Ave. Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales") ,
+          out = here:here("Memo/model_output/minneapolis/riverside_sales_tax_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+riverside_its <- riverside_sale %>% filter(Type == "Improvement") %>% 
+  mutate(ts_year = year - 2003)
+
+riverside_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = riverside_its)
+riverside_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = riverside_its)
+
+stargazer(riverside_its_rest, riverside_its_retail, type = "html",
+          title = "Riverside Ave. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/riverside_sales_tax_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#franklin...only doing ITS
+
+franklin_its <- minn_sale %>% filter(Group == 2, Type == "Improvement") %>% 
+  mutate(pre_post = if_else(year >= 2011, 1, 0), ts_year = year - 2003)
+
+franklin_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = franklin_its)
+franklin_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = franklin_its)
+
+stargazer(franklin_its_rest, franklin_its_retail, type = "html",
+          title = "Franklin Ave. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/franklin_sales_tax_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+
+#central
+
+central_sale <- minn_sale %>% filter(Group == 3) %>% 
+  mutate(pre_post = if_else(year >= 2012, 1, 0))
+
+central_did_rest <- lm(Restaurant ~ Type + pre_post + Type*pre_post, data = central_sale)
+central_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = central_sale)
+
+stargazer(central_did_rest, central_did_retail, type = "html",
+          title = "Central Ave. Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/central_sales_tax_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE )
+
+central_its <- central_sale %>% filter(Type == "Improvement") %>% 
+  mutate(ts_year = year - 2003)
+
+central_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = central_its)
+central_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = central_its)
+
+stargazer(central_its_rest, central_its_retail, type = "html",
+          title = "Central Ave. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/central_sales_tax_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#lyndale
+
+lyndale_sale <- minn_sale %>% filter(Group == 4) %>% 
+  mutate(pre_post = if_else(year >= 2009, 1, 0))
+
+lyndale_did_rest <- lm(Restaurant ~ Type + pre_post + Type*pre_post, data = lyndale_sale)
+lyndale_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = lyndale_sale)
+
+stargazer(lyndale_did_rest, lyndale_did_retail, type = "html",
+          title = "Lyndale Ave. S. Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/lyndale_sales_tax_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE )
+
+lyndale_its <- lyndale_sale %>% filter(Type == "Improvement") %>% 
+  mutate(ts_year = year - 2003)
+
+lyndale_its_rest <- lm(Restaurant ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_its)
+lyndale_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_its)
+
+stargazer(lyndale_its_rest, lyndale_its_retail, type = "html",
+          title = "Lyndale Ave. S. Sales Tax ITS Estimates", 
+          column.labels = c("Restaurant Sales", "Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/lyndale_sales_tax_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE) 
+
+#2nd street....ITS only for restaurant because too many missing DID terms
+
+second_sale <- minn_sale %>% filter(Group == 5) %>% 
+  mutate(pre_post = if_else(year >= 2011, 1, 0))
+
+second_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = second_sale)
+
+stargazer(second_did_retail, type = "html",
+          title = "North 2nd Sales Tax Difference-in-Difference Estimates", 
+          column.labels = c("Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/north2nd_sales_tax_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE) 
+
+second_sale <- minn_sale %>% filter(Group == 5, Type == "Improvement") %>% 
+  mutate(pre_post = if_else(year >= 2011, 1, 0), ts_year = year - 2003)
+
+
+second_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = second_sale)
+
+stargazer(second_its_retail, type = "html",
+          title = "North 2nd Sales Tax ITS Estimates", 
+          column.labels = c("Retail Sales"),
+          out = here:here("Memo/model_output/minneapolis/north2nd_sales_tax_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)  
+
+
+
+# qcew models-----------------------
+
+#riverside did
+
+minn_qcew <- tbl(con, "minneapolis_qcew_modified")
+
+riverside_qcew <- minn_qcew %>% filter(corridors == "Riverside Ave" | corridors == "Cedar Ave")
+
+riverside_qcew <- collect(riverside_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+         year_quarter = as.yearqtr(year_quarter))
+
+riverside_qcew <- riverside_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Cedar Ave"))
+
+riverside_qcew$street_type <- factor(riverside_qcew$street_type, 
+                                     levels = c("Treatment", "Control: Cedar Ave"))
+
+riverside_qcew <- riverside_qcew %>% 
+  mutate(pre_post = if_else(year_quarter >= "2009 Q1", 1, 0))
+
+river_qcew_did_emp <- lm(avg_emp ~ street_type + pre_post + street_type*pre_post, riverside_qcew)
+river_qcew_did_wages <- lm(total_wages ~ street_type + pre_post + street_type*pre_post, riverside_qcew)
+
+river_qcew_did_list <- list(river_qcew_did_emp, river_qcew_did_wages)
+
+stargazer(river_qcew_did_list[[1]], river_qcew_did_list[[2]],
+          title = "Riverside Avenue QCEW Difference-in-Difference Estimates",
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/riverside_qcew_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#riverside ITS
+
+river_its <- riverside_qcew %>% 
+  filter(street_type == "Treatment") %>% 
+  group_by(year) %>% summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+                               tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2009, 1, 0))
+
+river_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post, 
+                         data = river_its)
+
+river_qcew_its_wages <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post, 
+                           data = river_its)
+
+river_qc_its_list <- list(river_qcew_its_emp, river_qcew_its_wages)
+
+stargazer(river_qc_its_list[[1]], river_qc_its_list[[2]],
+          title = "Riverside Avenue QCEW ITS Estimates",
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/riverside_qcew_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#franklin ITS
+
+franklin_its <- minn_qcew %>% 
+  filter(corridors == "Franklin Ave", street_type == "improvement") %>% 
+  group_by(year) %>% 
+  summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+            tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2011, 1, 0)) %>% 
+  collect()
+
+
+franklin_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post,
+                            data = franklin_its)
+
+franklin_qcew_its_wage <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post,
+                             data = franklin_its)
+
+franklin_qcew_list <- list(franklin_qcew_its_emp, franklin_qcew_its_wage)
+
+stargazer(franklin_qcew_list[[1]], franklin_qcew_list[[2]], title = "Franklin Ave ITS Estimates", 
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/franklin_qcew_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#central DiD
+
+central_qcew <- minn_qcew %>% 
+  filter(corridors == "Central Ave" | corridors == "University Ave")
+
+central_qcew <- collect(central_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+         year_quarter = as.yearqtr(year_quarter))
+
+central_qcew <- central_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: University Ave"))
+
+central_qcew$street_type <- factor(central_qcew$street_type, 
+                                   levels = c("Treatment", "Control: University Ave"))
+
+central_qcew <- central_qcew %>% 
+  mutate(pre_post = if_else(year_quarter >= "2012 Q1", 1, 0)) 
+
+central_qc_emp_did <- lm(avg_emp ~ pre_post + street_type + pre_post*street_type, data = central_qcew)
+central_qc_wages_did <- lm(total_wages ~ pre_post + street_type + pre_post*street_type, 
+                           data = central_qcew)
+
+central_qc_did_list <- list(central_qc_emp_did, central_qc_wages_did)
+
+stargazer(central_qc_did_list[[1]], central_qc_did_list[[2]], 
+          title = "Central Ave. QCEW Difference-in-Difference Estimates", 
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/central_qcew_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#central ITS
+
+central_its <- central_qcew %>% 
+  filter(street_type == "Treatment")
+
+central_its <- central_its %>% 
+  group_by(year) %>% 
+  summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+            tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2012, 1, 0))
+
+central_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post, data = central_its)
+central_qcew_its_wages <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post, data = central_its)
+
+central_qcew_its_list <- list(central_qcew_its_emp, central_qcew_its_wages)
+
+stargazer(central_qcew_its_list[[1]], central_qcew_its_list[[2]], 
+          title = "Central Ave QCEW ITS Estimates", 
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/central_qcew_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#lyndale ave DiD
+
+lyndale_qcew <- minn_qcew %>% 
+  filter(corridors == "Lyndale Ave S" | corridors == "Grand Ave")
+
+lyndale_qcew <- collect(lyndale_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+         year_quarter = as.yearqtr(year_quarter))
+
+lyndale_qcew <- lyndale_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Grand Ave"))
+
+lyndale_qcew$street_type <- factor(lyndale_qcew$street_type, 
+                                   levels = c("Treatment", "Control: Grand Ave"))
+
+lyndale_qcew <- lyndale_qcew %>% 
+  mutate(pre_post = if_else(year_quarter >= "2008 Q1", 1, 0))
+
+
+lyndale_qc_emp_did <- lm(avg_emp ~ pre_post + street_type + pre_post*street_type, data = lyndale_qcew)
+lyndale_qc_wages_did <- lm(total_wages ~ pre_post + street_type + pre_post*street_type, 
+                           data = lyndale_qcew)
+
+lyndale_qc_did_list <- list(lyndale_qc_emp_did, lyndale_qc_wages_did)
+
+stargazer(lyndale_qc_did_list[[1]], lyndale_qc_did_list[[2]], 
+          title = "Lyndale Ave. S. QCEW Difference-in-Difference Estimates", 
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/lyndale_qcew_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#lyndale ave ITS
+
+lyndale_qcew_its <- lyndale_qcew %>% 
+  filter(street_type == "Treatment")
+
+lyndale_qcew_its <- lyndale_qcew_its %>% 
+  group_by(year) %>% 
+  summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+            tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2008, 1, 0))
+
+lyndale_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_qcew_its)
+lyndale_qcew_its_wages <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post, data = lyndale_qcew_its)
+
+lyndale_qcew_its_list <- list(lyndale_qcew_its_emp, lyndale_qcew_its_wages)
+
+stargazer(lyndale_qcew_its_list[[1]], lyndale_qcew_its_list[[2]], 
+          title = "Lyndale Ave. S. QCEW ITS Estimates",
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/lyndale_qcew_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#north second DiD
+
+north_qcew <- minn_qcew %>% 
+  filter(corridors == "North 2nd Street" | corridors == "Broadway Ave")
+
+north_qcew <- collect(north_qcew) %>% 
+  mutate(year_quarter = paste0(year,"-",quarter), 
+         year_quarter = as.yearqtr(year_quarter))
+
+north_qcew <- north_qcew %>% 
+  mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Broadway Ave"))
+
+north_qcew$street_type <- factor(north_qcew$street_type, 
+                                 levels = c("Treatment", "Control: Broadway Ave"))
+
+north_qcew <- north_qcew %>% 
+  mutate(pre_post = if_else(year_quarter >= "2009 Q1", 1, 0))
+
+
+north_qc_emp_did <- lm(avg_emp ~ pre_post + street_type + pre_post*street_type, data = north_qcew)
+north_qc_wages_did <- lm(total_wages ~ pre_post + street_type + pre_post*street_type, 
+                         data = north_qcew)
+
+north_qcew_did_list <- list(north_qc_emp_did, north_qc_wages_did)
+
+
+stargazer(north_qcew_did_list[[1]], north_qcew_did_list[[2]], 
+          title = "North 2nd Ave QCEW Difference in Difference Estimates",
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/north2nd_qcew_did.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+#north second ITS
+
+north_qcew_its <- north_qcew %>% 
+  filter(street_type == "Treatment")
+
+north_qcew_its <- north_qcew_its %>% 
+  group_by(year) %>% 
+  summarise(avg_emp = mean(avg_emp, na.rm = TRUE),
+            tot_wages = sum(total_wages, na.rm = TRUE)) %>% 
+  mutate(ts_year = year - 2000, pre_post = if_else(year >= 2009, 1, 0))
+
+north_qcew_its_emp <- lm(avg_emp ~ ts_year + pre_post + ts_year*pre_post, data = north_qcew_its)
+north_qcew_its_wages <- lm(tot_wages ~ ts_year + pre_post + ts_year*pre_post, data = north_qcew_its)
+
+north_qcew_its_list <- list(north_qcew_its_emp, north_qcew_its_wages)
+
+stargazer(north_qcew_its_list[[1]], north_qcew_its_list[[2]], 
+          title = "North 2nd St. QCEW ITS Estimates", 
+          column.labels = c("Average Employment", "Total Wages"), type = "html",
+          out = here:here("Memo/model_output/minneapolis/north2nd_qcew_its.html"),
+          no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
+
+dbDisconnect(con)

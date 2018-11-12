@@ -1,0 +1,197 @@
+#trying to export indianapolis models directly to html, open in word and paste from there
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, tidyr, stargazer, sf, ggplot2, ggthemes, cowplot, forcats, dplyr,dbplyr,RPostgreSQL, 
+       zoo, forcats)
+
+user <- "jamgreen"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+indy_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+                         a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+                         a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+                         b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+                         b.grouptype as grouptype,  a.year as year, a.geom
+                         FROM indy_lehd a, indy_corridors b
+                         WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geom);")
+
+
+
+#indy_corridor <- st_read(here::here("Data/Indianapolis/indy_corridor_lehd_NAD83.shp"))
+indy_corridor <- indy_corridor %>% 
+  rename(Type = grouptype) 
+#add new colume of construct year as numeric
+
+indy_corridor$Type <- as.character(indy_corridor$Type)
+indy_corridor[indy_corridor$name =="Virginia Ave Comp. Corridor 1\n",]$Type <- "Control: Meridian"
+indy_corridor[indy_corridor$name=="Virginia Ave Comp. Corridor 2\n",]$Type <- "Control: Prospect"
+indy_corridor[indy_corridor$name=="Virginia Ave Comp. Corridor 3\n",]$Type <- "Control: Shelby"
+indy_corridor[indy_corridor$name=="Mass Ave Comp. Corridor 1\n",]$Type <- "Control: Mass Ave"
+indy_corridor$Type <- as.factor(indy_corridor$Type)
+
+indy_corridor <- indy_corridor %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group,
+         BuildStart = buildstart, BuildEnd = buildend, Name = name)
+
+indy_corridor <- indy_corridor %>% filter(!is.na(C000))
+
+indy_corridor$Type <- fct_relevel(indy_corridor$Type, "Treatment", 
+                                  "Control: Mass Ave", 
+                                  "Control: Meridian", 
+                                  "Control: Prospect",
+                                  "Control: Shelby")
+
+#LEHD------------------
+#virginia ave
+
+virginia_agg_did <- did_agg_analysis(indy_corridor, group = 1, endyear = 2013)
+stargazer(virginia_agg_did[[1]], virginia_agg_did[[2]], virginia_agg_did[[3]], 
+          title = "Virginia Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here::here("Memo/model_output/indianapolis/va_ave_lehd_did.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+virginia_agg_its <- agg_its_analysis(indy_corridor, group = 1, endyear = 2013)
+stargazer(virginia_agg_its[[1]], virginia_agg_its[[2]], virginia_agg_its[[3]], 
+          title = "Virginia Ave. Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here::here("Memo/model_output/indianapolis/va_ave_lehd_its.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+
+#mass ave
+
+mass_agg_did <- did_agg_analysis(indy_corridor, group = 2, endyear = 2010)
+stargazer(mass_agg_did[[1]], mass_agg_did[[2]], mass_agg_did[[3]], 
+          title = "Massachusetts Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here::here("Memo/model_output/indianapolis/mass_ave_lehd_did.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+mass_agg_its <- agg_its_analysis(indy_corridor, group = 2, endyear = 2010)
+
+stargazer(mass_agg_its[[1]], mass_agg_its[[2]], mass_agg_its[[3]], 
+          title = "Massachusetts Ave. Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
+          out = here::here("Memo/model_output/indianapolis/mass_ave_lehd_did.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+#Sales TAX----------------------
+
+#sales tax DiD
+
+
+indy_sales <- tbl(con, "indy_sales_tax")
+indy_sales <- collect(indy_sales)
+
+va_ave <- indy_sales %>% filter(group == 2) %>% 
+  mutate(pre_post = if_else(lubridate::year(quarter) >= 2013, 1, 0),
+         treatment = if_else(corridor == "Virginia Ave", 1, 0))
+
+va_ave$corridor <- stringr::str_trim(va_ave$corridor, "both")
+
+va_ave <- va_ave %>% filter(corridor != "Meridian")
+
+va_ave <- va_ave %>% mutate(corridor = factor(corridor, 
+                                              levels = c("Virginia Ave", "Prospect",
+                                                         "Shelby")))
+
+va_diff_tax <- lm(tax_revenue ~ corridor + pre_post + pre_post*corridor, va_ave)
+
+#sales tax ITS
+
+va_ave_its <- indy_sales %>% filter(corridor == "Virginia Ave") %>% 
+  mutate(pre_post = if_else(lubridate::year(quarter) >= 2013, 1, 0),
+         ts_term = seq_len(nrow(.)))
+
+va_its_tax <- lm(tax_revenue ~ ts_term + pre_post + ts_term*pre_post, va_ave_its)
+
+ma_ave_its <- indy_sales %>% filter(corridor == "Mass Ave") %>% 
+  mutate(pre_post = if_else(lubridate::year(quarter) >= 2010, 1, 0), 
+         ts_term = seq_len(nrow(.)))
+
+ma_ave_tax <- lm(tax_revenue ~ ts_term + pre_post + ts_term*pre_post, ma_ave_its)
+
+indy_sales_lm <- list(va_diff_tax, va_its_tax, ma_ave_tax)
+
+stargazer(indy_sales_lm[[1]], 
+          title = "Virginia Ave. Corridor Diffrence-in-Difference Estimates", 
+          column.labels  = c("Sales Tax Revenue"), type = "html", 
+          out = here::here("Memo/model_output/indianapolis/va_ave_sales_tax_did.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+stargazer(indy_sales_lm[[2]], indy_sales_lm[[3]], 
+          title = "Virginia and Massachusetts Ave. Corridor ITS Estimates", 
+          column.labels  = c("Virginia Ave.", "Mass Ave."), type = "html",
+          out = here::here("Memo/model_output/indianapolis/va_ave_sales_tax_its.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+#QCEW--------------
+
+#qcew DID and ITS for VA avenue but not mass
+
+indy_qcew <- tbl(con, "indy_qcew_modified")
+indy_qcew <- collect(indy_qcew)
+
+indy_qcew$corridor_name <- stringr::str_trim(indy_qcew$corridor_name, "both")
+
+indy_qcew$corridor_type <- factor(indy_qcew$corridor_type, levels = c("treatment", "control"))
+
+indy_qcew <- indy_qcew %>% 
+  mutate(year_quarter = paste0(year,"-",qtr), 
+         year_quarter = as.yearqtr(year_quarter)) %>% 
+  filter(naics_code != "suppressed") %>% 
+  mutate(naics_label = case_when(naics_code == "722" ~ "Food/Drinking Places",
+                                 naics_code == "448" ~ "Clothing Stores",
+                                 naics_code == "721" ~ "Accommodation"))
+
+
+va_qcew <- indy_qcew %>% filter(corridor_group == 1)
+va_qcew <- va_qcew %>% filter(corridor_name != "meridian") %>% 
+  mutate(corridor_name = case_when(corridor_name == "shelby" ~ "Control: Shelby",
+                                   corridor_name == "virginia ave" ~ "Treatment: Virginia",
+                                   corridor_name == "prospect" ~ "Control: Prospect"),
+         pre_post = if_else(year_quarter >= 2013, 1, 0),
+         treatment = if_else(corridor_name == "Treatment: Virginia", 1, 0),
+         corridor = factor(corridor_name, levels = c("Treatment: Virginia", "Control: Prospect",
+                                                     "Control: Shelby"))) 
+
+
+
+va_diff_emp_qcew <- lm(employment ~ corridor + pre_post + pre_post*corridor, va_qcew)
+va_diff_wages_qcew <- lm(qtr_wages ~ corridor + pre_post + pre_post*corridor, va_qcew)
+
+qcew_list <- list(va_diff_emp_qcew, va_diff_wages_qcew)
+
+stargazer(qcew_list[[1]], qcew_list[[2]], 
+          title = "Virginia Ave. Corridor DiD Estimates", 
+          column.labels  = c("Quarterly Emp.", "Quarterly Wages"), type = "html",
+          out = here::here("Memo/model_output/indianapolis/va_ave_qcew_did.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+#va qcew its
+
+va_qc_its <- va_qcew %>% filter(corridor_type == "treatment") %>% 
+  mutate(ts_term = seq_len(nrow(.)))
+
+va_its_emp <- lm(employment ~ ts_term + pre_post + pre_post*ts_term, va_qc_its)
+va_its_wages <- lm(qtr_wages ~ ts_term + pre_post + pre_post*ts_term, va_qc_its)
+
+qc_its_list <- list(va_its_emp, va_its_wages)
+
+stargazer(qc_its_list[[1]], qc_its_list[[2]], 
+          title = "Virginia Ave. Corridor ITS Estimates", 
+          column.labels  = c("Quarterly Emp.", "Quarterly Wages"), type = "html",
+          out = here::here("Memo/model_output/indianapolis/va_ave_qcew_its.html"),
+          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
+dbDisconnect(con)
+
