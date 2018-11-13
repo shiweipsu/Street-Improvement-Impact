@@ -83,6 +83,7 @@ stargazer(mass_agg_did[[1]], mass_agg_did[[2]], mass_agg_did[[3]],
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
 
 mass_agg_its <- agg_its_analysis(indy_corridor, group = 2, endyear = 2010)
+
 stargazer(mass_agg_its[[1]], mass_agg_its[[2]], mass_agg_its[[3]], 
           title = "Massachusetts Ave. Corridor Interrupted Time Series Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
