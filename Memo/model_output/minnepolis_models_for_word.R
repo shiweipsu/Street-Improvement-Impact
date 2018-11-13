@@ -36,21 +36,21 @@ riverside_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 1, endyear
 stargazer(riverside_agg_did[[1]], riverside_agg_did[[2]], riverside_agg_did[[3]], 
           title = "Riverside Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
-          out = here:here("Memo/model_output/minneapolis/riverside_lehd_did.html"),
+          out = here::here("Memo/model_output/minneapolis/riverside_lehd_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 riverside_agg_its <- agg_its_analysis(df_its = minn_corridor, group = 1, endyear = 2009)
 stargazer(riverside_agg_its[[1]], riverside_agg_its[[2]], riverside_agg_its[[3]], type = "html", 
           title = "Interrupted Time Series- Riverside Ave.", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."),
-          out = here:here("Memo/model_output/minneapolis/riverside_lehd_its.html"),
+          out = here::here("Memo/model_output/minneapolis/riverside_lehd_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #franklin
 franklin_agg_did <- did_agg_analysis(df_did = minn_corridor, group = 2, endyear = 2011)
 stargazer(franklin_agg_did[[1]], franklin_agg_did[[2]],franklin_agg_did[[3]],         title = "Franklin Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), 
-          type = "html",out = here:here("Memo/model_output/minneapolis/franklin_lehd_did.html"),
+          type = "html",out = here::here("Memo/model_output/minneapolis/franklin_lehd_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 
@@ -58,7 +58,7 @@ franklin_its <- agg_its_analysis(df_its = minn_corridor,  group = 2, endyear = 2
 stargazer(franklin_its[[1]], franklin_its[[2]], franklin_its[[3]], 
           type = "html", title = "Interrupted Time Series- Franklin Ave.", 
           column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
-          out = here:here("Memo/model_output/minneapolis/franklin_lehd_its.html"),
+          out = here::here("Memo/model_output/minneapolis/franklin_lehd_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #central
@@ -68,14 +68,14 @@ central_did <- did_agg_analysis(df_did = minn_corridor, group = 3, endyear = 201
 stargazer(central_did[[1]], central_did[[2]], central_did[[3]], 
           title = "Central Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
-          out = here:here("Memo/model_output/minneapolis/central_lehd_did.html"),
+          out = here::here("Memo/model_output/minneapolis/central_lehd_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 central_its <- agg_its_analysis(df_its = minn_corridor, group = 3, endyear = 2012)
 stargazer(central_its[[1]], central_its[[2]], central_its[[3]], 
           type = "html", title = "Interrupted Time Series- Central Ave.", 
           column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
-          out = here:here("Memo/model_output/minneapolis/central_lehd_its.html"),
+          out = here::here("Memo/model_output/minneapolis/central_lehd_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #lyndale
@@ -84,14 +84,14 @@ lyndale_did <- did_agg_analysis(df_did = minn_corridor, group = 4, endyear = 200
 stargazer(lyndale_did[[1]], lyndale_did[[2]], lyndale_did[[3]], 
           title = "Lyndale Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
-          out = here:here("Memo/model_output/minneapolis/lyndale_lehd_did.html"),
+          out = here::here("Memo/model_output/minneapolis/lyndale_lehd_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 lyndale_its <- agg_its_analysis(minn_corridor, group = 4, endyear = 2009)
 stargazer(lyndale_its[[1]], lyndale_its[[2]], lyndale_its[[3]], 
           type = "html", title = "Interrupted Time Series- Lyndale Ave.", 
           column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
-          out = here:here("Memo/model_output/minneapolis/lyndale_lehd_its.html"),
+          out = here::here("Memo/model_output/minneapolis/lyndale_lehd_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #north 2nd
@@ -101,14 +101,14 @@ north_did <- did_agg_analysis(df_did = minn_corridor, group = 5, endyear = 2011)
 stargazer(north_did[[1]], north_did[[2]], north_did[[3]], 
           title = "North Second St.Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
-          out = here:here("Memo/model_output/minneapolis/north2nd_lehd_did.html"),
+          out = here::here("Memo/model_output/minneapolis/north2nd_lehd_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 north_its <- agg_its_analysis( minn_corridor, group = 5, endyear = 2011)
 stargazer(north_its[[1]], north_its[[2]], north_its[[3]], type = "html",
           title = "Interrupted Time Series- North 2nd Ave.", 
           column.labels = c("Retail Emp.", "Accommodations Emp.", "'Business' Emp."),
-          out = here:here("Memo/model_output/minneapolis/north2nd_lehd_its.html"),
+          out = here::here("Memo/model_output/minneapolis/north2nd_lehd_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE )
 
 
@@ -131,7 +131,7 @@ riverside_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = rive
 stargazer(riverside_did_rest, riverside_did_retail, type = "html",
           title = "Riverside Ave. Sales Tax Difference-in-Difference Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales") ,
-          out = here:here("Memo/model_output/minneapolis/riverside_sales_tax_did.html"),
+          out = here::here("Memo/model_output/minneapolis/riverside_sales_tax_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 riverside_its <- riverside_sale %>% filter(Type == "Improvement") %>% 
@@ -143,7 +143,7 @@ riverside_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data 
 stargazer(riverside_its_rest, riverside_its_retail, type = "html",
           title = "Riverside Ave. Sales Tax ITS Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/riverside_sales_tax_its.html"),
+          out = here::here("Memo/model_output/minneapolis/riverside_sales_tax_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #franklin...only doing ITS
@@ -157,7 +157,7 @@ franklin_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data =
 stargazer(franklin_its_rest, franklin_its_retail, type = "html",
           title = "Franklin Ave. Sales Tax ITS Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/franklin_sales_tax_its.html"),
+          out = here::here("Memo/model_output/minneapolis/franklin_sales_tax_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 
@@ -172,7 +172,7 @@ central_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = centra
 stargazer(central_did_rest, central_did_retail, type = "html",
           title = "Central Ave. Sales Tax Difference-in-Difference Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/central_sales_tax_did.html"),
+          out = here::here("Memo/model_output/minneapolis/central_sales_tax_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE )
 
 central_its <- central_sale %>% filter(Type == "Improvement") %>% 
@@ -184,7 +184,7 @@ central_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = 
 stargazer(central_its_rest, central_its_retail, type = "html",
           title = "Central Ave. Sales Tax ITS Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/central_sales_tax_its.html"),
+          out = here::here("Memo/model_output/minneapolis/central_sales_tax_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #lyndale
@@ -198,7 +198,7 @@ lyndale_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = lyndal
 stargazer(lyndale_did_rest, lyndale_did_retail, type = "html",
           title = "Lyndale Ave. S. Sales Tax Difference-in-Difference Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/lyndale_sales_tax_did.html"),
+          out = here::here("Memo/model_output/minneapolis/lyndale_sales_tax_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE )
 
 lyndale_its <- lyndale_sale %>% filter(Type == "Improvement") %>% 
@@ -210,7 +210,7 @@ lyndale_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = 
 stargazer(lyndale_its_rest, lyndale_its_retail, type = "html",
           title = "Lyndale Ave. S. Sales Tax ITS Estimates", 
           column.labels = c("Restaurant Sales", "Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/lyndale_sales_tax_its.html"),
+          out = here::here("Memo/model_output/minneapolis/lyndale_sales_tax_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE) 
 
 #2nd street....ITS only for restaurant because too many missing DID terms
@@ -223,7 +223,7 @@ second_did_retail <- lm(Retail ~ Type + pre_post + Type*pre_post, data = second_
 stargazer(second_did_retail, type = "html",
           title = "North 2nd Sales Tax Difference-in-Difference Estimates", 
           column.labels = c("Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/north2nd_sales_tax_did.html"),
+          out = here::here("Memo/model_output/minneapolis/north2nd_sales_tax_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE) 
 
 second_sale <- minn_sale %>% filter(Group == 5, Type == "Improvement") %>% 
@@ -235,7 +235,7 @@ second_its_retail <- lm(Retail ~ ts_year + pre_post + ts_year*pre_post, data = s
 stargazer(second_its_retail, type = "html",
           title = "North 2nd Sales Tax ITS Estimates", 
           column.labels = c("Retail Sales"),
-          out = here:here("Memo/model_output/minneapolis/north2nd_sales_tax_its.html"),
+          out = here::here("Memo/model_output/minneapolis/north2nd_sales_tax_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)  
 
 
@@ -270,7 +270,7 @@ river_qcew_did_list <- list(river_qcew_did_emp, river_qcew_did_wages)
 stargazer(river_qcew_did_list[[1]], river_qcew_did_list[[2]],
           title = "Riverside Avenue QCEW Difference-in-Difference Estimates",
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/riverside_qcew_did.html"),
+          out = here::here("Memo/model_output/minneapolis/riverside_qcew_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #riverside ITS
@@ -292,7 +292,7 @@ river_qc_its_list <- list(river_qcew_its_emp, river_qcew_its_wages)
 stargazer(river_qc_its_list[[1]], river_qc_its_list[[2]],
           title = "Riverside Avenue QCEW ITS Estimates",
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/riverside_qcew_its.html"),
+          out = here::here("Memo/model_output/minneapolis/riverside_qcew_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #franklin ITS
@@ -316,7 +316,7 @@ franklin_qcew_list <- list(franklin_qcew_its_emp, franklin_qcew_its_wage)
 
 stargazer(franklin_qcew_list[[1]], franklin_qcew_list[[2]], title = "Franklin Ave ITS Estimates", 
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/franklin_qcew_its.html"),
+          out = here::here("Memo/model_output/minneapolis/franklin_qcew_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #central DiD
@@ -347,7 +347,7 @@ central_qc_did_list <- list(central_qc_emp_did, central_qc_wages_did)
 stargazer(central_qc_did_list[[1]], central_qc_did_list[[2]], 
           title = "Central Ave. QCEW Difference-in-Difference Estimates", 
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/central_qcew_did.html"),
+          out = here::here("Memo/model_output/minneapolis/central_qcew_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #central ITS
@@ -369,7 +369,7 @@ central_qcew_its_list <- list(central_qcew_its_emp, central_qcew_its_wages)
 stargazer(central_qcew_its_list[[1]], central_qcew_its_list[[2]], 
           title = "Central Ave QCEW ITS Estimates", 
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/central_qcew_its.html"),
+          out = here::here("Memo/model_output/minneapolis/central_qcew_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #lyndale ave DiD
@@ -401,7 +401,7 @@ lyndale_qc_did_list <- list(lyndale_qc_emp_did, lyndale_qc_wages_did)
 stargazer(lyndale_qc_did_list[[1]], lyndale_qc_did_list[[2]], 
           title = "Lyndale Ave. S. QCEW Difference-in-Difference Estimates", 
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/lyndale_qcew_did.html"),
+          out = here::here("Memo/model_output/minneapolis/lyndale_qcew_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #lyndale ave ITS
@@ -423,7 +423,7 @@ lyndale_qcew_its_list <- list(lyndale_qcew_its_emp, lyndale_qcew_its_wages)
 stargazer(lyndale_qcew_its_list[[1]], lyndale_qcew_its_list[[2]], 
           title = "Lyndale Ave. S. QCEW ITS Estimates",
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/lyndale_qcew_its.html"),
+          out = here::here("Memo/model_output/minneapolis/lyndale_qcew_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #north second DiD
@@ -456,7 +456,7 @@ north_qcew_did_list <- list(north_qc_emp_did, north_qc_wages_did)
 stargazer(north_qcew_did_list[[1]], north_qcew_did_list[[2]], 
           title = "North 2nd Ave QCEW Difference in Difference Estimates",
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/north2nd_qcew_did.html"),
+          out = here::here("Memo/model_output/minneapolis/north2nd_qcew_did.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 #north second ITS
@@ -478,7 +478,7 @@ north_qcew_its_list <- list(north_qcew_its_emp, north_qcew_its_wages)
 stargazer(north_qcew_its_list[[1]], north_qcew_its_list[[2]], 
           title = "North 2nd St. QCEW ITS Estimates", 
           column.labels = c("Average Employment", "Total Wages"), type = "html",
-          out = here:here("Memo/model_output/minneapolis/north2nd_qcew_its.html"),
+          out = here::here("Memo/model_output/minneapolis/north2nd_qcew_its.html"),
           no.space = TRUE, font.size = "tiny", model.numbers = FALSE)
 
 dbDisconnect(con)
