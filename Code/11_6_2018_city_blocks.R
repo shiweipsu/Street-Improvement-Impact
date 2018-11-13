@@ -3,7 +3,7 @@
 
 
 library(pacman)
-p_load(tigris, dplyr, dbplyr, sf, here, RPostgreSQL)
+p_load(tigris, dplyr, dbplyr, sf, here, RPostgreSQL, purrr)
 options(tigris_class = "sf")
 
 #connect to bike_lanes for upload
@@ -37,16 +37,16 @@ nitc_cities2 <- st_transform(nitc_cities2, crs = 5070)
 
 #have to manually download the blocks...couldn't get the loop to work
 
-in_blocks <- blocks(state = "IN", county = "097")
-mn_blocks <- blocks(state = "MN", county = "053")
-dc_blocks <- blocks(state = "DC")
-tn_blocks <- blocks(state = "TN", county = "157")
-wa_blocks <- blocks(state = "WA", county = "033")
-pa_blocks <- blocks(state = "PA", county = "003")
+nitc_counties <- c("097", "053", "001", "157", "033", "003")
 
-nitc_blocks <- rbind_tigris(list(in_blocks, mn_blocks, dc_blocks, tn_blocks, wa_blocks, pa_blocks))
+state_blocks <- map2(nitc_states, nitc_counties,  ~{blocks(state = .x, county = .y)}) %>% 
+  rbind_tigris()
 
-nitc_blocks <- st_transform(nitc_blocks, crs = 5070)
+
+nitc_blocks <- st_transform(state_blocks, crs = 5070)
 nitc_place_blocks <- st_intersection(nitc_blocks, nitc_cities2)
+nitc_place_blocks <- nitc_place_blocks %>% filter(st_is(., "POLYGON"))
 
 #st_write(nitc_place_blocks, dsn = con, "city_blocks", overwrite = TRUE)
+
+dbDisconnect(con)
