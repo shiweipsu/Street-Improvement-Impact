@@ -1,13 +1,10 @@
 #install older version of pacman and load in packages
 
-install.packages("devtools", repos='http://cran.us.r-project.org/')
-library(devtools)
 
-install_version('pacman', version = "0.4.6",
-                 dependencies=TRUE, repos='http://cran.us.r-project.org/')
+
 library(pacman)
-p_load(tigris, dplyr, sf, here, RPostgreSQL, purrr, glue)
-options(tigris_type = "sf")
+p_load(tigris, dplyr, dbplyr, sf, here, RPostgreSQL, purrr)
+options(tigris_class = "sf")
 
 #connect to bike_lanes for upload
 
@@ -36,16 +33,20 @@ nitc_cities2 <- nitc_cities2 %>%
 
 nitc_cities2 <- st_transform(nitc_cities2, crs = 5070)
 
-st_write(nitc_cities2, dsn = con, "city_boundaries", overwrite = TRUE)
+#st_write(nitc_cities2, dsn = con, "city_boundaries", overwrite = TRUE)
 
-#attempt download of blocks
-#get state county pairs
-county_fips <- fips_codes
-county_fips <- county_fips %>% filter(state %in% nitc_states)
+#have to manually download the blocks...couldn't get the loop to work
 
-in_blocks <- blocks(state = "IN")
-mn_blocks <- blocks(state = "MN")
-dc_blocks <- blocks(state = "DC")
-tn_blocks <- blocks(state = "TN")
-wa_blocks <- blocks(state = "WA")
-pa_blocks <- blocks(state = "PA")
+nitc_counties <- c("097", "053", "001", "157", "033", "003")
+
+state_blocks <- map2(nitc_states, nitc_counties,  ~{blocks(state = .x, county = .y)}) %>% 
+  rbind_tigris()
+
+
+nitc_blocks <- st_transform(state_blocks, crs = 5070)
+nitc_place_blocks <- st_intersection(nitc_blocks, nitc_cities2)
+nitc_place_blocks <- nitc_place_blocks %>% filter(st_is(., "POLYGON"))
+
+#st_write(nitc_place_blocks, dsn = con, "city_blocks", overwrite = TRUE)
+
+dbDisconnect(con)
