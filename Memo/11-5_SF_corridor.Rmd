@@ -86,6 +86,11 @@ sf_emp_ratio <- employ_ratio_test(sf_corridor)
 
 sf_growth <- growth_rate(sf_corridor)
 
+# load nets
+sf_nets <- st_read(dsn = con, query = "select a.dunsnumber as DunsNumber, a.sales90 as sales90, b.type as Type, b.fullname as name, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.geometry
+FROM nets a, sf_corridor b
+WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
 dbDisconnect(con)
 
 g_legend<-function(a.gplot){
