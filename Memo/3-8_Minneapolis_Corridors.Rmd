@@ -205,8 +205,8 @@ The following table shows total, retail, and accommodations employment for River
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
-| Riverside Ave. | 345    | 18        | 6         | 85-90      | 80-85         | 65-70       |
-| Cedar Ave.     | 61     | 13          | 1         | 55-60      | 75-80         | 50-55       |
+| Riverside Ave. | 345     | 18          | 6         | 85-90      | 80-85  | 65-70     |
+| Cedar Ave.     | 61      | 13          | 1         | 55-60      | 75-80  | 50-55     |
 
 Table 1: Riverside and Cedar Avenue Employment Percentiles
 
@@ -274,7 +274,7 @@ Table 2: Franklin Ave. Corridors Employment Percentiles
 
 ### Corridor Average Employment Comparisons
 
-In terms of the t-tests both corridors have statistically non-significant differences in "business" employment and their business employment share categories. Thus these corridors are appropriate comparators for further study.
+In terms of the t-tests both corridors have statistically non-significant differences in "business" employment and their business employment share categories. But because these corridors are actually the same corridor they violate the independence
 
 
 ## Central Avenue
@@ -339,7 +339,6 @@ All t-tests came back non-significant at the .05 level meaning that the two corr
 
 ## Lyndale Avenue South
 
-Lyndale Avenue South
 
 ![Lyndale Avenue South Corridor](images/minneapolis_lyndale_corridor_blkgrp.png)
 
@@ -459,6 +458,10 @@ t.test(second$busi_perc2, broadway$busi_perc2)
 | Broadway   | 36     | 7         | 0         | 45-50      | 65-70         | N/A        |
 
 Table 5: North 2nd Street and Broadway Corridors Employment Profile
+
+##  Corridor Comparison Summary
+
+The table in the following shows the summary of above similarity analysis for treatment and control corridor groups. Nine indicators are checked for those corridor groups. Note that all corridors seem comparable though a few lacked any meaningful food/accommodations employment at the block level they generally met other criteria. Note that while Franklin meets these basic criteria it fails the independence assumption since the corridors are different sections of the same street. This means that Franklin is not an appropriate corridor for difference-in-difference testing.  
 
 
 # Data Analysis
@@ -944,6 +947,8 @@ qc_idx_emp_franklin <- ggplot(franklin_qcew,
   scale_y_continuous(labels = scales::percent) +
     theme(axis.text.x = element_text(angle=45, vjust = 0.5))
 
+# indexed qcew wages franklin --------
+
 qc_idx_franklin_wages <- ggplot(franklin_qcew, 
               aes(x = year_quarter, y = wage_idx, group = street_type, 
                            colour = street_type, shape = street_type)) +
@@ -963,7 +968,7 @@ qc_idx_franklin_wages <- ggplot(franklin_qcew,
   scale_y_continuous(labels = scales::percent) +
     theme(axis.text.x = element_text(angle=45, vjust = 0.5))
 
-plot_grid(qc_idx1, qc_idx2,  ncol = 1)
+plot_grid(qc_idx_emp_franklin, qc_idx_franklin_wages,  ncol = 1)
 
 
 ```
@@ -1000,9 +1005,9 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2012)
 
 central_agg <- bind_rows(central_agg, minn_agg)
 
-central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Retail", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Retail", corridor_name = "Central Ave.", control_corridor = "University Ave,", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
 
-central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "University Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
 plot_grid(central_agg_idx_retail, central_agg_idx_accom, align = "h")
 
