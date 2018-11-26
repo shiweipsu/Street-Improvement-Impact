@@ -12,14 +12,15 @@ fig_height: 5
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
 ```
+![](images/dc_corridors.png)
+
+
 
 # Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
-DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
-[insert city-wide map of DC here]
 
 # Data Sources/Methodology
 
@@ -136,7 +137,8 @@ Due to the data limitations of the LODES data for Washington DC we can test only
 
 ## 3.1 L St.
 
-[insert map image here]
+![](images/dc_LSt_corridor_blkgrp.png)
+
 
 Our first treatment corridor is L Street. Constructed in 2012, L runs from 14th to 25th St NW. It's comparator corridors are I and K streets running from 14th to 23rd St Nw. 
 
@@ -248,7 +250,7 @@ The t-test did return one significant result on the difference between L and I s
 
 ## M St.
 
-[insert map image here]
+![](images/dc_MSt_corridor_blkgrp.png)
 
 The M St. corridor was constructed in 2014 and runs parallel to the L St. corridor. M St.'s comparator corridors are also I and K St.
 
