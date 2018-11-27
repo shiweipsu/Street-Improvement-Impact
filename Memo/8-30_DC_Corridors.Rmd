@@ -12,14 +12,15 @@ fig_height: 5
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
 ```
+![](images/dc_corridors.png)
+
+
 
 # Introduction
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
-DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
-[insert city-wide map of DC here]
 
 # Data Sources/Methodology
 
@@ -46,6 +47,8 @@ Once corridors are selected based on these criteria we require further testing i
 ### Aggregated Trend Comparison
 
 This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
+
+We present both absolute and indexed values for all variables. Indexed values are useful when you need to compare values on different scales. For some corridors the differences in employment or sales tax is large and it is not possible to accurately compare those to smaller corridors without indexing. This is especially important for something like sales tax where some corridors have large amounts of taxable sales due to being on a major travel corridor or having a large anchor retailer like a department store.
 
 ###  Difference-in-Difference
 
@@ -132,11 +135,12 @@ dc_growth <- growth_rate(dc_corridor)
 
 Our first test in corridor comparability is comparing the count of the total number, retail, and accommodation jobs within the corridors compared to block figures for the District of Columbia as a whole. This  allows us to have a broad understanding of the relative job density of the corridors. This serves two purposes: first, it gives us a quick estimate of the range of jobs the corridors have; and second, it shows how similar the corridors are to each other in terms of the number of jobs in each. And then, we perform a t-test, a statistical test designed to measure if the means of two different groups are statistically similar. This final test offers us a more rigorous test of the comparability of the corridors. We compare the employment numbers a year before construction for each improvement corridor and its comparison corridor(s). Finally, we illustrate the growth trend of the comparable corridors, and perform a t-test and visual graph to justify the similarity of the corridors in terms of employment change over time. 
 
-Due to the data limitations of the LODES data for Washington DC we can test only the L and M Street corridors as they were completed after 2010. [if and when we get ancillary data we can update this]
+Due to the data limitations of the LODES data for Washington DC we can test only the L and M Street corridors as they were completed after 2010. 
 
 ## 3.1 L St.
 
-[insert map image here]
+![](images/dc_LSt_corridor_blkgrp.png)
+
 
 Our first treatment corridor is L Street. Constructed in 2012, L runs from 14th to 25th St NW. It's comparator corridors are I and K streets running from 14th to 23rd St Nw. 
 
@@ -248,7 +252,7 @@ The t-test did return one significant result on the difference between L and I s
 
 ## M St.
 
-[insert map image here]
+![](images/dc_MSt_corridor_blkgrp.png)
 
 The M St. corridor was constructed in 2014 and runs parallel to the L St. corridor. M St.'s comparator corridors are also I and K St.
 

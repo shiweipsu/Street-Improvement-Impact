@@ -31,9 +31,9 @@ For this study we used multiple data sources to estimate the effect of new bike 
 
 This report also takes advantage of establishment level **Quarterly Census of Employment and Wages** (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
 
-Due to data suppression issues, we were unable to get disaggregated individual three-digit NAICS employment figures for the Minneapolis corridors. As a compromise, Minnesota's Department of Employment and Economic Development (DEED) aggregated all of the three-digit NAICS retail codes (NAICS 442-453). These aggregated numbers correspond closely to the LEHD codes used in the report, but with the advantage that the numbers are not "fuzzed" for confidentiality concerns, the data include total wages paid and average employment. And all of this data is available quarterly and goes back to the year 2000 dramatically increasing our sample size.
+Due to data suppression issues, we were unable to get dis-aggregated individual three-digit NAICS employment figures for the Minneapolis corridors. As a compromise, Minnesota's Department of Employment and Economic Development (DEED) aggregated all of the three-digit NAICS retail codes (NAICS 442-453). These aggregated numbers correspond closely to the LEHD codes used in the report, but with the advantage that the numbers are not "fuzzed" for confidentiality concerns, the data include total wages paid and average employment. And all of this data is available quarterly and goes back to the year 2000 dramatically increasing our sample size.
 
-Finally, we also collected **sales tax data**. Sales tax data allows us to estimate a more sensitive measure of economic activity than employment (as the decision to hire or fire for a firm is often an expensive one we expect employment to be a delayed response). Some drawbacks of sales tax data is that some states do not have a sales tax or, in states or cities that do have one, the sales tax data is not broken down by specific industry and it is difficult to accurately parse out accurate figures. But the benefits of sales tax data largely outweigh these issues and do offer a more sensitive metric than employment. 
+Finally, we also collected **sales tax data**. Sales tax data allows us to estimate a more sensitive measure of economic activity than employment (as the decision to hire or fire for a firm is often an expensive one we expect employment to be a delayed response). Some drawbacks of sales tax data is that some states do not have a sales tax or, in states or cities that do have one, the sales tax data is not broken down by specific industry and it is difficult to accurately parse out accurate figures. But the benefits of sales tax data largely outweigh these issues and do offer a more sensitive metric than employment. Specifically, for Minneapolis, we have collected **taxable sales** for all retail industrial categories and restaurant taxable sales. 
 
 In terms of specific rates, Minneapolis sales tax is, at minimum, 8.025% (for example, buying a meal at a restaurant outside of downtown Minneapolis) up to 14.025% (for ordering a meal in a restaurant with live entertainment within the downtown taxing district). The minimal 8.025% rate includes the 6.875% state sales tax, a 0.5% transit tax for Hennepin County, an additional .15% Hennepin County tax and, finally, a 0.5% city sales/use tax. Additional entertainment and accommodations taxes may also be included.
 
@@ -52,6 +52,8 @@ Once corridors are selected based on these criteria we require further testing i
 ###  Aggregated Trend Comparison
 
 This first method follows the previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts, then that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
+
+We present both absolute and indexed values for all variables. Indexed values are useful when you need to compare values on different scales. For some corridors the differences in employment or sales tax is large and it is not possible to accurately compare those to smaller corridors without indexing. This is especially important for something like sales tax where some corridors have large amounts of taxable sales due to being on a major travel corridor or having a large anchor retailer like a department store. 
 
 ###  Difference-in-Difference
 
@@ -196,15 +198,15 @@ t.test(riverside$busi_perc2, cedar$busi_perc2)
 
 
 
-### Corrdior Employment Counts
+### Corridor Employment Counts
 
 The following table shows total, retail, and accommodations employment for Riverside and Cedar and the city based percentile rank of the corridors. Riverside ranks consistently higher than cedar when looking at the concentration of employment per block. 
 
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
-| Riverside Ave. | 345    | 18        | 6         | 85-90      | 80-85         | 65-70       |
-| Cedar Ave.     | 61     | 13          | 1         | 55-60      | 75-80         | 50-55       |
+| Riverside Ave. | 345     | 18          | 6         | 85-90      | 80-85  | 65-70     |
+| Cedar Ave.     | 61      | 13          | 1         | 55-60      | 75-80  | 50-55     |
 
 Table 1: Riverside and Cedar Avenue Employment Percentiles
 
@@ -272,7 +274,7 @@ Table 2: Franklin Ave. Corridors Employment Percentiles
 
 ### Corridor Average Employment Comparisons
 
-In terms of the t-tests both corridors have statistically non-significant differences in "business" employment and their business employment share categories. Thus these corridors are appropriate comparators for further study.
+In terms of the t-tests both corridors have statistically non-significant differences in "business" employment and their business employment share categories. But because these corridors are actually the same corridor they violate the independence
 
 
 ## Central Avenue
@@ -337,7 +339,6 @@ All t-tests came back non-significant at the .05 level meaning that the two corr
 
 ## Lyndale Avenue South
 
-Lyndale Avenue South
 
 ![Lyndale Avenue South Corridor](images/minneapolis_lyndale_corridor_blkgrp.png)
 
@@ -457,6 +458,10 @@ t.test(second$busi_perc2, broadway$busi_perc2)
 | Broadway   | 36     | 7         | 0         | 45-50      | 65-70         | N/A        |
 
 Table 5: North 2nd Street and Broadway Corridors Employment Profile
+
+##  Corridor Comparison Summary
+
+The table in the following shows the summary of above similarity analysis for treatment and control corridor groups. Nine indicators are checked for those corridor groups. Note that all corridors seem comparable though a few lacked any meaningful food/accommodations employment at the block level they generally met other criteria. Note that while Franklin meets these basic criteria it fails the independence assumption since the corridors are different sections of the same street. This means that Franklin is not an appropriate corridor for difference-in-difference testing.  
 
 
 # Data Analysis
@@ -599,7 +604,7 @@ The indexed plots give us an alternative view of the corridors that reinforce wh
 
 #### QCEW
 
-As mentioned earlier the QCEW data provided by the state will give us much more detail of changes over time as well as establishment counts and total wage data. While we do not have fully disaggregated data the increased sample size and detail on establishments and wages is still valuable and expands our understanding of the economic and business dynamics of our corridors.
+As mentioned earlier the QCEW data provided by the state will give us much more detail of changes over time as well as establishment counts and total wage data. While we do not have fully dis-aggregated data the increased sample size and detail on establishments and wages is still valuable and expands our understanding of the economic and business dynamics of our corridors.
 
 The Riverside Avenue trend analysis shows that there was a large jump in business activity on Riverside the first quarter of 2005 with consistent overall growth in employment and wages. This large jump in growth was related to the addition of a new, large establishment on the corridor as the total number of retail establishments grew from 4 to 5 in 2005. This large establishment is a clear driver in the growth of employment and wages. Also, note that there does not seem to be any immediately apparent relationship in employment or wage growth and the infrastructure construction period.  
 
@@ -732,7 +737,6 @@ plot_grid(qc_idx1, qc_idx2,  ncol = 1)
 
 The Riverside/Cedar Avenue treatment corridor exhibits a statistically significant and positive effect of infrastructure construction on the number of retail jobs and a positive, but non-significant, effect on accommodations employment. According to our model, Riverside Avenue grew by more than 285 jobs compared to the control corridor. 
 
-[insert riverside d-i-d table]
 
 In terms of sales tax, the corridor shows some mixed results. The *pre_post* construction term is positive and significant for both restaurant and retail showing positive sales tax receipt growth post-construction, but the difference term is negative and significant for retail sales signaling a negative impact of the new construction on retail sales tax receipts. This result largely mirrors what we saw in the visual trend analysis with that dramatic drop in sales in 2013/2014. Given that drop is well after construction there are likely additional reasons for the drop than just the placement of new infrastructure.
 
@@ -742,7 +746,6 @@ The QCEW difference-in-difference results largely parallels the LEHD results. Ac
 
 The Riverside Ave corridor does not exhibit a level or slope change from the pre-treatment trend patterns in our current specification of the model. While the ts_year coefficient for retail is positive and significant this only tells us that the growth trend of retail employment for the corridor is itself positive. The non-significant **prepost** and **ts_year:pre_post** indicate that there was neither a level or slope change attributable to the treatment.
 
-[insert riverside its table]
 
 The non-significant results from the *ts_year:pre_post* term gives some supportive evidence that the construction was not directly responsible for the drop in sales tax receipts for the corridor that the DiD highlighted. Overall, it seems unlikely there is a clear causal relationship between the corridor construction and employment or sales tax effects.
 
@@ -944,6 +947,8 @@ qc_idx_emp_franklin <- ggplot(franklin_qcew,
   scale_y_continuous(labels = scales::percent) +
     theme(axis.text.x = element_text(angle=45, vjust = 0.5))
 
+# indexed qcew wages franklin --------
+
 qc_idx_franklin_wages <- ggplot(franklin_qcew, 
               aes(x = year_quarter, y = wage_idx, group = street_type, 
                            colour = street_type, shape = street_type)) +
@@ -963,7 +968,7 @@ qc_idx_franklin_wages <- ggplot(franklin_qcew,
   scale_y_continuous(labels = scales::percent) +
     theme(axis.text.x = element_text(angle=45, vjust = 0.5))
 
-plot_grid(qc_idx1, qc_idx2,  ncol = 1)
+plot_grid(qc_idx_emp_franklin, qc_idx_franklin_wages,  ncol = 1)
 
 
 ```
@@ -978,7 +983,6 @@ We did not perform a difference-in-difference estimate for Franklin as it violat
 
 Franklin Avenue exhibits mixed results. For accommodations employment the corridor lost a significant number of jobs, thus the large, negative and statistically significant change in level seen in the **prepost** term, but also there is a positive shift in the *slope*. This is seen visually in the aggregate employment chart for accommodations employment for the corridor where there is a clear drop in employment after construction and then a massive jump in employment between 2014 and 2015. Due to a lack of data it is unclear whether this rise will taper off creating a new, higher level of employment, but it does seem like the corridor potentially has a positive shift in accommodations employment.
 
-[insert ITS table]
 
 ITS models were not run for Franklin using the sales tax data due to data consolidation issue. 
 
@@ -1001,9 +1005,9 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2012)
 
 central_agg <- bind_rows(central_agg, minn_agg)
 
-central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Retail", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Retail", corridor_name = "Central Ave.", control_corridor = "University Ave,", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
 
-central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "Cedar Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "University Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
 plot_grid(central_agg_idx_retail, central_agg_idx_accom, align = "h")
 
@@ -1219,7 +1223,6 @@ plot_grid(qc_idx_emp_central, qc_idx_central_wages,  ncol = 1)
 
 Central Avenue's difference term is significant and negative for accommodations employment, though non-significant for retail. For Central Avenue, therefore, the installation of the new infrastructure is responsible for the loss of approximately 203 accommodations jobs compared to the control corridor. This result can be intuited if you revisit the aggregate employment graph for the Central Avenue corridors and you can see there is a large gap in the overall number of accommodations jobs between the treatment and control corridor. Additionally, the control corridor has more robust growth over time compared to the treatment.
 
-[inset did table]
 
 In terms of sales tax, Central Avenue shows mixed results of the construction. The difference term for restaurant sales is negative and significant while retail sales tax returns are positive and significant. Overall, this model specification implies that new infrastructure construction is responsible for an additional 7 million dollars in retail sales tax receipts and a loss of 5.7 million dollars in restaurant receipts.It is not immediately apparent why the corridor should have such divergent results potentially signaling the influence of some uncontrolled factor affecting restaurant sales, in particular. 
 
@@ -1230,7 +1233,6 @@ The QCEW DiD estimates for wages and employment both returned non-significant re
 
 Central Avenue also has mixed results, but due to limited number of data points after construction these results may not be very informative. According to this model specification, Central Avenue retail employment saw a negative, statistically significant drop in employment level after treatment, but there is a positive slope signaling an overall positive growth trend. Again, viewing the aggregate the employment graphs can help the reader to understand these coefficients, particularly the change in slope. It is clear that retail employment seems to be on a positive trajectory, but the lack of additional points make it difficult to come to a solid conclusion on the overall trend. Also note the significant change in slope for the accommodations employment term.
 
-[insert its table]
 
 The sales tax ITS analysis only reinforces the ambiguous results of the corridor with the *ts_year:pre_post* term being significant and positive for restaurant sales but non-significant for retail. Also note the large, negative and significant *pre-post* term for restaurant, signaling some kind of massive shock to the corridor, but with stronger growth post construction. The overall ambiguity here makes it difficult to definitively give a clear causal influence of the construction on employment or sales tax receipts in the corridor.
 
@@ -1753,12 +1755,13 @@ For the QCEW models the slope change term in the total wages model is significan
 
 Overall, there are mixed effects of infrastructure improvement on retail and accommodations jobs. Three corridors- North Second, Franklin, and Riverside- show positive effects of new infrastructure placement but only for retail or accommodations employment. The negative results are also significant for only one of the industries. The mixed nature of the results in terms of significance and affected industries offer some preliminary evidence that the infrastructure does indeed have an effect, but it is unclear exactly what that effect is. 
 
-More importantly, while these results are interesting they should be taken with a heavy grain of salt. Difference-in-difference requires a certain set of assumptions in order for its results to be valid, and, unfortunately, many of the corridors tested do not fit. Two of the main assumptions, the parallel trend assumption, and the independence assumption, are violated in most of these models. The parallel trends assumption dictates that in order for a DiD estimate to be valid the trend in your variable of interest must be similar between your two groups before treatment. In plain terms, the growth trajectory of the two groups should be similar before a policy is enacted. This is not the case for a few of the corridors where it is clear that either the treatment or the control corridor had a dramatically different growth trajectory before treatment even began. The independence assumption basically states that the two groups should not be able to affect each other. A clear violation of this assumption is seen for the Franklin Avenue corridor where the control and treatment corridors are the same stretch road. It is unlikely that a change from one corridor will not affect the other as they are touching. As such, while interesting, these DiD estimates are not appropriate. 
+More importantly, while these results are interesting they should be taken with a heavy grain of salt. Difference-in-difference requires a certain set of assumptions in order for its results to be valid, and, unfortunately, many of the corridors tested do not fit. Two of the main assumptions, the parallel trend assumption, and the independence assumption, are violated in most of these models. The parallel trends assumption dictates that in order for a DiD estimate to be valid the trend in your variable of interest must be similar between your two groups before treatment. In plain terms, the growth trajectory of the two groups should be similar before in order for the model results to be valid. This is not the case for a few of the corridors where it is clear that either the treatment or the control corridor had a dramatically different growth trajectory before treatment even began. The independence assumption states that the two groups should not be able to affect each other. A clear violation of this assumption is seen for the Franklin Avenue corridor where the control and treatment corridors are the same stretch road. It is unlikely that a change from one corridor will not affect the other as they are touching. As such, while interesting, these DiD estimates are not appropriate. 
 
 
-#  Key Take Aways
+##  Key Take Aways
 
 * The impact of new cycling infrastructure on *employment* is mixed but is generally positive and significant
+* The North Second, Franklin and Riverside corridors, in particular, show a positive impact of new cycling infrastructure 
 * The impact of new cycling infrastructure on retail *sales tax* is negative
 * The LEHD and sales tax data contradict each other here requiring further research into why they diverge
 
@@ -1768,11 +1771,22 @@ More importantly, while these results are interesting they should be taken with 
 
 ```
 
+\newpage
+
 # Technical Appendix
+
+The following section presents the difference-in-difference and interrupted time series results for each corridor group. The sections are organized by the data source of the model: LEHD, sales tax and QCEW. 
+
+Check the appropriate sections earlier in the report for interpretation. 
 
 ##  LEHD
 
+\newpage
+
 ##  Sales Tax
+
+
+\newpage
 
 ##  QCEW
 
