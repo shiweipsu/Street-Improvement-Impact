@@ -254,7 +254,7 @@ Comparing retail and accommodations related employment, we find the Meridian St 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
 | Virginia Ave.  | 18      | 1          | 4         | 35-40   | 40-45      | 60-65     |
-| Meridian St.   | 538     | 32         | 75        | 90-95   | 85-90      | 90-95    |
+| Meridian St.   | 538     | 32         | 75        | 90-95   | 85-90      | 90-95     |
 | Prospect St.   | 30      | 5          | 4         | 45-50   | 60-65      | 60-65     |
 | Shelby St.     | 26      | 6          | 4         | 40-45   | 65-70      | 60-65     |
 
@@ -914,6 +914,10 @@ dbDisconnect(con)
 
 
 # Technical Appendix
+
+The following section presents the difference-in-difference and interrupted time series results for each corridor group. The sections are organized by the data source of the model: LEHD, sales tax and QCEW. 
+
+Check the appropriate sections earlier in the report for interpretation. 
 
 ##  LEHD Models
 
