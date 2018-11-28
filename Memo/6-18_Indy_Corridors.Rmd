@@ -3,13 +3,8 @@ title: "Indianapolis"
 author: "Jamaal Green"
 date: "August 21, 2018"
 output:
-  word_document: default
-  pdf_document:
-    includes:
-      in_header: header.tex
-    number_sections: true
-fig_width: 7
-fig_height: 5
+  word_document: 
+    reference_docx: "docx_reference2.docx"
 ---
 ```{r setup,include=FALSE}
 
@@ -23,7 +18,8 @@ knitr::opts_chunk$set(cache = TRUE)
 
 In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure  in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve safety the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality.
 
-DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
+Starting in 1999, Indianapolis began the planning process for the Indianapolis Cultural Trail, an 8-mile long pedestrian and bike trail connecting six historic district in the city. The trail included many street improvements including, but not limited to, protected bike lanes, pedestrian improvements and public art installations. Indianapolis Cultural Trail, Inc., the non-profit managing the trail, completed construction in 2013. In addition to the trail, Indianapolis Cultural Trail, Inc. also runs Pacers Bikeshare. The construction of the trail and bikesharing have dramatically changed the transportation choices in downtown Indianapolis.  
+
 
 ![Indianapolis Corridor](images/indy_corridors_whole.png)
 
