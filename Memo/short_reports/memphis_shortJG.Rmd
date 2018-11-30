@@ -43,6 +43,7 @@ Finally, we also collected **sales tax data**. Sales tax data allows us to estim
 # Methodology
 
 Three analytical methods were applied in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an aggregated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis.
+
 In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed, ideally made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and food service related jobs. Additionally, we chose street improvement corridors installed between 2008 and 2013 in order to guarantee we have sufficient data to track pre- and post-treatment economic trends. Once corridors are selected based on these criteria, further testing is conducted to discern the level of similarity between treatment and control corridors, including a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
 
 This first method, **aggregated trend analysis**, follows a previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts, then that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
@@ -68,3 +69,16 @@ include_graphics(here::here("Memo/images/memphis_madison.png"))
 * In terms of employment trends, Madison generally follows that of its control corridors. For retail, Madison experienced a brief bump and then drop in employment post-improvement while having a large spike in food/accommodations employment. Madison does diverge from it control corridors in food/accommodations employment.
 * Sales tax figures also show Madison largely growing in parallel to its control corridors without any visually apparent effect from the street-improvement 
 * Food/accommodations employment change did have a positive, and significant, result in the ITS model suggesting a positive causal relationship between the street improvement and food/accommodations employment on Madison. But note that other model specifications, including all of the sales tax models, returned non-significant results
+
+## Broad Avenue
+
+Our second treatment corridor is Broad Avenue. A protected bike lane was installed in 2010. Broad is a relatively short corridor, though, covering only five blocks. The control corridors are Cooper Street and Central Avenue. The control corridors are generally further away from the treatment corridor and have higher traffic volume. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics(here::here("Memo/images/memphis_broad.png"))
+
+```
+
+* Broad shows some contradictory patterns where its retail LEHD employment is largely negative but the sales tax receipts have a positive growth trend
+* The contradictory trends continue
