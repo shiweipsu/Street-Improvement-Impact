@@ -1,6 +1,6 @@
 ---
 title: "National Street Improvements Study\\ 
-Indianapolis Case Study"
+Memphis Case Study"
 output:
   word_document: 
     reference_docx: "10-29_Indianapolis_Short.docx"
@@ -81,4 +81,16 @@ include_graphics(here::here("Memo/images/memphis_broad.png"))
 ```
 
 * Broad shows some contradictory patterns where its retail LEHD employment is largely negative but the sales tax receipts have a positive growth trend
-* The contradictory trends continue
+* The contradictory trends continue with the econometric models. There is a significant, negative result for retail employment with the LEHD DiD model, and a positive impact on LEHD food employment in the ITS model. 
+* The sales tax models show generally, positive results of street improvement on gross sales and new establishment openings
+
+# Study Process
+
+Because this project makes use of a variety of different data sources, it required collaboration between the research team and representatives from multiple agencies/departments. Our principle contact was with the City of Memphis, sales tax data was provided by State of Tennessee Department of Revenue.
+
+We use two data sources- LEHD and sales tax. These two data sources do not closely track with each other because sales tax captures slightly different industries than the LEHD. For example, LEHD data captures both food service and accommodation employment, as a whole, while the sales tax covers different goods at different rates. 
+
+Each of the three analysis approaches, aggregated trend analysis, DID and ITS, have their own pros and cons. The aggregated trend analysis is the easiest to perform and the easiest to understand while the two other approaches require greater demands on the data in order to remain valid, but they ideally provide more rigorous and valid conclusions. Both the aggregated trend analysis and DID approaches involve both treatment and control corridors, thus the selection of appropriate control corridorsis a concern. We attempted to address these concerns with out Our proposed corridor selection criteria that included difference of means tests and quantile comparisons.
+
+In summary, this project involves a city and state multi-department collaboration concerning data collection and distribution. Our different data sources are mostly consistent with each other. Different approaches might draw some slightly different conclusions, while the results derived from econometric approaches are more valid and reliable.
+
