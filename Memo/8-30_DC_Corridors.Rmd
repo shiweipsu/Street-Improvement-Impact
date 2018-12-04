@@ -270,7 +270,7 @@ The percentile table shows total, retail, and accommodations employment for M St
 #comparisons-----
 
 # prepare city level data & block level corridor data at the year before construction
-conyear <- first(filter(dc_corridor, Group== 5, Type== "Improvement")$BuildStart)-1 
+conyear <- first(filter(dc_corridor, Group== 5, Type== "Treatment")$BuildStart)-1 
 
 
 dc_corridor$Type <- as.factor(dc_corridor$Type)
@@ -280,7 +280,7 @@ dc_corridor$Type <- as.factor(dc_corridor$Type)
 dc_lehd_2013 <- dc_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
 
 
-m_st <- dc_corridor %>% filter(Group == 5, Type =="Improvement", year==conyear) %>%  employ_ratio_test(.)
+m_st <- dc_corridor %>% filter(Group == 5, Type =="Treatment", year==conyear) %>%  employ_ratio_test(.)
 
 i_st_nw <- dc_corridor %>% filter(Group == 5, Type == "Control: I St", year ==conyear) %>% employ_ratio_test(.)
 
@@ -299,14 +299,14 @@ quant_df <- data.frame(q_tot_emp = quantile(dc_lehd_2013$C000,
                                                probs = p, na.rm = TRUE),
                        probs = p)
 
-m_st %>% summarise(TotEmp = sum(C000)/nrow(fifteenth), RetailEmp = sum(CNS07)/nrow(m_st), AccomEmp = sum(CNS18)/nrow(m_st)) %>% as.data.frame()
+m_st %>% summarise(TotEmp = sum(C000)/nrow(m_st), RetailEmp = sum(CNS07)/nrow(m_st), AccomEmp = sum(CNS18)/nrow(m_st)) %>% as.data.frame()
 
 i_st_nw %>% summarise(TotEmp = sum(C000)/nrow(i_st_nw), RetailEmp = sum(CNS07)/nrow(i_st_nw), AccomEmp = sum(CNS18)/nrow(i_st_nw)) %>% 
-  as.data.frame
+  as.data.frame()
 
 
 k_st_nw %>% summarise(TotEmp = sum(C000)/nrow(k_st_nw), RetailEmp = sum(CNS07)/nrow(k_st_nw), AccomEmp = sum(CNS18)/nrow(k_st_nw)) %>% 
-  as.data.frame
+  as.data.frame()
 
 # t-test: compare retail, food_accom, business amount---
 t.test(m_st$Business, i_st_nw$Business)
@@ -427,9 +427,6 @@ plot_grid(l_agg_retail, l_agg_accom, ncol = 1)
 
 ```
 
-####  Sales Tax
-
-####  QCEW
 
 
 ### Difference-in-Difference
@@ -438,9 +435,6 @@ plot_grid(l_agg_retail, l_agg_accom, ncol = 1)
 
 The difference term for all models was non-significant for the LEHD.
 
-####  Sales Tax
-
-####  QCEW
 
 ### Interrupted Time Series
 
@@ -512,9 +506,6 @@ plot_grid(m_agg_retail, m_agg_accom, ncol = 1)
 
 ```
 
-#### Sales Tax
-
-####  QCEW
 
 ### Difference-in-Difference
 
@@ -522,15 +513,12 @@ plot_grid(m_agg_retail, m_agg_accom, ncol = 1)
 
 Due to the late construction date no difference-in-difference models were estimated for M St.
 
-#### QCEW
-
-#### Sales Tax
 
 ### Interrupted Time Series
 
 ####  LEHD
 
-Due to the limited number of observations we did not run any interrupted time series for models .
+Due to the limited number of observations we did not run any interrupted time series models .
 
 # Conclusion
 
@@ -540,14 +528,8 @@ Overall, it is not yet possible to definitely say if new street improvements hav
 
 # Key Takeaways
 
+* It is not yet possible to say with any certainty whether new street improvements have had any effect on local business due to data constraints.
+
 # Technical Appendix
 
-The following section presents the difference-in-difference and interrupted time series results for each corridor group. The sections are organized by the data source of the model: LEHD, sales tax and QCEW. 
-
-Check the appropriate sections earlier in the report for interpretation. 
-
-##  LEHD
-
-## Sales Tax
-
-## QCEW
+Due to data limitations no models were run for L and M streets. 
