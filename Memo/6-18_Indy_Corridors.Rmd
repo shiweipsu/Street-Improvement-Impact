@@ -352,7 +352,7 @@ The Prospect and Shelby corridors seem appropriate comparators for Virginia Aven
 
 # Data Analysis
 
-This section presents the results of the econometric models for the appropriate corridors. We will run two different models, a difference-in-difference and interrupted time series. The difference-in-difference (DiD) approach aims to estimate the difference between the control and treatment corridors at two points in time (pre and post-treatment). The "difference" term is the interaction between the pre/post and treatment/control indicator variables. The interrupted time series (ITS) model tracks the change in our outcome of interest only for the treatment corridor. The main variables in the model are a time series variable that gives an estimate of the general trend of our outcome variable, a pre/post-treatment indicator variable that signals the change in the *level* of our outcome variable attributable to the treatment, and the interaction term between the time series and pre/post-treatment term that gives an estimate of the *slope*, or rate of change, of our outcome after treatment. 
+This section presents the results of the econometric models for the appropriate corridors. We will run two different models, a difference-in-difference and interrupted time series. The difference-in-difference (DID) approach aims to estimate the difference between the control and treatment corridors at two points in time (pre and post-treatment). The "difference" term is the interaction between the pre/post and treatment/control indicator variables. The interrupted time series (ITS) model tracks the change in our outcome of interest only for the treatment corridor. The main variables in the model are a time series variable that gives an estimate of the general trend of our outcome variable, a pre/post-treatment indicator variable that signals the change in the *level* of our outcome variable attributable to the treatment, and the interaction term between the time series and pre/post-treatment term that gives an estimate of the *slope*, or rate of change, of our outcome after treatment. 
 
 ##  Virginia Avenue
 
@@ -872,7 +872,7 @@ plot_grid(qc3, qc4, ncol = 1)
 
 ###  Difference in Difference
 
-We did not run a DiD model for the Massachusetts Ave corridor because it violated too many assumptions of the model.
+We did not run a DID model for the Massachusetts Ave corridor because it violated too many assumptions of the model.
 
 ###  Interrupted Time Series 
 
@@ -889,7 +889,7 @@ In terms of the sales tax model, the pre_post term is negative and significant s
 
 # Conclusion
 
-Overall, the results show a rather mixed set of conclusions regarding the effect of new bike lane infrastructure placement on employment, wages and sales tax in Indianapolis. Descriptive data for both corridors, but particularly the Virginia Ave corridor shows a generally positive growth trend in all metrics over time. When modeling these effects using the DiD and ITS models we have mixed, though largely positive, results. The DiD specifications are generally positive for both corridors while the ITS specifications are non-significant or positive. Overall, this signals a positive causal effect of bike lane infrastructure placement in the city, at least for Virginia Ave. 
+Overall, the results show a rather mixed set of conclusions regarding the effect of new bike lane infrastructure placement on employment, wages and sales tax in Indianapolis. Descriptive data for both corridors, but particularly the Virginia Ave corridor shows a generally positive growth trend in all metrics over time. When modeling these effects using the DID and ITS models we have mixed, though largely positive, results. The DID specifications are generally positive for both corridors while the ITS specifications are non-significant or positive. Overall, this signals a positive causal effect of bike lane infrastructure placement in the city, at least for Virginia Ave. 
 
 While this is an overall positive result, we should warn that the results are still mixed and our models are not perfect. First, while the results are a mix of positive and non-significant, no corridor shows a primarily *negative* result of new cycling infrastructure on employment, sales tax receipts or wages. This offers supportive evidence that such infrastructure is, at minimum, not harmful to local business, and in the case of Virginia Ave, we have evidence that the new bike lane has a positive causal effect on commercial growth. With these corridors and specifications, at least, there is simply not the evidence that cycling infrastructure harms local business. Second, while we have evidence of a positive causal relationship, our models are still relatively simple and do not account for all potential determinants of growth. Virginia Ave, in particular, has robust employment and wage growth starting before and during the construction period, though its growth accelerates afterwards. Further investigation into the corridors is warranted to account for any additional variables not covered in our model. Greater transportation data, for example, would help us determine whether corridors saw increased traffic, both auto and non-auto, and to see whether or not such flows had a noticeable effect on business. 
 
