@@ -1,0 +1,71 @@
+---
+title: "National Street Improvements Study\\ 
+Seattle Case Study"
+output:
+  word_document: 
+    reference_docx: "10-29_Indianapolis_Short.docx"
+    
+fig_width: 7
+fig_height: 5
+---
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(knitr, here)
+
+```
+
+# Introduction
+
+In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve traffic safety and mobility for city residents, the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. 
+
+This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality. In particular, how do street improvements impact retail sales and employment? 
+
+Memphis has conducted many street improvement projects in past years, such as bike lane installations, road diets, etc. This report explores two recent street improvement corridors, which are Madison and Broad Avenues, to explore the economic and business impact of these investments.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics(here::here("Memo/images/seattle_corridors.png"))
+
+```
+
+# Data Sources
+
+For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the **Longitudinal Employer-Household Dynamics Dataset** (LEHD). It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S. employment. As such, LEHD provides geographically granular detail about jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. One major disadvantage of the LODES data set is that in order to guarantee confidentiality, block level data is “fuzzed” so the numbers reflect estimates instead of the exact number of jobs. Additionally, though employment is disaggregated by industry, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate restaurant workers from hotel service workers, for example. That being said, the LODES data set is comprehensive, offers unprecedented geographic detail, and is longitudinal, allowing for consistent comparisons over time.
+
+This report also takes advantage of establishment level **Quarterly Census of Employment and Wages** (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
+
+# Methodology
+
+Three analytical methods were applied in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an aggregated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis.
+
+In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed, ideally made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and food service related jobs. Additionally, we chose street improvement corridors installed between 2008 and 2013 in order to guarantee we have sufficient data to track pre- and post-treatment economic trends. Once corridors are selected based on these criteria, further testing is conducted to discern the level of similarity between treatment and control corridors, including a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
+
+This first method, **aggregated trend analysis**, follows a previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts, then that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
+
+The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between treatment and control corridors within the same time period. This is known as a **difference-in-difference** (DID) approach. The approach looks at the change in the variable of interest, employment levels or sales revenues in our case, in the treatment corridor before and after the street improvement occurs. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods should provide us with an unbiased estimate of the effect of the street improvement. 
+
+The third method, **interrupted time series**, is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. This approach treats the street improvement as the “interruption” and estimates the change in the level and the growth trend of business activities in the corridor after the street improvement construction. If the street improvement treatment has a causal impact, the post-intervention sales revenue or employment should show a different level or slope compared to the pre-intervention data. 
+
+# Corridor Analysis 
+
+## Second Avenue
+
+The first corridor group consists of the 2nd and 4th Avenue corridors in downtown Seattle. While 1st Avenue is listed, we excluded it because it shared half of the same census blocks as 2nd. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics(here::here("Memo/images/seattle_2nd_ave.png"))
+
+```
+
+* The growth employment trend of the two corridors mirror each other, though 4th Avenue has an overall larger amount of employment
+* Second Avenue has consistent and smooth growth starting post-recenssion that carries through the contruction period
+* Due to data limitations all models returned non-significant values for the LEHD
+
+##  Broadway Street
+
