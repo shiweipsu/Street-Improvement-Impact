@@ -22,7 +22,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, gridExtra)
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, data.table, readRDS)
 
 #query the corridors from bike_lanes
 user <- "shiwei"
@@ -41,10 +41,17 @@ a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 a
 FROM sf_lehd a, sf_corridor b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
-sf_corridor[sf_corridor$name =="Polk St",]$type <- "Treatment: Polk"
-sf_corridor[sf_corridor$name=="Van Ness Ave",]$type <- "Control: Van Ness"
-sf_corridor[sf_corridor$name =="17th St",]$type <- "Treatment: 17th St"
-sf_corridor[sf_corridor$name=="18th St",]$type <- "Control: 18th St"
+sf_lehd <- readRDS("Data/sf_lehd.RDS")
+sf_corridor <- readRDS("Data/sf_corridor.RDS")
+sf_corridor <- st_join(st_buffer(sf_corridor,20),sf_lehd, join=st_intersects)
+sf_blocks <- left_join(as.data.frame(sf_corridor), unique(sf_lehd[,c(1,56)]), by = "geoid10") %>% 
+  mutate(geometry.x=NULL, geometry=geometry.y, geometry.y=NULL) %>% st_sf
+
+
+sf_corridor[sf_corridor$fullname =="Polk St",]$type <- "Treatment: Polk"
+sf_corridor[sf_corridor$fullname=="Van Ness Ave",]$type <- "Control: Van Ness"
+sf_corridor[sf_corridor$fullname =="17th St",]$type <- "Treatment: 17th St"
+sf_corridor[sf_corridor$fullname=="18th St",]$type <- "Control: 18th St"
 sf_corridor$type <- as.factor(sf_corridor$type)
 
 sf_corridor <- sf_corridor %>%
@@ -52,9 +59,10 @@ sf_corridor <- sf_corridor %>%
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,
-         Group=corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+         Group=group, BuildStart = buildstart, BuildEnd = buildend, Name = fullname, Type=type)
 
-sf_lehd <- st_read(dsn = con, query = "SELECT * FROM sf_lehd") %>% as.data.frame() %>% 
+sf_lehd <- st_read(dsn = con, query = "SELECT * FROM sf_lehd") %>% as.data.frame() 
+sf_lehd <- sf_lehd %>% 
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
@@ -66,8 +74,14 @@ a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 a
 FROM sf_rac a, sf_corridor b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
-sf_corridor_rac[sf_corridor_rac$name =="Van Ness Ave",]$type <- "Control: Van Ness"
-sf_corridor_rac[sf_corridor_rac$name=="Polk St",]$type <- "Treatment: Polk"
+sf_rac <- readRDS("Data/sf_rac.RDS")
+sf_corridor <- readRDS("Data/sf_corridor.RDS")
+sf_corridor_rac <- st_join(st_buffer(sf_corridor,20),sf_rac, join=st_intersects)
+
+sf_corridor_rac[sf_corridor_rac$fullname =="Van Ness Ave",]$type <- "Control: Van Ness"
+sf_corridor_rac[sf_corridor_rac$fullname=="Polk St",]$type <- "Treatment: Polk"
+sf_corridor_rac[sf_corridor_rac$fullname =="17th St",]$type <- "Treatment: 17th St"
+sf_corridor_rac[sf_corridor_rac$fullname=="18th St",]$type <- "Control: 18th St"
 sf_corridor_rac$type <- as.factor(sf_corridor_rac$type)
 
 sf_corridor_rac <- sf_corridor_rac %>%
@@ -75,10 +89,11 @@ sf_corridor_rac <- sf_corridor_rac %>%
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,
-         Group=corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+         Group=group, BuildStart = buildstart, BuildEnd = buildend, Name = fullname, Type=type)
 
 
-sf_rac <- st_read(dsn = con, query = "SELECT * FROM sf_rac") %>% as.data.frame() %>% 
+sf_rac <- st_read(dsn = con, query = "SELECT * FROM sf_rac") %>% as.data.frame() 
+sf_rac <- sf_rac %>% 
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
          CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
@@ -92,34 +107,74 @@ sf_growth <- growth_rate(sf_corridor)
 sf_nets <- st_read(dsn = con, query = "select * FROM nets a, sf_corridor b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
-sf_polk <- sf_nets %>% 
+nets <- readRDS("Data/nets.RDS") %>% filter(city =="SAN FRANCISCO")
+sf_corridor <- readRDS("Data/sf_corridor.RDS")
+sf_nets_b <- st_join(nets, unique(sf_blocks[,c(1:5,61)]) %>% st_sf, join=st_intersects, left=F)
+sf_nets_bf <- st_join(st_buffer(sf_corridor,20),nets, join=st_intersects)
+sf_nets_bf <- left_join(as.data.frame(sf_nets_bf), nets[,c(1,92)], by = "dunsnumber") %>% 
+  mutate(geometry.x=NULL, geometry=geometry.y, geometry.y=NULL) %>% st_sf(.)
+
+
+ sf_polk_b <- sf_nets_b %>% 
   filter(group==1) %>% 
   gather(key, value, -c(1:10,89:97)) %>% 
-  separate(key, c("retail", "year"), sep=-2) %>% 
+  separate(key, c("retail", "year"), sep=-3) %>% 
   spread(retail, value) %>% 
-  mutate(business1 = case_when(substr(naics,1,3) %in% c(441:454) ~ "Retail",
+  mutate(biz1 = case_when(substr(naics.1,1,3) %in% c(441:454) ~ "Retail",
+                               substr(naics.1,1,3) %in% c(722) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+ 
+ sf_polk_bf <- sf_nets_bf %>% 
+  filter(group==1) %>% 
+  gather(key, value, -c(1:15,94:97)) %>% 
+  separate(key, c("retail", "year"), sep=-3) %>% 
+  spread(retail, value) %>% 
+  mutate(biz2 = case_when((substr(naics.1,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics.1,1,4) %in% c(8121,8123,8129)) ~ "Retail",
+                               substr(naics.1,1,4) %in% c(7224,7225) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+ 
+ sf_sev_b <- sf_nets_b %>% 
+  filter(group==2) %>% 
+  gather(key, value, -c(1:10,89:97)) %>% 
+  separate(key, c("retail", "year"), sep=-3) %>% 
+  spread(retail, value) %>% 
+  mutate(biz1 = case_when(substr(naics.1,1,3) %in% c(441:454) ~ "Retail",
+                               substr(naics.1,1,3) %in% c(722) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+ 
+ sf_sev_bf <- sf_nets_bf %>% 
+  filter(group==2) %>% 
+  gather(key, value, -c(1:15,94:97)) %>% 
+  separate(key, c("retail", "year"), sep=-3) %>% 
+  spread(retail, value) %>% 
+  mutate(biz2 = case_when((substr(naics.1,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics.1,1,4) %in% c(8121,8123,8129)) ~ "Retail",
+                               substr(naics.1,1,4) %in% c(7224,7225) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+
+# nets <- st_read(dsn = con, query = "select * from nets") %>% filter (city == "SAN FRANCISCO")
+
+nets <- setDT(nets)
+nets <- setkey(nets, dunsnumber)
+nets_long <- melt(nets, id.vars = c("dunsnumber", "city"),
+                  measure.vars = 11:88,
+                  variable.factor = TRUE)
+
+sf_nets_a <- nets_long %>% 
+  separate(variable, c("retail", "year"), sep=-3) %>% 
+  spread(retail, value) %>% 
+  mutate(biz1 = case_when(substr(naics,1,3) %in% c(441:454) ~ "Retail",
                                substr(naics,1,3) %in% c(722) ~ "Food"),
-         business2 = case_when((substr(naics,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics,1,4) %in% c(8121,8123,8129)) ~ "Retail",
+         biz2 = case_when((substr(naics,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics,1,4) %in% c(8121,8123,8129)) ~ "Retail",
                                substr(naics,1,4) %in% c(7224,7225) ~ "Food"),
          year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
 
-sf_nets_all <- st_read(dsn = con, query = "select * from nets") %>% filter (city == "SAN FRANCISCO")
-sf_nets_a <- sf_nets_all %>% gather(key, value, -c(1:10,89:97)) %>% 
-  separate(key, c("retail", "year"), sep=-2) %>% 
-  spread(retail, value) %>% 
-  mutate(business1 = case_when(substr(naics,1,3) %in% c(441:454) ~ "Retail",
-                               substr(naics,1,3) %in% c(722) ~ "Food"),
-         business2 = case_when((substr(naics,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics,1,4) %in% c(8121,8123,8129)) ~ "Retail",
-                               substr(naics,1,4) %in% c(7224,7225) ~ "Food"),
-         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
-
-sf_nets1 <- sf_nets_a %>% 
-  group_by(year, business1) %>% 
+nets_biz1 <- sf_nets_a %>% 
+  group_by(year, biz1) %>% 
   summarise(emp = sum(emp, na.rm = T), sales= sum(sales, na.rm = T), n=n(),
             emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
 
-sf_nets2 <- sf_nets_a %>% 
-  group_by(year, business2) %>% 
+nets_biz2 <- sf_nets_a %>% 
+  group_by(year, biz2) %>% 
   summarise(emp = sum(emp, na.rm = T), sales= sum(sales, na.rm = T), n=n(),
             emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
 
@@ -248,9 +303,9 @@ plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 # 17th st
 sevth_agg <- agg_trend_table(sf_corridor, group = 2)
 
-sevth_agg_retail_trend_plot <- agg_trend_plot(sevth_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "17th Street", construct_year = 2009, end_year = 2010)
+sevth_agg_retail_trend_plot <- agg_trend_plot(sevth_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "17th Street", construct_year = 2011, end_year = 2012)
 
-sevth_agg_food_trend_plot <- agg_trend_plot(sevth_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "17th Street", construct_year = 2009, end_year = 2010)
+sevth_agg_food_trend_plot <- agg_trend_plot(sevth_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "17th Street", construct_year = 2011, end_year = 2012)
 
 prow <- plot_grid(sevth_agg_retail_trend_plot + theme(legend.position="none"),
                   sevth_agg_food_trend_plot + theme(legend.position="none"), align = 'vh', hjust = -1, nrow = 1)
@@ -423,21 +478,25 @@ stargazer(polk_agg_its[[1]], polk_agg_its[[2]], polk_agg_its[[3]],
 
 
 # NETS analysis
+# Polk
 ## trend plot - industry type 1
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
 # one types of industry categories similar to LEHD
-polk_nets1 <- sf_polk %>% 
-  group_by(fullname, type, buildstart, buildend, group, year, business1) %>% 
+polk_nets_b <- sf_polk_b %>% 
+  group_by(fullname, type, buildstart, buildend, group, year, biz1) %>% 
   summarise(emp = sum(emp), sales= sum(sales), n=n(),
-            emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
-sf_nets1 <- sf_nets1 %>% 
-  mutate(fullname="city", type="City", buildstart=0, buildend=0, group=1) %>% select(fullname:group, year:geometry)
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
 
-polk_nets1 <- rbind(polk_nets1, sf_nets1) %>% select(-geometry) %>% mutate(geometry=0)
+nets_biz1 <- nets_biz1 %>% 
+  mutate(fullname="city", type="City", buildstart=0, buildend=0, group=1) %>% select(fullname:group, year:sales_pest) %>% as.data.frame(.)
+
+polk_nets_b <- rbind(polk_nets_b, nets_biz1) %>% mutate(geometry=0)
 
 # employment plot
 # abousolute employment
-polk_nets1_emp <- polk_nets1 %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = business1, emp) %>% 
+polk_nets1_emp <- polk_nets_b %>% select(-sales, -n, -emp_pest, -sales_pest) %>% 
+  spread(key = biz1, emp) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 polk_nets1_emp $Type <- as.factor(polk_nets1_emp $Type)
 
@@ -448,7 +507,7 @@ polk_emp_food_trend_plot <- trend_plot(filter(polk_nets1_emp, Type!="City"), ind
 # there are two food restraunt close in 1966 and 2002 seperately with over 100 employment
 
 # employment per establishment
-polk_nets1_emp_pest <- polk_nets1 %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = business1, emp_pest) %>% 
+polk_nets1_emp_pest <- polk_nets_b %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz1, emp_pest) %>% 
   rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
 polk_nets1_emp_pest $Type <- as.factor(polk_nets1_emp_pest $Type)
 
@@ -478,7 +537,7 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 # sales plot
 # abousolute sales
-polk_nets1_sales <- polk_nets1 %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = business1, sales) %>% 
+polk_nets1_sales <- polk_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 polk_nets1_sales $Type <- as.factor(polk_nets1_sales$Type)
 
@@ -488,7 +547,7 @@ polk_sales_food_trend_plot <- trend_plot(filter(polk_nets1_sales, Type!="City"),
 
 
 # sales per establishment
-polk_nets1_sales_pest <- polk_nets1 %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = business1, sales_pest) %>% 
+polk_nets1_sales_pest <- polk_nets_b %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = biz1, sales_pest) %>% 
   rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
 polk_nets1_sales_pest $Type <- as.factor(polk_nets1_sales_pest $Type)
 
@@ -522,18 +581,20 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 ## trend plot - industry type 2
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
 # one types of industry categories similar to LEHD
-polk_nets2 <- sf_polk %>% 
-  group_by(fullname, type, buildstart, buildend, group, year, business2) %>% 
+polk_nets_bf <- sf_polk_bf %>% 
+  group_by(fullname, type, buildstart, buildend, group, year, biz2) %>% 
   summarise(emp = sum(emp), sales= sum(sales), n=n(),
-            emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
-sf_nets2 <- sf_nets2 %>% 
-  mutate(fullname="city", type="City", buildstart=0, buildend=0, group=1) %>% select(fullname:group, year:geometry)
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz2==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
 
-polk_nets2 <- rbind(polk_nets2, sf_nets2) %>% select(-geometry) %>% mutate(geometry=0)
+nets_biz2 <- nets_biz2 %>% 
+  mutate(fullname="city", type="City", buildstart=0, buildend=0, group=1) %>% select(fullname:group, year:sales_pest) %>% as.data.frame(.)
+
+polk_nets_bf <- rbind(polk_nets_bf, nets_biz2) %>% mutate(geometry=0)
 
 # employment plot
 # abousolute employment
-polk_nets2_emp <- polk_nets2 %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = business2, emp) %>% 
+polk_nets2_emp <- polk_nets_bf %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, emp) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 polk_nets2_emp $Type <- as.factor(polk_nets2_emp $Type)
 
@@ -544,7 +605,7 @@ polk_emp_food_trend_plot <- trend_plot(filter(polk_nets2_emp, Type!="City"), ind
 # there are two food restraunt close in 1966 and 2002 seperately with over 100 employment
 
 # employment per establishment
-polk_nets2_emp_pest <- polk_nets2 %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = business2, emp_pest) %>% 
+polk_nets2_emp_pest <- polk_nets_bf %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz2, emp_pest) %>% 
   rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
 polk_nets2_emp_pest $Type <- as.factor(polk_nets2_emp_pest $Type)
 
@@ -574,7 +635,7 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(2, .2))
 
 # sales plot
 # abousolute sales
-polk_nets2_sales <- polk_nets2 %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = business2, sales) %>% 
+polk_nets2_sales <- polk_nets_bf %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, sales) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 polk_nets2_sales $Type <- as.factor(polk_nets2_sales$Type)
 
@@ -584,7 +645,7 @@ polk_sales_food_trend_plot <- trend_plot(filter(polk_nets2_sales, Type!="City"),
 
 
 # sales per establishment
-polk_nets2_sales_pest <- polk_nets2 %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = business2, sales_pest) %>% 
+polk_nets2_sales_pest <- polk_nets_bf %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = biz2, sales_pest) %>% 
   rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
 polk_nets2_sales_pest $Type <- as.factor(polk_nets2_sales_pest $Type)
 
@@ -651,38 +712,32 @@ polk_nets2_sales %>%
 ```{r, echo=FALSE, results='asis'}
 # DID
 #employment
-polk_nets1_emp$Type <- relevel(polk_nets1_emp$Type,ref = "Treatment")
 polk_nets2_emp$Type <- relevel(polk_nets2_emp$Type,ref = "Treatment")
-
-polk_nets1_emp_did <- did_agg_analysis(filter(polk_nets1_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
-polk_nets2_emp_did <- did_agg_analysis(filter(polk_nets2_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
-stargazer(polk_nets1_emp_did[[1]], polk_nets2_emp_did[[1]], polk_nets1_emp_did[[2]], polk_nets2_emp_did[[2]], 
-          title = "Polk Ave. Corridor Difference-in-Difference Estimates", 
-          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
-          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp."), model.numbers = F)
-
-# sales
-polk_nets1_sales$Type <- relevel(polk_nets1_sales$Type,ref = "Treatment")
 polk_nets2_sales$Type <- relevel(polk_nets2_sales$Type,ref = "Treatment")
 
-polk_nets1_sales_did <- did_agg_analysis(filter(polk_nets1_sales, Type!="City" & year>2003), group = 1, endyear = 2010)
+polk_nets2_emp_did <- did_agg_analysis(filter(polk_nets2_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
+
 polk_nets2_sales_did <- did_agg_analysis(filter(polk_nets2_sales, Type!="City" & year>2003), group = 1, endyear = 2010)
-stargazer(polk_nets1_sales_did[[1]], polk_nets2_sales_did[[1]], polk_nets1_sales_did[[2]], polk_nets2_sales_did[[2]], 
+
+stargazer(polk_nets2_emp_did[[1]], polk_nets2_emp_did[[2]], polk_nets2_sales_did[[1]], polk_nets2_sales_did[[2]], 
           title = "Polk Ave. Corridor Difference-in-Difference Estimates", 
-          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
-          type = "text", dep.var.labels = c("Retail Sales", "Food Sales"), model.numbers = F)
+          column.labels  = c("Retail", "Food", "Retail","Food"), 
+          type = "text", dep.var.labels = c("Employment","Employment", "Sales", "Sales"), model.numbers = F)
+
 
 # ITS
-polk_nets1_emp_its <- agg_its_analysis(polk_nets1_emp, group = 1, endyear = 2010)
-polk_nets2_emp_its <- agg_its_analysis(polk_nets2_emp, group = 1, endyear = 2010)
-stargazer(polk_nets1_emp_its[[1]], polk_nets2_emp_its[[1]], polk_nets1_emp_its[[2]], polk_nets2_emp_its[[2]], 
+
+polk_nets2_emp_its <- agg_its_analysis(filter(polk_nets2_emp, year>2003), group = 1, endyear = 2010)
+polk_nets2_sales_its <- agg_its_analysis(filter(polk_nets2_sales, year>2003), group = 1, endyear = 2010)
+
+stargazer(polk_nets2_emp_its[[1]], polk_nets2_emp_its[[2]], polk_nets2_sales_its[[1]], polk_nets2_sales_its[[2]], 
           title = "Polk Ave. Corridor Difference-in-Difference Estimates", 
-          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
-          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp."), model.numbers = F)
+          column.labels  = c("Retail", "Food", "Retail","Food"), 
+          type = "text", dep.var.labels = c("Employment","Employment", "Sales", "Sales"), model.numbers = F)
 
 
 polk_nets1_sales_its <- agg_its_analysis(polk_nets1_sales, group = 1, endyear = 2010)
-polk_nets2_sales_its <- agg_its_analysis(polk_nets2_sales, group = 1, endyear = 2010)
+
 stargazer(polk_nets1_sales_its[[1]], polk_nets2_sales_its[[1]], polk_nets1_sales_its[[2]], polk_nets2_sales_its[[2]], 
           title = "Polk Ave. Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
@@ -692,12 +747,267 @@ stargazer(polk_nets1_sales_its[[1]], polk_nets2_sales_its[[1]], polk_nets1_sales
 ```
 
 
+
+# 17th
+## trend plot - industry type 1
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
+# one types of industry categories similar to LEHD
+sev_nets_b <- sf_sev_b %>% 
+  group_by(fullname, type, buildstart, buildend, group, year, biz1) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
+
+nets_biz1 <- nets_biz1 %>% 
+  mutate(fullname="city", type="City", buildstart=0, buildend=0, group=2) %>% select(fullname:group, year:sales_pest) %>% as.data.frame(.)
+
+sev_nets_b <- rbind(sev_nets_b, nets_biz1) %>% mutate(geometry=0)
+
+# employment plot
+# abousolute employment
+sev_nets1_emp <- sev_nets_b %>% select(-sales, -n, -emp_pest, -sales_pest) %>% 
+  spread(key = biz1, emp) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets1_emp $Type <- as.factor(sev_nets1_emp $Type)
+
+sev_emp_retail_trend_plot <- trend_plot(filter(sev_nets1_emp, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+sev_emp_food_trend_plot <- trend_plot(filter(sev_nets1_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+
+# employment per establishment
+sev_nets1_emp_pest <- sev_nets_b %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz1, emp_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+sev_nets1_emp_pest $Type <- as.factor(sev_nets1_emp_pest $Type)
+
+sev_emp_pest_retail_trend_plot <- trend_plot(sev_nets1_emp_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+sev_emp_pest_food_trend_plot <- trend_plot(sev_nets1_emp_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+# indexed employment
+sev_nets1_emp_idx <- agg_index_trend_table(sev_nets1_emp, group = 2, construct_year = 2009)
+sev_nets1_emp_idx $Type <- as.factor(sev_nets1_emp_idx $Type)
+
+sev_emp_retail_indexed_trend_plot <- trend_plot(sev_nets1_emp_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+sev_emp_food_indexed_trend_plot <- trend_plot(sev_nets1_emp_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+prow <- plot_grid(sev_emp_retail_trend_plot + theme(legend.position="none"),
+                  sev_emp_food_trend_plot + theme(legend.position="none"),
+                  sev_emp_pest_retail_trend_plot + theme(legend.position="none"),
+                  sev_emp_pest_food_trend_plot + theme(legend.position="none"),
+                  sev_emp_retail_indexed_trend_plot + theme(legend.position="none"),
+                  sev_emp_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(sev_emp_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+# sales plot
+# abousolute sales
+sev_nets1_sales <- sev_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets1_sales $Type <- as.factor(sev_nets1_sales$Type)
+
+sev_sales_retail_trend_plot <- trend_plot(filter(sev_nets1_sales, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+sev_sales_food_trend_plot <- trend_plot(filter(sev_nets1_sales, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+
+# sales per establishment
+sev_nets1_sales_pest <- sev_nets_b %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = biz1, sales_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+sev_nets1_sales_pest $Type <- as.factor(sev_nets1_sales_pest $Type)
+
+sev_sales_pest_retail_trend_plot <- trend_plot(sev_nets1_sales_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+sev_sales_pest_food_trend_plot <- trend_plot(sev_nets1_sales_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "17th Street", construct_year = 2009, end_year = 2010, y_lable = "Sales", index = "Per Establishment")
+
+# indexed sales
+sev_nets1_sales_idx <- agg_index_trend_table(sev_nets1_sales, group = 2, construct_year = 2009)
+sev_nets1_sales_idx $Type <- as.factor(sev_nets1_sales_idx $Type)
+
+sev_sales_retail_indexed_trend_plot <- trend_plot(sev_nets1_sales_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+sev_sales_food_indexed_trend_plot <- trend_plot(sev_nets1_sales_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+prow <- plot_grid(sev_sales_retail_trend_plot + theme(legend.position="none"),
+                  sev_sales_food_trend_plot + theme(legend.position="none"),
+                  sev_sales_pest_retail_trend_plot + theme(legend.position="none"),
+                  sev_sales_pest_food_trend_plot + theme(legend.position="none"),
+                  sev_sales_retail_indexed_trend_plot + theme(legend.position="none"),
+                  sev_sales_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(sev_sales_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+
+```
+
+## trend plot - industry type 2
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
+# one types of industry categories similar to LEHD
+sev_nets_bf <- sf_sev_bf %>% 
+  group_by(fullname, type, buildstart, buildend, group, year, biz2) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz2==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
+
+nets_biz2 <- nets_biz2 %>% 
+  mutate(fullname="city", type="City", buildstart=0, buildend=0, group=2) %>% select(fullname:group, year:sales_pest) %>% as.data.frame(.)
+
+sev_nets_bf <- rbind(sev_nets_bf, nets_biz2) %>% mutate(geometry=0)
+
+# employment plot
+# abousolute employment
+sev_nets2_emp <- sev_nets_bf %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, emp) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets2_emp $Type <- as.factor(sev_nets2_emp $Type)
+
+sev_emp_retail_trend_plot <- trend_plot(filter(sev_nets2_emp, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+sev_emp_food_trend_plot <- trend_plot(filter(sev_nets2_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+# employment per establishment
+sev_nets2_emp_pest <- sev_nets_bf %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz2, emp_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+sev_nets2_emp_pest $Type <- as.factor(sev_nets2_emp_pest $Type)
+
+sev_emp_pest_retail_trend_plot <- trend_plot(sev_nets2_emp_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+sev_emp_pest_food_trend_plot <- trend_plot(sev_nets2_emp_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+# indexed employment
+sev_nets2_emp_idx <- agg_index_trend_table(sev_nets2_emp, group = 2, construct_year = 2011)
+sev_nets2_emp_idx $Type <- as.factor(sev_nets2_emp_idx $Type)
+
+sev_emp_retail_indexed_trend_plot <- trend_plot(sev_nets2_emp_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+sev_emp_food_indexed_trend_plot <- trend_plot(sev_nets2_emp_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+prow <- plot_grid(sev_emp_retail_trend_plot + theme(legend.position="none"),
+                  sev_emp_food_trend_plot + theme(legend.position="none"),
+                  sev_emp_pest_retail_trend_plot + theme(legend.position="none"),
+                  sev_emp_pest_food_trend_plot + theme(legend.position="none"),
+                  sev_emp_retail_indexed_trend_plot + theme(legend.position="none"),
+                  sev_emp_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(sev_emp_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(2, .2))
+
+# sales plot
+# abousolute sales
+sev_nets2_sales <- sev_nets_bf %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets2_sales $Type <- as.factor(sev_nets2_sales$Type)
+
+sev_sales_retail_trend_plot <- trend_plot(filter(sev_nets2_sales, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+sev_sales_food_trend_plot <- trend_plot(filter(sev_nets2_sales, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+
+# sales per establishment
+sev_nets2_sales_pest <- sev_nets_bf %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = biz2, sales_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+sev_nets2_sales_pest $Type <- as.factor(sev_nets2_sales_pest $Type)
+
+sev_sales_pest_retail_trend_plot <- trend_plot(sev_nets2_sales_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+sev_sales_pest_food_trend_plot <- trend_plot(sev_nets2_sales_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+# indexed sales
+sev_nets2_sales_idx <- agg_index_trend_table(sev_nets2_sales, group = 2, construct_year = 2009)
+sev_nets2_sales_idx $Type <- as.factor(sev_nets2_sales_idx $Type)
+
+sev_sales_retail_indexed_trend_plot <- trend_plot(sev_nets2_sales_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+sev_sales_food_indexed_trend_plot <- trend_plot(sev_nets2_sales_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "17th Street", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+prow <- plot_grid(sev_sales_retail_trend_plot + theme(legend.position="none"),
+                  sev_sales_food_trend_plot + theme(legend.position="none"),
+                  sev_sales_pest_retail_trend_plot + theme(legend.position="none"),
+                  sev_sales_pest_food_trend_plot + theme(legend.position="none"),
+                  sev_sales_retail_indexed_trend_plot + theme(legend.position="none"),
+                  sev_sales_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(sev_sales_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+
+```
+
+## trend analysis - table
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+
+# compute post change table compare to base year
+sev_nets1_emp %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+
+sev_nets1_sales %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+
+
+sev_nets2_emp %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+
+sev_nets2_sales %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+  
+```
+
+# model
+```{r, echo=FALSE, results='asis'}
+# DID
+#employment
+sev_nets2_emp$Type <- relevel(sev_nets2_emp$Type,ref = "Treatment")
+sev_nets2_sales$Type <- relevel(sev_nets2_sales$Type,ref = "Treatment")
+
+sev_nets2_emp_did <- did_agg_analysis(filter(sev_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+
+sev_nets2_sales_did <- did_agg_analysis(filter(sev_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+
+stargazer(sev_nets2_emp_did[[1]], sev_nets2_emp_did[[2]], sev_nets2_sales_did[[1]], sev_nets2_sales_did[[2]], 
+          title = "17th Street Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail", "Food", "Retail","Food"), 
+          type = "text", dep.var.labels = c("Employment","Employment", "Sales", "Sales"), model.numbers = F)
+
+
+# ITS
+
+sev_nets2_emp_its <- agg_its_analysis(filter(sev_nets2_emp, year>2005), group = 2, endyear = 2012)
+sev_nets2_sales_its <- agg_its_analysis(filter(sev_nets2_sales, year>2005), group = 2, endyear = 2012)
+
+stargazer(sev_nets2_emp_its[[1]], sev_nets2_emp_its[[2]], sev_nets2_sales_its[[1]], sev_nets2_sales_its[[2]], 
+          title = "17th Street Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail", "Food", "Retail","Food"), 
+          type = "text", dep.var.labels = c("Employment","Employment", "Sales", "Sales"), model.numbers = F)
+
+
+```
 # Distributional analysis
 ## additional distributional analysis - income (bar graph)
 ```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
-polk_inc <- sf_corridor %>% as.data.frame() %>% filter(Group == 1) %>% 
-  mutate(Type = ifelse(Type == "Treatment", "Treatment: Polk", "Control: Van Ness"),
-    Type = factor(Type, levels = c("Treatment: Polk", "Control: Van Ness"))) %>% 
+polk_inc <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
+  mutate(Type = factor(Type, levels = c("Treatment: Polk", "Control: Van Ness"))) %>% 
   group_by(Type, year) %>% 
   summarise(low_income = sum(CE01), 
             mid_income = sum(CE02), 
@@ -739,7 +1049,7 @@ polk_race <- sf_corridor %>% as.data.frame() %>% filter(Group == 1) %>%
          hawaii_perc = hawaii/tot_emp*100,
          other_perc = other/tot_emp*100) 
 
-pdx_race <- sf_lehd %>% 
+sf_race <- sf_lehd %>% 
   group_by(year) %>% 
   summarise(
     white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
@@ -751,14 +1061,13 @@ pdx_race <- sf_lehd %>%
          hawaii_perc = hawaii/tot_emp*100,
          other_perc = other/tot_emp*100,
          Type = "City") %>% 
-  select(Type, year:other_perc)
+  select(Type, year:other_perc) %>% as.data.frame() %>% select(-geometry)
 
 
-polk_race <- rbind(as.data.frame(polk_race), as.data.frame(pdx_race))
+polk_race <- rbind(as.data.frame(polk_race), as.data.frame(sf_race))
 polk_race[polk_race$year<2009,][,c(3:8,10:15)] <- NA
 polk_race$Type <- as.factor(as.character(polk_race$Type))
   
-
 white_plot <- dist_trend_plot(polk_race,demo = "White", demo_code = "white_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 45, 65)
 
 black_plot <- dist_trend_plot(polk_race,demo = "Black", demo_code = "black_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 0,20)
@@ -771,13 +1080,18 @@ hawaii_plot <- dist_trend_plot(polk_race,demo = "Native Hawaiian", demo_code = "
 
 other_plot <- dist_trend_plot(polk_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,20)
 
-mylegend<-g_legend(white_plot)
+prow <- plot_grid(white_plot + theme(legend.position="none"),
+                  black_plot + theme(legend.position="none"),
+                  asian_plot + theme(legend.position="none"),
+                  ameindian_plot + theme(legend.position="none"),
+                  hawaii_plot + theme(legend.position="none"),
+                  other_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
 
-grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
-                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
-                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
-                         nrow=3),
-             mylegend, nrow=4,heights=c(10, 1,1,1))
+legend_b <- get_legend(white_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
 ```
 
 
@@ -833,25 +1147,29 @@ polk_race[polk_race$year<2009,][,c(3:8,10:15)] <- NA
 polk_race$Type <- as.factor(as.character(polk_race$Type))
   
 
-white_plot <- dist_trend_plot(polk_race,demo = "White", demo_code = "white_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 58, 79)
+white_plot <- dist_trend_plot(polk_race,demo = "White", demo_code = "white_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 55, 80)
 
-black_plot <- dist_trend_plot(polk_race,demo = "Black", demo_code = "black_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 0,20)
+black_plot <- dist_trend_plot(polk_race,demo = "Black", demo_code = "black_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 0,25)
 
-ameindian_plot <- dist_trend_plot(polk_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Polk Street", cat = "Employment",construct_year = 2009, end_year = 2010, 0,20)
+ameindian_plot <- dist_trend_plot(polk_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Polk Street", cat = "Employment",construct_year = 2009, end_year = 2010, 0,25)
 
 asian_plot <- dist_trend_plot(polk_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,12,32)
 
-hawaii_plot <- dist_trend_plot(polk_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,20)
+hawaii_plot <- dist_trend_plot(polk_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,25)
 
-other_plot <- dist_trend_plot(polk_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,20)
+other_plot <- dist_trend_plot(polk_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,25)
 
-mylegend<-g_legend(white_plot)
+prow <- plot_grid(white_plot + theme(legend.position="none"),
+                  black_plot + theme(legend.position="none"),
+                  ameindian_plot + theme(legend.position="none"),
+                  asian_plot + theme(legend.position="none"),
+                  hawaii_plot + theme(legend.position="none"),
+                  other_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
 
-grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
-                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
-                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
-                         nrow=3),
-             mylegend, nrow=4,heights=c(10, 1,1,1))
+legend_b <- get_legend(white_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 ```
 
 # residence -race (table)
@@ -885,7 +1203,7 @@ polk_edu <- sf_corridor %>% as.data.frame() %>% filter(Group == 1) %>%
          col_perc = col/tot_emp*100,
          bach_perc = bach/tot_emp*100) 
 
-pdx_edu <- sf_lehd %>% 
+sf_edu <- sf_lehd %>% 
   group_by(year) %>% 
   summarise(
     hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
@@ -894,10 +1212,10 @@ pdx_edu <- sf_lehd %>%
          col_perc = col/tot_emp*100,
          bach_perc = bach/tot_emp*100,
          Type = "City") %>% 
-  select(Type, year:bach_perc)
+  select(Type, year:bach_perc) %>% as.data.frame(.) %>% select(-geometry)
 
 
-polk_edu <- rbind(as.data.frame(polk_edu), as.data.frame(pdx_edu))
+polk_edu <- rbind(as.data.frame(polk_edu), as.data.frame(sf_edu))
 polk_edu[polk_edu$year<2009,][,c(3:6,8:11)] <- NA
 polk_edu$Type <- as.factor(as.character(polk_edu$Type))
   
@@ -906,16 +1224,19 @@ hisch_under_plot <- dist_trend_plot(polk_edu,demo = "Less Than High School", dem
 
 hisch_plot <- dist_trend_plot(polk_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 5, 20)
 
-col_plot <- dist_trend_plot(polk_edu,demo = "College", demo_code = "col_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 10, 25)
+col_plot <- dist_trend_plot(polk_edu,demo = "College", demo_code = "col_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010, 15, 30)
 
 bach_plot <- dist_trend_plot(polk_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,25,40)
 
-mylegend<-g_legend(hisch_plot)
+prow <- plot_grid(hisch_under_plot + theme(legend.position="none"),
+                  hisch_plot + theme(legend.position="none"),
+                  col_plot + theme(legend.position="none"),
+                  bach_plot + theme(legend.position="none"),
+           align = 'vh', hjust = -1, nrow = 2)
 
-grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
-                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
-                         nrow=2),
-             mylegend, nrow=3,heights=c(10, 1,1))
+legend_b <- get_legend(col_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 ```
 
 # additional distributional analysis - edu (table)
@@ -946,7 +1267,7 @@ polk_edu <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>%
          col_perc = col/tot_emp*100,
          bach_perc = bach/tot_emp*100) 
 
-pdx_edu <- sf_lehd %>% 
+sf_edu <- sf_rac %>% 
   group_by(year) %>% 
   summarise(
     hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
@@ -955,10 +1276,10 @@ pdx_edu <- sf_lehd %>%
          col_perc = col/tot_emp*100,
          bach_perc = bach/tot_emp*100,
          Type = "City") %>% 
-  select(Type, year:bach_perc)
+  select(Type, year:bach_perc) %>% as.data.frame(.) %>% select(-geometry)
 
 
-polk_edu <- rbind(as.data.frame(polk_edu), as.data.frame(pdx_edu))
+polk_edu <- rbind(as.data.frame(polk_edu), as.data.frame(sf_edu))
 polk_edu[polk_edu$year<2009,][,c(3:6,8:11)] <- NA
 polk_edu$Type <- as.factor(as.character(polk_edu$Type))
   
@@ -971,12 +1292,15 @@ col_plot <- dist_trend_plot(polk_edu,demo = "College", demo_code = "col_perc", c
 
 bach_plot <- dist_trend_plot(polk_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Polk Street", cat = "Employment", construct_year = 2009, end_year = 2010,29,39)
 
-mylegend<-g_legend(hisch_plot)
+prow <- plot_grid(hisch_under_plot + theme(legend.position="none"),
+                  hisch_plot + theme(legend.position="none"),
+                  col_plot + theme(legend.position="none"),
+                  bach_plot + theme(legend.position="none"),
+           align = 'vh', hjust = -1, nrow = 2)
 
-grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
-                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
-                         nrow=2),
-             mylegend, nrow=3,heights=c(10, 1,1))
+legend_b <- get_legend(col_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 ```
 
 
@@ -1006,14 +1330,14 @@ polk_gender <- sf_corridor %>% as.data.frame() %>% filter(Group == 1) %>%
   summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
   mutate(female_perc = female/tot_emp*100) 
 
-pdx_gender <- sf_lehd %>% 
+sf_gender <- sf_lehd %>% 
   group_by(year) %>% 
   summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
   mutate(female_perc = female/tot_emp*100,
          Type = "City") %>% 
-  select(Type, year:female_perc)
+  select(Type, year:female_perc) %>% as.data.frame(.) %>% select(-geometry)
 
-polk_gender <- rbind(as.data.frame(polk_gender), as.data.frame(pdx_gender))
+polk_gender <- rbind(as.data.frame(polk_gender), as.data.frame(sf_gender))
 polk_gender[polk_gender$year<2009,][,c(3,5)] <- NA
 polk_gender$Type <- as.factor(as.character(polk_gender$Type))
 
@@ -1024,22 +1348,24 @@ polk_gender_rac <- sf_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>
   summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
   mutate(female_perc = female/tot_emp*100) 
 
-pdx_gender_rac <- sf_rac %>% 
+sf_gender_rac <- sf_rac %>% 
   group_by(year) %>% 
   summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
   mutate(female_perc = female/tot_emp*100,
          Type = "City") %>% 
-  select(Type, year:female_perc)
+  select(Type, year:female_perc) %>% as.data.frame(.) %>% select(-geometry)
 
-polk_gender_rac <- rbind(as.data.frame(polk_gender_rac), as.data.frame(pdx_gender_rac))
+polk_gender_rac <- rbind(as.data.frame(polk_gender_rac), as.data.frame(sf_gender_rac))
 polk_gender_rac[polk_gender_rac$year<2009,][,c(3,5)] <- NA
 polk_gender_rac$Type <- as.factor(as.character(polk_gender_rac$Type))
 
 gender_rac_plot <- dist_trend_plot(polk_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Polk Street", cat = "Residents", construct_year = 2009, end_year = 2010, 43, 55)
 
-mylegend<-g_legend(gender_plot)
+prow <- plot_grid(gender_plot + theme(legend.position="none"),
+                  gender_rac_plot + theme(legend.position="none"),
+           align = 'vh', hjust = -1, nrow = 1)
 
-grid.arrange(arrangeGrob(gender_plot + theme(legend.position="none"), gender_rac_plot + theme(legend.position="none"),
-                         nrow = 1),
-             mylegend, nrow=2,heights=c(10,1))
+legend_b <- get_legend(gender_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 ```
