@@ -1781,14 +1781,44 @@ Check the appropriate sections earlier in the report for interpretation.
 
 ##  LEHD
 
+### Riverside Avenue
+
+### Franklin Avenue
+
+### Central Avenue
+
+### Lyndale Avenue South
+
+### North 2nd Street
+
 \newpage
 
 ##  Sales Tax
+
+### Riverside Avenue
+
+### Franklin Avenue
+
+### Central Avenue
+
+### Lyndale Avenue South
+
+### North 2nd Street
 
 
 \newpage
 
 ##  QCEW
+
+### Riverside Avenue
+
+### Franklin Avenue
+
+### Central Avenue
+
+### Lyndale Avenue South
+
+### North 2nd Street
 
 
 

@@ -69,19 +69,14 @@ stargazer(virginia_agg_its[[1]], virginia_agg_its[[2]], virginia_agg_its[[3]],
 
 #mass ave
 
-mass_agg_did <- did_agg_analysis(indy_corridor, group = 2, endyear = 2010)
-stargazer(mass_agg_did[[1]], mass_agg_did[[2]], mass_agg_did[[3]], 
-          title = "Massachusetts Ave. Corridor Difference-in-Difference Estimates", 
-          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
-          out = here::here("Memo/model_output/indianapolis/mass_ave_lehd_did.html"),
-          font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
+
 
 mass_agg_its <- agg_its_analysis(indy_corridor, group = 2, endyear = 2010)
 
 stargazer(mass_agg_its[[1]], mass_agg_its[[2]], mass_agg_its[[3]], 
           title = "Massachusetts Ave. Corridor Interrupted Time Series Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html",
-          out = here::here("Memo/model_output/indianapolis/mass_ave_lehd_did.html"),
+          out = here::here("Memo/model_output/indianapolis/mass_ave_lehd_its.html"),
           font.size = "tiny", model.numbers = FALSE, no.space = TRUE)
 
 #Sales TAX----------------------

@@ -118,6 +118,14 @@ dc_corridor <- dc_corridor %>%
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, 
          Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name)
 
+dc_corridor <- dc_corridor %>% 
+  mutate(Type = case_when(Name == "K St" ~ "Control: K St",
+                          Name == "I St" ~ "Control: I St",
+                          Name == "17th St" ~ "Control: 17th St",
+                          Name == "9th St" ~ "Control: 9th St",
+                          Name == "Georgia Ave" ~ "Control: Georgia Ave",
+                          Type == "Improvement" ~ "Treatment"))
+
 dc_lehd <- st_read(dsn = con, query = "SELECT * FROM dc_lehd") %>% 
   as.data.frame() %>% 
   rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
@@ -153,11 +161,8 @@ The percentile table shows total, retail, and accommodations employment for L St
 #comparisons-----
 
 # prepare city level data & block level corridor data at the year before construction
-conyear <- first(filter(dc_corridor, Group== 2, Type== "Improvement")$BuildStart)-1 
+conyear <- first(filter(dc_corridor, Group== 2, Type== "Treatment")$BuildStart)-1 
 
-dc_corridor$Type <- as.character(dc_corridor$Type)
-dc_corridor[dc_corridor$Name =="I St",]$Type <- "Control: I St"
-dc_corridor[dc_corridor$Name=="K St",]$Type <- "Control: K St"
 
 dc_corridor$Type <- as.factor(dc_corridor$Type)
 # find the year before construction
@@ -166,7 +171,7 @@ dc_corridor$Type <- as.factor(dc_corridor$Type)
 dc_lehd_2011 <- dc_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
 
 
-fifteenth <- dc_corridor %>% filter(Group == 2, Type =="Improvement", year==conyear) %>%  employ_ratio_test(.)
+l_street <- dc_corridor %>% filter(Group == 2, Type =="Treatment", year==conyear) %>%  employ_ratio_test(.)
 
 i_st_nw <- dc_corridor %>% filter(Group == 2, Type == "Control: I St", year ==conyear) %>% employ_ratio_test(.)
 
@@ -185,7 +190,7 @@ quant_df <- data.frame(q_tot_emp = quantile(dc_lehd_2011$C000,
                                                probs = p, na.rm = TRUE),
                        probs = p)
 
-fifteenth %>% summarise(TotEmp = sum(C000)/nrow(fifteenth), RetailEmp = sum(CNS07)/nrow(fifteenth), AccomEmp = sum(CNS18)/nrow(fifteenth)) %>% as.data.frame()
+l_street %>% summarise(TotEmp = sum(C000)/nrow(l_street), RetailEmp = sum(CNS07)/nrow(l_street), AccomEmp = sum(CNS18)/nrow(l_street)) %>% as.data.frame()
 
 i_st_nw %>% summarise(TotEmp = sum(C000)/nrow(i_st_nw), RetailEmp = sum(CNS07)/nrow(i_st_nw), AccomEmp = sum(CNS18)/nrow(i_st_nw)) %>% 
   as.data.frame
@@ -195,17 +200,17 @@ k_st_nw %>% summarise(TotEmp = sum(C000)/nrow(k_st_nw), RetailEmp = sum(CNS07)/n
   as.data.frame
 
 # t-test: compare retail, food_accom, business amount---
-t.test(fifteenth$Business, i_st_nw$Business)
-t.test(fifteenth$Retail, i_st_nw$Retail)
-t.test(fifteenth$Food_Accom, i_st_nw$Food_Accom)
-t.test(fifteenth$ratio1, i_st_nw$ratio1)
-t.test(fifteenth$ratio2, i_st_nw$ratio2)
+t.test(l_street$Business, i_st_nw$Business)
+t.test(l_street$Retail, i_st_nw$Retail)
+t.test(l_street$Food_Accom, i_st_nw$Food_Accom)
+t.test(l_street$ratio1, i_st_nw$ratio1)
+t.test(l_street$ratio2, i_st_nw$ratio2)
 
-t.test(fifteenth$Business, k_st_nw$Business)
-t.test(fifteenth$Retail, k_st_nw$Retail)
-t.test(fifteenth$Food_Accom, k_st_nw$Food_Accom)
-t.test(fifteenth$ratio1, k_st_nw$ratio1)
-t.test(fifteenth$ratio2, k_st_nw$ratio2)
+t.test(l_street$Business, k_st_nw$Business)
+t.test(l_street$Retail, k_st_nw$Retail)
+t.test(l_street$Food_Accom, k_st_nw$Food_Accom)
+t.test(l_street$ratio1, k_st_nw$ratio1)
+t.test(l_street$ratio2, k_st_nw$ratio2)
 
 #t-tests growth rates...only two observations, can't run it----
 
@@ -265,11 +270,8 @@ The percentile table shows total, retail, and accommodations employment for M St
 #comparisons-----
 
 # prepare city level data & block level corridor data at the year before construction
-conyear <- first(filter(dc_corridor, Group== 5, Type== "Improvement")$BuildStart)-1 
+conyear <- first(filter(dc_corridor, Group== 5, Type== "Treatment")$BuildStart)-1 
 
-dc_corridor$Type <- as.character(dc_corridor$Type)
-dc_corridor[dc_corridor$Name =="I St",]$Type <- "Control: I St"
-dc_corridor[dc_corridor$Name=="K St",]$Type <- "Control: K St"
 
 dc_corridor$Type <- as.factor(dc_corridor$Type)
 # find the year before construction
@@ -278,7 +280,7 @@ dc_corridor$Type <- as.factor(dc_corridor$Type)
 dc_lehd_2013 <- dc_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
 
 
-m_st <- dc_corridor %>% filter(Group == 5, Type =="Improvement", year==conyear) %>%  employ_ratio_test(.)
+m_st <- dc_corridor %>% filter(Group == 5, Type =="Treatment", year==conyear) %>%  employ_ratio_test(.)
 
 i_st_nw <- dc_corridor %>% filter(Group == 5, Type == "Control: I St", year ==conyear) %>% employ_ratio_test(.)
 
@@ -297,14 +299,14 @@ quant_df <- data.frame(q_tot_emp = quantile(dc_lehd_2013$C000,
                                                probs = p, na.rm = TRUE),
                        probs = p)
 
-m_st %>% summarise(TotEmp = sum(C000)/nrow(fifteenth), RetailEmp = sum(CNS07)/nrow(fifteenth), AccomEmp = sum(CNS18)/nrow(fifteenth)) %>% as.data.frame()
+m_st %>% summarise(TotEmp = sum(C000)/nrow(m_st), RetailEmp = sum(CNS07)/nrow(m_st), AccomEmp = sum(CNS18)/nrow(m_st)) %>% as.data.frame()
 
 i_st_nw %>% summarise(TotEmp = sum(C000)/nrow(i_st_nw), RetailEmp = sum(CNS07)/nrow(i_st_nw), AccomEmp = sum(CNS18)/nrow(i_st_nw)) %>% 
-  as.data.frame
+  as.data.frame()
 
 
 k_st_nw %>% summarise(TotEmp = sum(C000)/nrow(k_st_nw), RetailEmp = sum(CNS07)/nrow(k_st_nw), AccomEmp = sum(CNS18)/nrow(k_st_nw)) %>% 
-  as.data.frame
+  as.data.frame()
 
 # t-test: compare retail, food_accom, business amount---
 t.test(m_st$Business, i_st_nw$Business)
@@ -347,9 +349,9 @@ t.test(m_st$ratio2, k_st_nw$ratio2)
 
 | Corridor | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------|---------|------------|-----------|---------|------------|-----------|
-| 15th St. | 2188    | 39         | 213       | 90-95   | 90-95      | 95-100    |
-| I St.    | 1295    | 4          | 103       | 85-90   | 60-65      | 85-90     |
-| K St.    | 1804    | 15         | 167       | 90-95   | 80-85      | 90-95     |
+| M St.    | 1357    | 20         | 125       | 90-95   | 85-90      | 90-95    |
+| I St.    | 1229    | 6          | 91        | 90-95   | 70-75      | 85-90     |
+| K St.    | 2143    | 17         | 126       | 95-100  | 80-85      | 90-95     |
 
 Table 2: M, I and K St. Employment Percentiles, 2013 employment numbers
 
@@ -365,23 +367,30 @@ The t-test did return one significant result on the difference between M and I s
 
 #### LEHD
 
-L Street's growth patterns for both retail and accommodations employment slightly lag behind the city and the control corridors, but the trends remain relatively similar until later when the city and I St. pick up retail employment growth. For accommodations employment L Street largely follows its control corridors. Considering how closely the corridors seem to track one another it seems that there has not been a noticeable effect of the new infrastructure on retail or accommodations employment.
+L Street's growth patterns for both retail and accommodations employment slightly lag behind the city and the control corridors, but the trends remain relatively similar until later when the city and I St. pick up retail employment growth. For accommodations employment L Street largely follows its control corridors except its recovery is modest but still trends positive. Considering how closely the corridors seem to track one another it seems that there has not been a noticeable effect of the new infrastructure on retail or accommodations employment.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
 
 
 #L St index table and plot
+
+dc_idx <- city_agg_index_trend_table(dc_lehd, construct_year = 2012)
+
+
 l_st_agg_idx <- agg_index_trend_table(dc_corridor, group = 2, construct_year = 2012)
+
+l_st_agg_idx <- bind_rows(l_st_agg_idx, dc_idx)
+
+l_st_agg_idx <- l_st_agg_idx %>% mutate(Type = if_else(Type == "city", "City", Type))
+
+l_st_agg_idx$Type <- factor(l_st_agg_idx$Type, 
+                        levels = c("Treatment","City", 
+                                   "Control: I St",
+                                   "Control: K St"))
 
 #city agg plots
 
-dc_agg <- city_agg_index_trend_table(dc_lehd, construct_year = 2012)
-
-l_st_agg_idx <- bind_rows(l_st_agg_idx, dc_agg)
 l_st_agg_idx <- l_st_agg_idx %>% filter(!is.na(year))
-
-l_st_agg_idx <- l_st_agg_idx %>% 
-  mutate(Type = if_else(Type == "city", "City", Type))
 
 
 l_agg_retail <- ggplot(l_st_agg_idx, aes(x = year, y = CNS07_sd, 
@@ -418,9 +427,6 @@ plot_grid(l_agg_retail, l_agg_accom, ncol = 1)
 
 ```
 
-####  Sales Tax
-
-####  QCEW
 
 
 ### Difference-in-Difference
@@ -429,9 +435,6 @@ plot_grid(l_agg_retail, l_agg_accom, ncol = 1)
 
 The difference term for all models was non-significant for the LEHD.
 
-####  Sales Tax
-
-####  QCEW
 
 ### Interrupted Time Series
 
@@ -446,7 +449,7 @@ Due to the limited number of observations no interrupted time series models were
 
 ####  LEHD
 
-The trends for M Street are more ambiguous compared to L primarily due to the fact that the construction period is too late to see any potential impacts. That being said, the pre-construction trends show M largely tracking with its controls with respect to retail employment. But M's accommodations employment trends diverge dramatically from its controls with an initial drop and then fairly smooth recovery and growth starting around 2013.  
+The trends for M Street are more ambiguous compared to L primarily due to the fact that the construction period is too late to see any potential impacts. That being said, the pre-construction trends show M largely tracking with its controls with respect to retail employment except for a major drop in employment in 2010. But M's accommodations employment trends diverge dramatically from its controls with an initial drop and then fairly smooth recovery and growth starting around 2013.  
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
 
@@ -463,6 +466,10 @@ m_st_agg_idx <- m_st_agg_idx %>% filter(!is.na(year))
 
 m_st_agg_idx <- m_st_agg_idx %>% 
   mutate(Type = if_else(Type == "city", "City", Type))
+
+m_st_agg_idx$Type <- factor(m_st_agg_idx$Type,
+                            levels = c("Treatment", "City",
+                                       "Control: I St", "Control: K St"))
 
 
 m_agg_retail <- ggplot(m_st_agg_idx, aes(x = year, y = CNS07_sd, 
@@ -499,9 +506,6 @@ plot_grid(m_agg_retail, m_agg_accom, ncol = 1)
 
 ```
 
-#### Sales Tax
-
-####  QCEW
 
 ### Difference-in-Difference
 
@@ -509,26 +513,23 @@ plot_grid(m_agg_retail, m_agg_accom, ncol = 1)
 
 Due to the late construction date no difference-in-difference models were estimated for M St.
 
-#### QCEW
-
-#### Sales Tax
 
 ### Interrupted Time Series
 
 ####  LEHD
 
-Due to the limited number of observations we did not run any interrupted time series for models .
+Due to the limited number of observations we did not run any interrupted time series models .
 
 # Conclusion
+
+Overall, it is not yet possible to definitely say if new street improvements have affected corridor businesses. L Street does not show a casual impact of new street improvements with our current model specifications and, unfortunately, it was not possible to run any econometric models on the M Street corridor due to the late construction date. Both corridors suffer from serious sample size issues with the LEHD data.
 
 
 
 # Key Takeaways
 
+* It is not yet possible to say with any certainty whether new street improvements have had any effect on local business due to data constraints.
+
 # Technical Appendix
 
-##  LEHD
-
-## Sales Tax
-
-## QCEW
+Due to data limitations no models were run for L and M streets. 

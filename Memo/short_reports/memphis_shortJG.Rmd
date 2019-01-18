@@ -1,0 +1,96 @@
+---
+title: "National Street Improvements Study\\ 
+Memphis Case Study"
+output:
+  word_document: 
+    reference_docx: "10-29_Indianapolis_Short.docx"
+    
+fig_width: 7
+fig_height: 5
+---
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(knitr, here)
+
+```
+
+# Introduction
+
+In order to make their cities more livable, policymakers and planning departments are improving streets and upgrading transportation infrastructure in order to improve access and mobility for pedestrians and bicyclists through the reduction of on-street parking or traffic lanes. While studies have shown how such upgrades improve traffic safety and mobility for city residents, the question remains whether such infrastructure improvements also improve the economic outcomes of improved corridors. 
+
+This study will attempt to answer to what extent these types of corridor-level street improvements impact economic activity and business vitality. In particular, how do street improvements impact retail sales and employment? 
+
+Memphis has conducted many street improvement projects in past years, such as bike lane installations, road diets, etc. This report explores two recent street improvement corridors, which are Madison and Broad Avenues, to explore the economic and business impact of these investments.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics(here::here("Memo/images/memphis_corridors.png"))
+
+```
+
+# Data Sources
+
+For this study we used multiple data sources to estimate the effect of new bike lane infrastructure investment. First, we used the Longitudinal Origin-Destination Employment Statistics (LODES) data set from the **Longitudinal Employer-Household Dynamics Dataset** (LEHD). It integrates existing data from state-supplied administrative records on workers and employers with existing census, surveys, and other administrative records to create a longitudinal data system on U.S. employment. As such, LEHD provides geographically granular detail about jobs, workers and local economies, allowing us to examine employment by broad industry sector, wage and educational attainment. One major disadvantage of the LODES data set is that in order to guarantee confidentiality, block level data is “fuzzed” so the numbers reflect estimates instead of the exact number of jobs. Additionally, though employment is disaggregated by industry, it is only provided at the most general level (the equivalent of two digit NAICS codes) so we are unable to isolate restaurant workers from hotel service workers, for example. That being said, the LODES data set is comprehensive, offers unprecedented geographic detail, and is longitudinal, allowing for consistent comparisons over time.
+
+This report also takes advantage of establishment level **Quarterly Census of Employment and Wages** (QCEW) data. Also referred to as ES-202 data, the QCEW is quarterly data submitted by firms to their respective state governments as part of the unemployment insurance system. Employers report their industry code, their number of employees at the site, and gross pay. The individual QCEW data is confidential and requires special permission from the state in order to use it and has additional data use restrictions. The QCEW gives us address level data on individual establishments as well as detailed employment information. Unfortunately, getting access to such data is difficult and differs for each state and has to be presented in a way to preserve confidentiality. As such, we cannot present ultra-detailed industrial information and have further presentation restrictions depending on the state.
+
+Finally, we also collected **sales tax data**. Sales tax data allows us to estimate a more sensitive measure of economic activity than employment (as the decision to hire or fire for a firm is often an expensive one we expect employment to be a delayed response). Some drawbacks of sales tax data is that some states do not have a sales tax or, in states or cities that do have one, the sales tax data is not broken down by specific industry and it is difficult to accurately parse out accurate figures. But the benefits of sales tax data largely outweigh these issues and do offer a more sensitive metric than employment. Tennessee has a general 7% sales tax for merchandise, with exception on non-restaurant food which tax is 5.5%. In Shelby County, where Memphis is located, there is an additional sales tax of 2.25%, as well as an additional 5% accommodations tax. This gives a range of 7.75-14.25% sales tax rates in the city of Memphis.
+
+# Methodology
+
+Three analytical methods were applied in order to isolate the impact of street improvements while controlling for other economic and regional factors. The methods are an aggregated trend analysis (following the NY DOT study), a difference-in-difference approach, and an interrupted time series analysis.
+
+In order to properly isolate the effect of the street improvements we must identify treatment corridors (corridors that actually were improved) and control corridors (corridors that are similar to the treatment corridors except they remain unimproved). Treatment corridors are corridors where new bike or pedestrian related improvements were installed, ideally made up of a minimum of 10 adjacent, or intersecting, census blocks with a minimal number of retail and food service related jobs. Additionally, we chose street improvement corridors installed between 2008 and 2013 in order to guarantee we have sufficient data to track pre- and post-treatment economic trends. Once corridors are selected based on these criteria, further testing is conducted to discern the level of similarity between treatment and control corridors, including a combination of descriptive statistics- comparing corridor employment figures to city employment quantiles- and statistical tests- t-tests in order to determine if the average employment, by block, for each corridor is similar to the other.
+
+This first method, **aggregated trend analysis**, follows a previous NYCDOT study (NYCDOT, 2013), aiming to examine whether the treatment corridors tend to have better business performance than comparison corridors after street improvements. The approach compares the trends of treatment and control corridors in addition to city-wide trends over the full time period we have data for. If treatment corridors show greater increases in employment or sales tax receipts, then that would represent a positive impact of street improvement on business activities. This method is easy to follow and represents the aggregated trend of business activities. However, it lacks the rigor of econometric estimates and statistical tests that explicitly test whether or not the street improvement caused the change in trend.
+
+The second method aims to estimate the difference in business vitality of pre- and post-improvement periods between treatment and control corridors within the same time period. This is known as a **difference-in-difference** (DID) approach. The approach looks at the change in the variable of interest, employment levels or sales revenues in our case, in the treatment corridor before and after the street improvement occurs. Meanwhile, the control group has not been treated in either time period. The difference in growth trajectories between the two periods should provide us with an unbiased estimate of the effect of the street improvement. 
+
+The third method, **interrupted time series**, is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. This approach treats the street improvement as the “interruption” and estimates the change in the level and the growth trend of business activities in the corridor after the street improvement construction. If the street improvement treatment has a causal impact, the post-intervention sales revenue or employment should show a different level or slope compared to the pre-intervention data. 
+
+# Corridor Analysis
+
+## Madison Avenue
+
+Our first treatment corridor is Madison Avenue in Midtown district, which installed buffered bike lane in 2011. The control corridors are Highland Street, Jackson Avenue, and Union Avenue. Union Avenue corridor is close to the treatment corridor in Midtown district, while Highland Street and Jackson Avenue are located in east and north boundary of the Midtown district. Union Avenue has more travel lanes and higher traffic volume than treatment corridor, which the other two control corridors have slightly higher travel volume than treatment corridor.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics(here::here("Memo/images/memphis_madison.png"))
+
+```
+
+* We had to drop Jackson as a control corridor as it was too dissimilar to Madison. 
+* In terms of employment trends, Madison generally follows that of its control corridors. For retail, Madison experienced a brief bump and then drop in employment post-improvement while having a large spike in food/accommodations employment. Madison does diverge from it control corridors in food/accommodations employment.
+* Sales tax figures also show Madison largely growing in parallel to its control corridors without any visually apparent effect from the street-improvement 
+* Food/accommodations employment change did have a positive, and significant, result in the ITS model suggesting a positive causal relationship between the street improvement and food/accommodations employment on Madison. But note that other model specifications, including all of the sales tax models, returned non-significant results
+
+## Broad Avenue
+
+Our second treatment corridor is Broad Avenue. A protected bike lane was installed in 2010. Broad is a relatively short corridor, though, covering only five blocks. The control corridors are Cooper Street and Central Avenue. The control corridors are generally further away from the treatment corridor and have higher traffic volume. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics(here::here("Memo/images/memphis_broad.png"))
+
+```
+
+* Broad shows some contradictory patterns where its retail LEHD employment is largely negative but the sales tax receipts have a positive growth trend
+* The contradictory trends continue with the econometric models. There is a significant, negative result for retail employment with the LEHD DiD model, and a positive impact on LEHD food employment in the ITS model. 
+* The sales tax models show generally, positive results of street improvement on gross sales and new establishment openings
+
+# Study Process
+
+Because this project makes use of a variety of different data sources, it required collaboration between the research team and representatives from multiple agencies/departments. Our principle contact was with the City of Memphis, sales tax data was provided by State of Tennessee Department of Revenue.
+
+We use two data sources- LEHD and sales tax. These two data sources do not closely track with each other because sales tax captures slightly different industries than the LEHD. For example, LEHD data captures both food service and accommodation employment, as a whole, while the sales tax covers different goods at different rates. 
+
+Each of the three analysis approaches, aggregated trend analysis, DID and ITS, have their own pros and cons. The aggregated trend analysis is the easiest to perform and the easiest to understand while the two other approaches require greater demands on the data in order to remain valid, but they ideally provide more rigorous and valid conclusions. Both the aggregated trend analysis and DID approaches involve both treatment and control corridors, thus the selection of appropriate control corridors is a concern. We attempted to address these concerns with out Our proposed corridor selection criteria that included difference of means tests and quantile comparisons.
+
+In summary, this project involves a city and state multi-department collaboration concerning data collection and distribution. Our different data sources are mostly consistent with each other. Different approaches might draw some slightly different conclusions, while the results derived from econometric approaches are more valid and reliable.
+
