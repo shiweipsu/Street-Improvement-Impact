@@ -64,8 +64,44 @@ include_graphics(here::here("Memo/images/seattle_2nd_ave.png"))
 ```
 
 * The growth employment trend of the two corridors mirror each other, though 4th Avenue has an overall larger amount of employment
-* Second Avenue has consistent and smooth growth starting post-recenssion that carries through the contruction period
+* Second Avenue has consistent and smooth growth starting post-recession that carries through the contruction period
 * Due to data limitations all models returned non-significant values for the LEHD
 
 ##  Broadway Street
+
+The second corridor group consists of Broadway and two control corridors- 15th Ave E and E Olive Way. The corridors are in the Pike and capital Hill neighborhoods and are proximal to downtown.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+include_graphics(here::here("Memo/images/seattle_broadway.png"))
+
+```
+
+* The growth employment trends are largely similar across all corridors though E Olive Way has much greater employment fluctuation pre-2013
+* Difference-in-difference models show a positive causal effect of bike lane installation for food/accommodations employment on Broadway and non-significant effect for retail
+* The interrupted time series models all returned non-significant
+
+## Roosevelt Way
+
+Our third corridor- Roosevelt Way- is located in North Seattle near the University District. Its two control corridors are University Way and N 45th St. 
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+include_graphics(here::here("Memo/images/seattle_roosevelt.png"))
+
+```
+
+* University way has significantly more food/accommodations employment, but t-tests for the other metrics are comparable
+* Due to the late installation of the bike lane in 2016 we do not have LEHD data to run the trend and model analyses
+
+# Study Process
+
+Because this project makes use of a variety of different data sources, it required collaboration between the research team and representatives from multiple agencies/departments. Our principle contact was with the City of Seattle and employment data was provided by State of Washington's Department of Revenue and Employment.
+
+We use two data sources- LEHD and Quarterly Census of Employment and Wages (QCEW) data. These two data sources can track with each other because tracks overall employment for industries but at the establishment level. The LEHD, becauase it is aggregated at specific census geographies and at coarse industrial levels, will give us rougher estimates that will differ from the QCEW. For example, LEHD data captures both food service and accommodation employment, as a whole, while the QCEW data can give us employment for hotels or specific retailers, like clothiers, explicitly. 
+
+Each of the three analysis approaches, aggregated trend analysis, DID and ITS, have their own pros and cons. The aggregated trend analysis is the easiest to perform and the easiest to understand while the two other approaches require greater demands on the data in order to remain valid, but they ideally provide more rigorous and valid conclusions. Both the aggregated trend analysis and DID approaches involve both treatment and control corridors, thus the selection of appropriate control corridorsis a concern. We attempted to address these concerns with out Our proposed corridor selection criteria that included difference of means tests and quantile comparisons.
+
+In summary, this project involves a city and state multi-department collaboration concerning data collection and distribution. Our different data sources are mostly consistent with each other. Different approaches might draw some slightly different conclusions, while the results derived from econometric approaches are more valid and reliable.
+
 
