@@ -71,7 +71,8 @@ include_graphics(here::here("Memo/images/seattle_2nd_ave.png"))
 
 The second corridor group consists of Broadway and two control corridors- 15th Ave E and E Olive Way. The corridors are in the Pike and capital Hill neighborhoods and are proximal to downtown.
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 include_graphics(here::here("Memo/images/seattle_broadway.png"))
 
@@ -85,7 +86,8 @@ include_graphics(here::here("Memo/images/seattle_broadway.png"))
 
 Our third corridor- Roosevelt Way- is located in North Seattle near the University District. Its two control corridors are University Way and N 45th St. 
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 include_graphics(here::here("Memo/images/seattle_roosevelt.png"))
 
@@ -103,5 +105,3 @@ We use two data sources- LEHD and Quarterly Census of Employment and Wages (QCEW
 Each of the three analysis approaches, aggregated trend analysis, DID and ITS, have their own pros and cons. The aggregated trend analysis is the easiest to perform and the easiest to understand while the two other approaches require greater demands on the data in order to remain valid, but they ideally provide more rigorous and valid conclusions. Both the aggregated trend analysis and DID approaches involve both treatment and control corridors, thus the selection of appropriate control corridorsis a concern. We attempted to address these concerns with out Our proposed corridor selection criteria that included difference of means tests and quantile comparisons.
 
 In summary, this project involves a city and state multi-department collaboration concerning data collection and distribution. Our different data sources are mostly consistent with each other. Different approaches might draw some slightly different conclusions, while the results derived from econometric approaches are more valid and reliable.
-
-
