@@ -41,6 +41,7 @@ a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 a
 FROM portland_lehd a, portland_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
+portland_corridor[portland_corridor$name =="STARK_OAK",]$type <- "Treatment: Stark & Oak"
 portland_corridor[portland_corridor$name =="EVERETT",]$type <- "Control: Everett"
 portland_corridor[portland_corridor$name=="ALDER",]$type <- "Control: Alder"
 portland_corridor$type <- as.factor(portland_corridor$type)
@@ -74,6 +75,7 @@ names(pdx_nets_b)  <- tolower(names(pdx_nets_b))
 pdx_nets_bf <- st_read(dsn = con, query = "select * FROM nets a, portland_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
 
+pdx_nets_bf[pdx_nets_bf$streetname=="STARK_OAK",]$type <- "Treatment: Stark & Oak"
 pdx_nets_bf[pdx_nets_bf$streetname =="EVERETT",]$type <- "Control: Everett"
 pdx_nets_bf[pdx_nets_bf$streetname=="ALDER",]$type <- "Control: Alder"
 
@@ -366,7 +368,8 @@ stark_emp_retail_trend_plot <- trend_plot(filter(stark_nets1_emp, Type!="City"),
 
 stark_emp_food_trend_plot <- trend_plot(filter(stark_nets1_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Stark & Oak Street", construct_year = 2009, end_year = 2010, y_lable = "Employment", index = "Total")
 
-# there are two food restraunt close in 1966 and 2002 seperately with over 100 employment
+# A department store is opened with 1200 employment until 2003, and then the size shrink afterwards
+# A restraunt is with 1000 eomploy until 1993, and then shrink afterwards
 
 # employment per establishment
 stark_nets1_emp_pest <- stark_nets_b %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz1, emp_pest) %>% 
@@ -462,6 +465,7 @@ stark_emp_retail_trend_plot <- trend_plot(filter(stark_nets2_emp, Type!="City"),
 
 stark_emp_food_trend_plot <- trend_plot(filter(stark_nets2_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, y_lable = "Employment", index = "Total")
 
+# there is a communication equipment store close in 2011 with 130 employment
 
 # employment per establishment
 stark_nets2_emp_pest <- stark_nets_bf %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz2, emp_pest) %>% 
@@ -571,19 +575,20 @@ stark_nets2_sales %>%
 ```{r, echo=FALSE, results='asis'}
 # DID
 #employment
-stark_nets1_emp$Type <- relevel(stark_nets1_emp$Type,ref = "Treatment")
-stark_nets2_emp$Type <- relevel(stark_nets2_emp$Type,ref = "Treatment")
+stark_nets1_emp$Type <- relevel(stark_nets1_emp$Type,ref = "Treatment: Stark & Oak")
+stark_nets2_emp$Type <- relevel(stark_nets2_emp$Type,ref = "Treatment: Stark & Oak")
 
 stark_nets1_emp_did <- did_agg_analysis(filter(stark_nets1_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
 stark_nets2_emp_did <- did_agg_analysis(filter(stark_nets2_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
-stargazer(stark_nets1_emp_did[[1]], stark_nets2_emp_did[[1]], stark_nets1_emp_did[[2]], stark_nets2_emp_did[[2]], 
+stargazer(stark_nets1_emp_did[[1]], stark_nets2_emp_did[[1]], stark_nets1_emp_did[[2]], stark_nets2_emp_did[[2]],
+          stark_nets1_emp_did[[3]], stark_nets2_emp_did[[3]],
           title = "Stark & Oak Avenue Corridor Difference-in-Difference Estimates", 
-          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
-          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp."), model.numbers = F)
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business"), model.numbers = F)
 
 # sales
-stark_nets1_sales$Type <- relevel(stark_nets1_sales$Type,ref = "Treatment")
-stark_nets2_sales$Type <- relevel(stark_nets2_sales$Type,ref = "Treatment")
+stark_nets1_sales$Type <- relevel(stark_nets1_sales$Type,ref = "Treatment: Stark & Oak")
+stark_nets2_sales$Type <- relevel(stark_nets2_sales$Type,ref = "Treatment: Stark & Oak")
 
 stark_nets1_sales_did <- did_agg_analysis(filter(stark_nets1_sales, Type!="City" & year>2003), group = 1, endyear = 2010)
 stark_nets2_sales_did <- did_agg_analysis(filter(stark_nets2_sales, Type!="City" & year>2003), group = 1, endyear = 2010)
@@ -592,13 +597,20 @@ stargazer(stark_nets1_sales_did[[1]], stark_nets2_sales_did[[1]], stark_nets1_sa
           column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
           type = "text", dep.var.labels = c("Retail Sales", "Food Sales"), model.numbers = F)
 
-# ITS
-stark_nets1_emp_its <- agg_its_analysis(stark_nets1_emp, group = 1, endyear = 2010)
-stark_nets2_emp_its <- agg_its_analysis(stark_nets2_emp, group = 1, endyear = 2010)
-stargazer(stark_nets1_emp_its[[1]], stark_nets2_emp_its[[1]], stark_nets1_emp_its[[2]], stark_nets2_emp_its[[2]], 
+# show only Type 2 results
+stargazer(stark_nets2_emp_did[[1]], stark_nets2_emp_did[[2]], stark_nets2_emp_did[[2]],
+          stark_nets2_sales_did[[1]],  stark_nets2_sales_did[[2]], stark_nets2_sales_did[[3]],
           title = "Stark & Oak Avenue Corridor Difference-in-Difference Estimates", 
-          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
-          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp."), model.numbers = F)
+          column.labels  = c("Retail", "Food", "Business","Retail", "Food", "Business"), 
+          type = "text", dep.var.labels = c("Employment","Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
+# ITS
+stark_nets1_emp_its <- agg_its_analysis(filter(stark_nets1_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
+stark_nets2_emp_its <- agg_its_analysis(filter(stark_nets2_emp, Type!="City" & year>2003), group = 1, endyear = 2010)
+stargazer(stark_nets1_emp_its[[1]], stark_nets2_emp_its[[1]], stark_nets1_emp_its[[2]], stark_nets2_emp_its[[2]], 
+          stark_nets1_emp_its[[3]], stark_nets2_emp_its[[3]],
+          title = "Stark & Oak Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2",  "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business Emp."), model.numbers = F)
 
 
 stark_nets1_sales_its <- agg_its_analysis(stark_nets1_sales, group = 1, endyear = 2010)
