@@ -141,7 +141,7 @@ dbDisconnect(con)
 ```
 
 
-# NETS analysis
+# NETS analysis: central ave
 ## trend plot - industry type 1
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
 # one types of industry categories similar to LEHD
@@ -435,6 +435,307 @@ stargazer(central_nets1_sales_its[[1]], central_nets2_sales_its[[1]], central_ne
 stargazer(central_nets2_emp_its[[1]], central_nets2_emp_its[[2]], central_nets2_emp_its[[2]],
           central_nets2_sales_its[[1]],  central_nets2_sales_its[[2]], central_nets2_sales_its[[3]],
           title = "Central Avenue Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail", "Food", "Business","Retail", "Food", "Business"), 
+          type = "text", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
+
+
+```
+
+# NETS analysis: franklin ave
+## trend plot - industry type 1
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
+# one types of industry categories similar to LEHD
+frkl_nets_b <- minn_frkl_b %>% 
+  group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
+
+minn_nets1 <- minn_nets1 %>% 
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest) %>% as.data.frame()
+
+frkl_nets_b <- rbind(frkl_nets_b, minn_nets1) %>% mutate(geometry=0)
+
+# employment plot
+# abousolute employment
+frkl_nets1_emp <- frkl_nets_b %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, emp) %>%
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets1_emp $Type <- as.factor(frkl_nets1_emp $Type)
+
+frkl_emp_retail_trend_plot <- trend_plot(filter(frkl_nets1_emp, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+frkl_emp_food_trend_plot <- trend_plot(filter(frkl_nets1_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+# A department store is opened with 1200 employment until 2003, and then the size shrink afterwards
+# A restraunt is with 1000 eomploy until 1993, and then shrink afterwards
+
+# employment per establishment
+frkl_nets1_emp_pest <- frkl_nets_b %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz1, emp_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+frkl_nets1_emp_pest $Type <- as.factor(as.character(frkl_nets1_emp_pest $Type))
+
+frkl_emp_pest_retail_trend_plot <- trend_plot(frkl_nets1_emp_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+frkl_emp_pest_food_trend_plot <- trend_plot(frkl_nets1_emp_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+# indexed employment
+frkl_nets1_emp_idx <- agg_index_trend_table(frkl_nets1_emp, group = 2, construct_year = 2011)
+frkl_nets1_emp_idx $Type <- as.factor(as.character(frkl_nets1_emp_idx $Type))
+
+frkl_emp_retail_indexed_trend_plot <- trend_plot(frkl_nets1_emp_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+frkl_emp_food_indexed_trend_plot <- trend_plot(frkl_nets1_emp_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+prow <- plot_grid(frkl_emp_retail_trend_plot + theme(legend.position="none"),
+                  frkl_emp_food_trend_plot + theme(legend.position="none"),
+                  frkl_emp_pest_retail_trend_plot + theme(legend.position="none"),
+                  frkl_emp_pest_food_trend_plot + theme(legend.position="none"),
+                  frkl_emp_retail_indexed_trend_plot + theme(legend.position="none"),
+                  frkl_emp_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(frkl_emp_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+# sales plot
+# abousolute sales
+frkl_nets1_sales <- frkl_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets1_sales $Type <- as.factor(frkl_nets1_sales$Type)
+
+frkl_sales_retail_trend_plot <- trend_plot(filter(frkl_nets1_sales, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+frkl_sales_food_trend_plot <- trend_plot(filter(frkl_nets1_sales, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+
+# sales per establishment
+frkl_nets1_sales_pest <- frkl_nets_b %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = biz1, sales_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+frkl_nets1_sales_pest $Type <- as.factor(as.character(frkl_nets1_sales_pest $Type))
+
+frkl_sales_pest_retail_trend_plot <- trend_plot(frkl_nets1_sales_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+frkl_sales_pest_food_trend_plot <- trend_plot(frkl_nets1_sales_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+# indexed sales
+frkl_nets1_sales_idx <- agg_index_trend_table(frkl_nets1_sales, group = 2, construct_year = 2011)
+frkl_nets1_sales_idx $Type <- as.factor(as.character(frkl_nets1_sales_idx $Type))
+
+frkl_sales_retail_indexed_trend_plot <- trend_plot(frkl_nets1_sales_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+frkl_sales_food_indexed_trend_plot <- trend_plot(frkl_nets1_sales_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+prow <- plot_grid(frkl_sales_retail_trend_plot + theme(legend.position="none"),
+                  frkl_sales_food_trend_plot + theme(legend.position="none"),
+                  frkl_sales_pest_retail_trend_plot + theme(legend.position="none"),
+                  frkl_sales_pest_food_trend_plot + theme(legend.position="none"),
+                  frkl_sales_retail_indexed_trend_plot + theme(legend.position="none"),
+                  frkl_sales_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(frkl_sales_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+
+```
+
+## trend plot - industry type 2
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
+# one types of industry categories similar to LEHD
+frkl_nets_bf <- minn_frkl_bf %>% 
+  mutate(buildstart = as.numeric(buildstart), buildend=as.numeric(buildend)) %>% 
+  mutate(buildstart = ifelse(is.na(buildstart), 0, buildstart),
+         buildend = ifelse(is.na(buildend), 0, buildend)) %>% 
+  group_by(name, type, buildstart, buildend, group, year, biz2) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
+  
+minn_nets2 <- minn_nets2 %>% 
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest)
+
+frkl_nets_bf <- rbind(frkl_nets_bf, minn_nets2) %>% mutate(geometry=0)
+
+# employment plot
+# abousolute employment
+frkl_nets2_emp <- frkl_nets_bf %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, emp) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets2_emp $Type <- as.factor(frkl_nets2_emp $Type)
+
+frkl_emp_retail_trend_plot <- trend_plot(filter(frkl_nets2_emp, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+frkl_emp_food_trend_plot <- trend_plot(filter(frkl_nets2_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Total")
+
+# there is a communication equipment store close in 2011 with 130 employment
+
+# employment per establishment
+frkl_nets2_emp_pest <- frkl_nets_bf %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz2, emp_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+frkl_nets2_emp_pest $Type <- as.factor(frkl_nets2_emp_pest $Type)
+
+frkl_emp_pest_retail_trend_plot <- trend_plot(frkl_nets2_emp_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+frkl_emp_pest_food_trend_plot <- trend_plot(frkl_nets2_emp_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Per Establishment")
+
+# indexed employment
+frkl_nets2_emp_idx <- agg_index_trend_table(frkl_nets2_emp, group = 2, construct_year = 2011)
+frkl_nets2_emp_idx $Type <- as.factor(frkl_nets2_emp_idx $Type)
+
+frkl_emp_retail_indexed_trend_plot <- trend_plot(frkl_nets2_emp_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+frkl_emp_food_indexed_trend_plot <- trend_plot(frkl_nets2_emp_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Employment", index = "Indexed")
+
+prow <- plot_grid(frkl_emp_retail_trend_plot + theme(legend.position="none"),
+                  frkl_emp_food_trend_plot + theme(legend.position="none"),
+                  frkl_emp_pest_retail_trend_plot + theme(legend.position="none"),
+                  frkl_emp_pest_food_trend_plot + theme(legend.position="none"),
+                  frkl_emp_retail_indexed_trend_plot + theme(legend.position="none"),
+                  frkl_emp_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(frkl_emp_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(2, .2))
+
+# sales plot
+# abousolute sales
+frkl_nets2_sales <- frkl_nets_bf %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets2_sales $Type <- as.factor(frkl_nets2_sales$Type)
+
+frkl_sales_retail_trend_plot <- trend_plot(filter(frkl_nets2_sales, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+frkl_sales_food_trend_plot <- trend_plot(filter(frkl_nets2_sales, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Total")
+
+
+# sales per establishment
+frkl_nets2_sales_pest <- frkl_nets_bf %>% select(-sales, -n, -emp, -emp_pest) %>% spread(key = biz2, sales_pest) %>% 
+  rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
+frkl_nets2_sales_pest $Type <- as.factor(frkl_nets2_sales_pest $Type)
+
+frkl_sales_pest_retail_trend_plot <- trend_plot(frkl_nets2_sales_pest, industry = "Retail", industry_code = "CNS07_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+frkl_sales_pest_food_trend_plot <- trend_plot(frkl_nets2_sales_pest, industry = "Food",industry_code = "CNS18_pest", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Per Establishment")
+
+# indexed sales
+frkl_nets2_sales_idx <- agg_index_trend_table(frkl_nets2_sales, group = 2, construct_year = 2011)
+frkl_nets2_sales_idx $Type <- as.factor(frkl_nets2_sales_idx $Type)
+
+frkl_sales_retail_indexed_trend_plot <- trend_plot(frkl_nets2_sales_idx, industry = "Retail", industry_code = "CNS07_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+frkl_sales_food_indexed_trend_plot <- trend_plot(frkl_nets2_sales_idx, industry = "Food",industry_code = "CNS18_sd", corridor_name = "Franklin Avenue", construct_year = 2011, end_year = 2012, y_lable = "Sales", index = "Indexed")
+
+prow <- plot_grid(frkl_sales_retail_trend_plot + theme(legend.position="none"),
+                  frkl_sales_food_trend_plot + theme(legend.position="none"),
+                  frkl_sales_pest_retail_trend_plot + theme(legend.position="none"),
+                  frkl_sales_pest_food_trend_plot + theme(legend.position="none"),
+                  frkl_sales_retail_indexed_trend_plot + theme(legend.position="none"),
+                  frkl_sales_food_indexed_trend_plot + theme(legend.position="none"), 
+           align = 'vh', hjust = -1, nrow = 3)
+
+legend_b <- get_legend(frkl_sales_retail_indexed_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+
+```
+
+
+## trend analysis - table
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+
+# compute post change table compare to base year
+frkl_nets1_emp %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+
+frkl_nets1_sales %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+
+
+frkl_nets2_emp %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+
+frkl_nets2_sales %>% 
+  filter (year %in% c(2011, 2012, 2013, 2014)) %>% 
+  group_by(Type) %>% 
+  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
+         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
+  
+```
+
+# model
+```{r, echo=FALSE, results='asis'}
+# DID
+#employment
+frkl_nets1_emp$Type <- relevel(frkl_nets1_emp$Type,ref = "Treatment: Franklin")
+frkl_nets2_emp$Type <- relevel(frkl_nets2_emp$Type,ref = "Treatment: Franklin")
+
+frkl_nets1_emp_did <- did_agg_analysis(filter(frkl_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_emp_did <- did_agg_analysis(filter(frkl_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_emp_did[[1]], frkl_nets2_emp_did[[1]], frkl_nets1_emp_did[[2]], frkl_nets2_emp_did[[2]],
+          frkl_nets1_emp_did[[3]], frkl_nets2_emp_did[[3]],
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business"), model.numbers = F)
+
+# sales
+frkl_nets1_sales$Type <- relevel(frkl_nets1_sales$Type,ref = "Treatment: Franklin")
+frkl_nets2_sales$Type <- relevel(frkl_nets2_sales$Type,ref = "Treatment: Franklin")
+
+frkl_nets1_sales_did <- did_agg_analysis(filter(frkl_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_sales_did <- did_agg_analysis(filter(frkl_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_sales_did[[1]], frkl_nets2_sales_did[[1]], frkl_nets1_sales_did[[2]], frkl_nets2_sales_did[[2]], 
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Sales", "Food Sales"), model.numbers = F)
+
+# show only Type 2 results
+stargazer(frkl_nets2_emp_did[[1]], frkl_nets2_emp_did[[2]], frkl_nets2_emp_did[[3]],
+          frkl_nets2_sales_did[[1]],  frkl_nets2_sales_did[[2]], frkl_nets2_sales_did[[3]],
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail", "Food", "Business","Retail", "Food", "Business"), 
+          type = "text", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
+
+# ITS
+frkl_nets1_emp <- frkl_nets1_emp %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+frkl_nets2_emp <- frkl_nets2_emp %>% ungroup %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+frkl_nets1_sales <- frkl_nets1_sales %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+frkl_nets2_sales <- frkl_nets2_sales %>% ungroup %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+
+frkl_nets1_emp_its <- agg_its_analysis(filter(frkl_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_emp_its <- agg_its_analysis(filter(frkl_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_emp_its[[1]], frkl_nets2_emp_its[[1]], frkl_nets1_emp_its[[2]], frkl_nets2_emp_its[[2]], 
+          frkl_nets1_emp_its[[3]], frkl_nets2_emp_its[[3]],
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2",  "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business Emp."), model.numbers = F)
+
+
+frkl_nets1_sales_its <- agg_its_analysis(filter(frkl_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_sales_its <- agg_its_analysis(filter(frkl_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_sales_its[[1]], frkl_nets2_sales_its[[1]], frkl_nets1_sales_its[[2]], frkl_nets2_sales_its[[2]], 
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Sales", "Food Sales"), model.numbers = F)
+
+
+stargazer(frkl_nets2_emp_its[[1]], frkl_nets2_emp_its[[2]], frkl_nets2_emp_its[[2]],
+          frkl_nets2_sales_its[[1]],  frkl_nets2_sales_its[[2]], frkl_nets2_sales_its[[3]],
+          title = "Franklin Avenue Corridor Interrupted Time Series Estimates", 
           column.labels  = c("Retail", "Food", "Business","Retail", "Food", "Business"), 
           type = "text", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
 
