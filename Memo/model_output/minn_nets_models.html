@@ -131,6 +131,9 @@ $(document).ready(function () {
 
 <div id="load-data" class="section level1">
 <h1>load data</h1>
+</div>
+<div id="prep-data" class="section level1">
+<h1>prep data</h1>
 <pre class="r"><code>central_nets_b &lt;- minn_central_b %&gt;% 
   group_by(name, type, buildstart, buildend, group, year, biz1) %&gt;% 
   summarise(emp = sum(emp), sales= sum(sales), n=n(),
@@ -1340,6 +1343,1226 @@ F Statistic (df = 3; 6)
 </td>
 <td>
 0.539
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="6" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+</div>
+<div id="prep-data-franklin" class="section level1">
+<h1>prep data: franklin</h1>
+<pre class="r"><code>frkl_nets_b &lt;- minn_frkl_b %&gt;% 
+  group_by(name, type, buildstart, buildend, group, year, biz1) %&gt;% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %&gt;% filter(biz1==c(&quot;Food&quot;, &quot;Retail&quot;)) %&gt;%
+ as.data.frame(.) %&gt;% select(-geometry)</code></pre>
+<pre><code>## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length
+
+## Warning in biz1 == c(&quot;Food&quot;, &quot;Retail&quot;): longer object length is not a
+## multiple of shorter object length</code></pre>
+<pre class="r"><code>minn_nets1 &lt;- minn_nets1 %&gt;% 
+  mutate(name=&quot;city&quot;, type=&quot;City&quot;, buildstart=0, buildend=0, group=2) %&gt;% select(name:group, year:sales_pest) %&gt;% as.data.frame()
+
+frkl_nets_b &lt;- rbind(frkl_nets_b, minn_nets1) %&gt;% mutate(geometry=0)
+
+frkl_nets1_emp &lt;- frkl_nets_b %&gt;% select(-sales, -n, -emp_pest, -sales_pest) %&gt;% spread(key = biz1, emp) %&gt;%
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets1_emp $Type &lt;- as.factor(frkl_nets1_emp $Type)
+
+frkl_nets1_sales &lt;- frkl_nets_b %&gt;% select(-emp, -n, -emp_pest, -sales_pest) %&gt;% spread(key = biz1, sales) %&gt;% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets1_sales $Type &lt;- as.factor(frkl_nets1_sales$Type)
+
+frkl_nets_bf &lt;- minn_frkl_bf %&gt;% 
+  mutate(buildstart = as.numeric(buildstart), buildend=as.numeric(buildend)) %&gt;% 
+  mutate(buildstart = ifelse(is.na(buildstart), 0, buildstart),
+         buildend = ifelse(is.na(buildend), 0, buildend)) %&gt;% 
+  group_by(name, type, buildstart, buildend, group, year, biz2) %&gt;% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %&gt;% drop_na(.)</code></pre>
+<pre><code>## Warning in evalq(as.numeric(buildstart), &lt;environment&gt;): NAs introduced by
+## coercion</code></pre>
+<pre><code>## Warning in evalq(as.numeric(buildend), &lt;environment&gt;): NAs introduced by
+## coercion</code></pre>
+<pre class="r"><code>minn_nets2 &lt;- minn_nets2 %&gt;% 
+  mutate(name=&quot;city&quot;, type=&quot;City&quot;, buildstart=0, buildend=0, group=2) %&gt;% select(name:group, year:sales_pest)
+
+frkl_nets_bf &lt;- rbind(frkl_nets_bf, minn_nets2) %&gt;% mutate(geometry=0)</code></pre>
+<pre><code>## Warning in bind_rows_(x, .id): Vectorizing 'sfc_GEOMETRY' elements may not
+## preserve their attributes</code></pre>
+<pre class="r"><code>frkl_nets2_emp &lt;- frkl_nets_bf %&gt;% select(-sales, -n, -emp_pest, -sales_pest) %&gt;% spread(key = biz2, emp) %&gt;% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets2_emp $Type &lt;- as.factor(frkl_nets2_emp $Type)
+
+frkl_nets2_sales &lt;- frkl_nets_bf %&gt;% select(-emp, -n, -emp_pest, -sales_pest) %&gt;% spread(key = biz2, sales) %&gt;% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets2_sales $Type &lt;- as.factor(frkl_nets2_sales$Type)</code></pre>
+</div>
+<div id="models" class="section level1">
+<h1>models</h1>
+</div>
+<div id="franklin-avenue-corridor-difference-in-difference-estimates" class="section level1">
+<h1>Franklin Avenue Corridor Difference-in-Difference Estimates</h1>
+<pre><code>                                                 Dependent variable:                        
+                          ------------------------------------------------------------------
+                                Retail Emp.            Food Emp.             Business       
+                            Type 1      Type 2      Type 1    Type 2     Type 1     Type 2  </code></pre>
+<table>
+<colgroup>
+<col width="100%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>TypeControl: Franklin -127.429*** -103.429*** 156.571*** 35.000*** 29.143*** -68.429*** (4.966) (4.444) (5.027) (3.961) (6.881) (6.324)</td>
+</tr>
+<tr class="even">
+<td>prepost -15.619** -5.429 6.333 -0.095 -9.286 -5.524 (6.411) (5.737) (6.490) (5.114) (8.884) (8.165)</td>
+</tr>
+<tr class="odd">
+<td>TypeControl: Franklin:prepost 31.762*** 25.429*** -18.238* -16.667** 13.524 8.762 (9.066) (8.113) (9.178) (7.232) (12.564) (11.547)</td>
+</tr>
+<tr class="even">
+<td>Constant 197.286*** 150.429*** 130.000*** 87.429*** 327.286*** 237.857*** (3.511) (3.142) (3.554) (2.801) (4.866) (4.472)</td>
+</tr>
+</tbody>
+</table>
+<p>Observations 20 20 20 20 20 20<br />
+R2 0.981 0.977 0.988 0.853 0.684 0.907<br />
+Adjusted R2 0.977 0.973 0.986 0.825 0.624 0.889<br />
+Residual Std. Error (df = 16) 9.290 8.313 9.404 7.411 12.874 11.832<br />
+F Statistic (df = 3; 16) 272.514*** 225.689*** 431.695*** 30.892*** 11.524*** 51.751*** ================================================================================================ Note: <em>p&lt;0.1; <strong>p&lt;0.05; </strong></em>p&lt;0.01</p>
+</div>
+<div id="franklin-avenue-corridor-difference-in-difference-estimates-1" class="section level1">
+<h1>Franklin Avenue Corridor Difference-in-Difference Estimates</h1>
+<pre><code>                                                   Dependent variable:                          
+                          ----------------------------------------------------------------------
+                                      Retail Sales                        Food Sales            
+                                Type 1            Type 2            Type 1           Type 2     </code></pre>
+<table>
+<colgroup>
+<col width="100%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>TypeControl: Franklin -11,740,619.000*** -7,803,876.000*** 5,076,686.000*** 1,380,214.000*** (963,145.900) (766,685.400) (232,109.000) (157,433.600)</td>
+</tr>
+<tr class="even">
+<td>prepost -1,971,476.000 -581,890.300 562,281.000* 339,866.700 (1,243,416.000) (989,786.600) (299,651.500) (203,245.900)</td>
+</tr>
+<tr class="odd">
+<td>TypeControl: Franklin:prepost 1,731,686.000 662,209.400 -481,052.400 -754,181.000** (1,758,456.000) (1,399,770.000) (423,771.100) (287,433.100)</td>
+</tr>
+<tr class="even">
+<td>Constant 19,217,776.000*** 13,549,990.000*** 3,869,286.000*** 2,581,300.000*** (681,047.000) (542,128.500) (164,125.900) (111,322.400)</td>
+</tr>
+</tbody>
+</table>
+<p>Observations 20 20 20 20<br />
+R2 0.925 0.898 0.976 0.840<br />
+Adjusted R2 0.911 0.879 0.971 0.809<br />
+Residual Std. Error (df = 16) 1,801,881.000 1,434,337.000 434,236.200 294,531.300<br />
+F Statistic (df = 3; 16) 65.485*** 46.974*** 216.233*** 27.901***<br />
+==================================================================================================== Note: <em>p&lt;0.1; <strong>p&lt;0.05; </strong></em>p&lt;0.01</p>
+<table style="text-align:center">
+<caption>
+<strong>Franklin Avenue Corridor Difference-in-Difference Estimates</strong>
+</caption>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Employment
+</td>
+<td>
+Employment
+</td>
+<td>
+Sales
+</td>
+<td>
+Sales
+</td>
+<td>
+Sales
+</td>
+<td>
+business
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Retail
+</td>
+<td>
+Food
+</td>
+<td>
+Business
+</td>
+<td>
+Retail
+</td>
+<td>
+Food
+</td>
+<td>
+Business
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Franklin
+</td>
+<td>
+-103.429<sup>***</sup>
+</td>
+<td>
+35.000<sup>***</sup>
+</td>
+<td>
+-68.429<sup>***</sup>
+</td>
+<td>
+-7,803,876.000<sup>***</sup>
+</td>
+<td>
+1,380,214.000<sup>***</sup>
+</td>
+<td>
+-6,423,661.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(4.444)
+</td>
+<td>
+(3.961)
+</td>
+<td>
+(6.324)
+</td>
+<td>
+(766,685.400)
+</td>
+<td>
+(157,433.600)
+</td>
+<td>
+(733,830.400)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+prepost
+</td>
+<td>
+-5.429
+</td>
+<td>
+-0.095
+</td>
+<td>
+-5.524
+</td>
+<td>
+-581,890.300
+</td>
+<td>
+339,866.700
+</td>
+<td>
+-242,023.700
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(5.737)
+</td>
+<td>
+(5.114)
+</td>
+<td>
+(8.165)
+</td>
+<td>
+(989,786.600)
+</td>
+<td>
+(203,245.900)
+</td>
+<td>
+(947,371.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Franklin:prepost
+</td>
+<td>
+25.429<sup>***</sup>
+</td>
+<td>
+-16.667<sup>**</sup>
+</td>
+<td>
+8.762
+</td>
+<td>
+662,209.400
+</td>
+<td>
+-754,181.000<sup>**</sup>
+</td>
+<td>
+-91,971.570
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(8.113)
+</td>
+<td>
+(7.232)
+</td>
+<td>
+(11.547)
+</td>
+<td>
+(1,399,770.000)
+</td>
+<td>
+(287,433.100)
+</td>
+<td>
+(1,339,785.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+150.429<sup>***</sup>
+</td>
+<td>
+87.429<sup>***</sup>
+</td>
+<td>
+237.857<sup>***</sup>
+</td>
+<td>
+13,549,990.000<sup>***</sup>
+</td>
+<td>
+2,581,300.000<sup>***</sup>
+</td>
+<td>
+16,131,290.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(3.142)
+</td>
+<td>
+(2.801)
+</td>
+<td>
+(4.472)
+</td>
+<td>
+(542,128.500)
+</td>
+<td>
+(111,322.400)
+</td>
+<td>
+(518,896.500)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+20
+</td>
+<td>
+20
+</td>
+<td>
+20
+</td>
+<td>
+20
+</td>
+<td>
+20
+</td>
+<td>
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.977
+</td>
+<td>
+0.853
+</td>
+<td>
+0.907
+</td>
+<td>
+0.898
+</td>
+<td>
+0.840
+</td>
+<td>
+0.874
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.973
+</td>
+<td>
+0.825
+</td>
+<td>
+0.889
+</td>
+<td>
+0.879
+</td>
+<td>
+0.809
+</td>
+<td>
+0.850
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 16)
+</td>
+<td>
+8.313
+</td>
+<td>
+7.411
+</td>
+<td>
+11.832
+</td>
+<td>
+1,434,337.000
+</td>
+<td>
+294,531.300
+</td>
+<td>
+1,372,871.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 16)
+</td>
+<td>
+225.689<sup>***</sup>
+</td>
+<td>
+30.892<sup>***</sup>
+</td>
+<td>
+51.751<sup>***</sup>
+</td>
+<td>
+46.974<sup>***</sup>
+</td>
+<td>
+27.901<sup>***</sup>
+</td>
+<td>
+36.866<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="6" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+</div>
+<div id="franklin-avenue-corridor-difference-in-difference-estimates-2" class="section level1">
+<h1>Franklin Avenue Corridor Difference-in-Difference Estimates</h1>
+<pre><code>                                               Dependent variable:                      
+                         ---------------------------------------------------------------
+                              Retail Emp.           Food Emp.          Business Emp.    
+                           Type 1     Type 2    Type 1    Type 2     Type 1     Type 2  </code></pre>
+<table>
+<colgroup>
+<col width="100%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td align="left">ts_year -1.357 1.286 5.464*** 3.857** 4.107 5.143*** (2.073) (1.010) (1.259) (1.409) (2.303) (1.240)</td>
+</tr>
+<tr class="even">
+<td align="left">prepost 14.738 46.286 88.619 72.548 103.357 118.833* (86.559) (42.177) (52.551) (58.811) (96.161) (51.788)</td>
+</tr>
+<tr class="odd">
+<td align="left">ts_year:prepost -2.143 -5.286 -9.964* -8.357 -12.107 -13.643** (8.029) (3.912) (4.875) (5.455) (8.920) (4.804)</td>
+</tr>
+<tr class="even">
+<td align="left">Constant 205.429*** 142.714*** 97.214*** 64.286*** 302.643*** 207.000*** (13.111) (6.389) (7.960) (8.908) (14.566) (7.845)</td>
+</tr>
+</tbody>
+</table>
+<p>Observations 10 10 10 10 10 10<br />
+R2 0.449 0.450 0.783 0.578 0.467 0.786<br />
+Adjusted R2 0.174 0.175 0.675 0.367 0.201 0.679<br />
+Residual Std. Error (df = 6) 10.970 5.345 6.660 7.453 12.187 6.563<br />
+F Statistic (df = 3; 6) 1.630 1.635 7.220** 2.743 1.754 7.345**<br />
+============================================================================================ Note: <em>p&lt;0.1; <strong>p&lt;0.05; </strong></em>p&lt;0.01</p>
+</div>
+<div id="franklin-avenue-corridor-difference-in-difference-estimates-3" class="section level1">
+<h1>Franklin Avenue Corridor Difference-in-Difference Estimates</h1>
+<pre><code>                                                  Dependent variable:                         
+                         ---------------------------------------------------------------------
+                                    Retail Sales                        Food Sales            
+                              Type 1            Type 2            Type 1           Type 2     </code></pre>
+<table>
+<colgroup>
+<col width="100%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td align="left">ts_year -644,975.900** -161,540.200 236,917.900*** 180,667.900*** (235,268.500) (98,566.300) (42,909.180) (36,270.310)</td>
+</tr>
+<tr class="even">
+<td align="left">prepost -3,653,888.000 2,735,662.000 3,260,888.000 2,704,274.000 (9,823,224.000) (4,115,463.000) (1,791,597.000) (1,514,403.000)</td>
+</tr>
+<tr class="odd">
+<td align="left">ts_year:prepost 446,117.400 -228,168.300 -353,017.900* -297,067.900* (911,191.000) (381,745.600) (166,186.500) (140,474.300)</td>
+</tr>
+<tr class="even">
+<td align="left">Constant 23,087,631.000*** 14,519,231.000*** 2,447,779.000*** 1,497,293.000*** (1,487,969.000) (623,388.000) (271,381.500) (229,393.600)</td>
+</tr>
+</tbody>
+</table>
+<p>Observations 10 10 10 10<br />
+R2 0.681 0.517 0.880 0.843<br />
+Adjusted R2 0.522 0.275 0.820 0.764<br />
+Residual Std. Error (df = 6) 1,244,924.000 521,563.800 227,054.000 191,924.400<br />
+F Statistic (df = 3; 6) 4.278* 2.139 14.629*** 10.711***<br />
+================================================================================================== Note: <em>p&lt;0.1; <strong>p&lt;0.05; </strong></em>p&lt;0.01</p>
+<table style="text-align:center">
+<caption>
+<strong>Franklin Avenue Corridor Interrupted Time Series Estimates</strong>
+</caption>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Employment
+</td>
+<td>
+Employment
+</td>
+<td>
+Sales
+</td>
+<td>
+Sales
+</td>
+<td>
+Sales
+</td>
+<td>
+business
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+Retail
+</td>
+<td>
+Food
+</td>
+<td>
+Business
+</td>
+<td>
+Retail
+</td>
+<td>
+Food
+</td>
+<td>
+Business
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year
+</td>
+<td>
+1.286
+</td>
+<td>
+3.857<sup>**</sup>
+</td>
+<td>
+5.143<sup>***</sup>
+</td>
+<td>
+-161,540.200
+</td>
+<td>
+180,667.900<sup>***</sup>
+</td>
+<td>
+19,127.680
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1.010)
+</td>
+<td>
+(1.409)
+</td>
+<td>
+(1.240)
+</td>
+<td>
+(98,566.300)
+</td>
+<td>
+(36,270.310)
+</td>
+<td>
+(82,734.240)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+prepost
+</td>
+<td>
+46.286
+</td>
+<td>
+72.548
+</td>
+<td>
+118.833<sup>*</sup>
+</td>
+<td>
+2,735,662.000
+</td>
+<td>
+2,704,274.000
+</td>
+<td>
+5,439,936.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(42.177)
+</td>
+<td>
+(58.811)
+</td>
+<td>
+(51.788)
+</td>
+<td>
+(4,115,463.000)
+</td>
+<td>
+(1,514,403.000)
+</td>
+<td>
+(3,454,423.000)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+ts_year:prepost
+</td>
+<td>
+-5.286
+</td>
+<td>
+-8.357
+</td>
+<td>
+-13.643<sup>**</sup>
+</td>
+<td>
+-228,168.300
+</td>
+<td>
+-297,067.900<sup>*</sup>
+</td>
+<td>
+-525,236.200
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(3.912)
+</td>
+<td>
+(5.455)
+</td>
+<td>
+(4.804)
+</td>
+<td>
+(381,745.600)
+</td>
+<td>
+(140,474.300)
+</td>
+<td>
+(320,428.300)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+142.714<sup>***</sup>
+</td>
+<td>
+64.286<sup>***</sup>
+</td>
+<td>
+207.000<sup>***</sup>
+</td>
+<td>
+14,519,231.000<sup>***</sup>
+</td>
+<td>
+1,497,293.000<sup>***</sup>
+</td>
+<td>
+16,016,524.000<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6.389)
+</td>
+<td>
+(8.908)
+</td>
+<td>
+(7.845)
+</td>
+<td>
+(623,388.000)
+</td>
+<td>
+(229,393.600)
+</td>
+<td>
+(523,257.300)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+10
+</td>
+<td>
+10
+</td>
+<td>
+10
+</td>
+<td>
+10
+</td>
+<td>
+10
+</td>
+<td>
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.450
+</td>
+<td>
+0.578
+</td>
+<td>
+0.786
+</td>
+<td>
+0.517
+</td>
+<td>
+0.843
+</td>
+<td>
+0.360
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.175
+</td>
+<td>
+0.367
+</td>
+<td>
+0.679
+</td>
+<td>
+0.275
+</td>
+<td>
+0.764
+</td>
+<td>
+0.039
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error (df = 6)
+</td>
+<td>
+5.345
+</td>
+<td>
+7.453
+</td>
+<td>
+6.563
+</td>
+<td>
+521,563.800
+</td>
+<td>
+191,924.400
+</td>
+<td>
+437,788.400
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 3; 6)
+</td>
+<td>
+1.635
+</td>
+<td>
+2.743
+</td>
+<td>
+7.345<sup>**</sup>
+</td>
+<td>
+2.139
+</td>
+<td>
+10.711<sup>***</sup>
+</td>
+<td>
+1.123
 </td>
 </tr>
 <tr>

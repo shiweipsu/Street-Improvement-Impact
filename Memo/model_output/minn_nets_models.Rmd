@@ -250,3 +250,113 @@ stargazer(central_nets2_emp_its[[1]], central_nets2_emp_its[[2]], central_nets2_
           type = "html", dep.var.labels = c("Employment","Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
 ```
 
+# prep data: franklin
+```{r}
+frkl_nets_b <- minn_frkl_b %>% 
+  group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
+
+minn_nets1 <- minn_nets1 %>% 
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest) %>% as.data.frame()
+
+frkl_nets_b <- rbind(frkl_nets_b, minn_nets1) %>% mutate(geometry=0)
+
+frkl_nets1_emp <- frkl_nets_b %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, emp) %>%
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets1_emp $Type <- as.factor(frkl_nets1_emp $Type)
+
+frkl_nets1_sales <- frkl_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets1_sales $Type <- as.factor(frkl_nets1_sales$Type)
+
+frkl_nets_bf <- minn_frkl_bf %>% 
+  mutate(buildstart = as.numeric(buildstart), buildend=as.numeric(buildend)) %>% 
+  mutate(buildstart = ifelse(is.na(buildstart), 0, buildstart),
+         buildend = ifelse(is.na(buildend), 0, buildend)) %>% 
+  group_by(name, type, buildstart, buildend, group, year, biz2) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
+  
+minn_nets2 <- minn_nets2 %>% 
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest)
+
+frkl_nets_bf <- rbind(frkl_nets_bf, minn_nets2) %>% mutate(geometry=0)
+
+frkl_nets2_emp <- frkl_nets_bf %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, emp) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets2_emp $Type <- as.factor(frkl_nets2_emp $Type)
+
+frkl_nets2_sales <- frkl_nets_bf %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+frkl_nets2_sales $Type <- as.factor(frkl_nets2_sales$Type)
+```
+
+# models
+```{r,echo=FALSE, results='asis'}
+# DID
+#employment
+frkl_nets1_emp$Type <- relevel(frkl_nets1_emp$Type,ref = "Treatment: Franklin")
+frkl_nets2_emp$Type <- relevel(frkl_nets2_emp$Type,ref = "Treatment: Franklin")
+
+frkl_nets1_emp_did <- did_agg_analysis(filter(frkl_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_emp_did <- did_agg_analysis(filter(frkl_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_emp_did[[1]], frkl_nets2_emp_did[[1]], frkl_nets1_emp_did[[2]], frkl_nets2_emp_did[[2]],
+          frkl_nets1_emp_did[[3]], frkl_nets2_emp_did[[3]],
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business"), model.numbers = F)
+
+# sales
+frkl_nets1_sales$Type <- relevel(frkl_nets1_sales$Type,ref = "Treatment: Franklin")
+frkl_nets2_sales$Type <- relevel(frkl_nets2_sales$Type,ref = "Treatment: Franklin")
+
+frkl_nets1_sales_did <- did_agg_analysis(filter(frkl_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_sales_did <- did_agg_analysis(filter(frkl_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_sales_did[[1]], frkl_nets2_sales_did[[1]], frkl_nets1_sales_did[[2]], frkl_nets2_sales_did[[2]], 
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Sales", "Food Sales"), model.numbers = F)
+
+# show only Type 2 results
+stargazer(frkl_nets2_emp_did[[1]], frkl_nets2_emp_did[[2]], frkl_nets2_emp_did[[3]],
+          frkl_nets2_sales_did[[1]],  frkl_nets2_sales_did[[2]], frkl_nets2_sales_did[[3]],
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail", "Food", "Business","Retail", "Food", "Business"), 
+          type = "html", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
+
+# ITS
+frkl_nets1_emp <- frkl_nets1_emp %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+frkl_nets2_emp <- frkl_nets2_emp %>% ungroup %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+frkl_nets1_sales <- frkl_nets1_sales %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+frkl_nets2_sales <- frkl_nets2_sales %>% ungroup %>% 
+  mutate(Type = ifelse(Type=="Treatment: Franklin", "Treatment", as.character(Type)))
+
+frkl_nets1_emp_its <- agg_its_analysis(filter(frkl_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_emp_its <- agg_its_analysis(filter(frkl_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_emp_its[[1]], frkl_nets2_emp_its[[1]], frkl_nets1_emp_its[[2]], frkl_nets2_emp_its[[2]], 
+          frkl_nets1_emp_its[[3]], frkl_nets2_emp_its[[3]],
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2",  "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business Emp."), model.numbers = F)
+
+
+frkl_nets1_sales_its <- agg_its_analysis(filter(frkl_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+frkl_nets2_sales_its <- agg_its_analysis(filter(frkl_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+stargazer(frkl_nets1_sales_its[[1]], frkl_nets2_sales_its[[1]], frkl_nets1_sales_its[[2]], frkl_nets2_sales_its[[2]], 
+          title = "Franklin Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
+          type = "text", dep.var.labels = c("Retail Sales", "Food Sales"), model.numbers = F)
+
+
+stargazer(frkl_nets2_emp_its[[1]], frkl_nets2_emp_its[[2]], frkl_nets2_emp_its[[3]],
+          frkl_nets2_sales_its[[1]],  frkl_nets2_sales_its[[2]], frkl_nets2_sales_its[[3]],
+          title = "Franklin Avenue Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail", "Food", "Business","Retail", "Food", "Business"), 
+          type = "html", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
+```
+
