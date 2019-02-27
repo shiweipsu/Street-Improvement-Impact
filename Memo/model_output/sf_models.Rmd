@@ -1,0 +1,286 @@
+---
+title: "sf_models"
+author: "Wei Shi"
+date: "February 26, 2019"
+output: html_document
+---
+## load data
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, data.table)
+
+#query the corridors from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+sf_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+                       a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+                       a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd02 as cd03, a.cd04 as cd04, b.type as Type, b.FULLNAME as name, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+                       FROM sf_lehd a, sf_corridor b
+                       WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
+sf_corridor[sf_corridor$name =="Polk St",]$type <- "Treatment: Polk"
+sf_corridor[sf_corridor$name=="Van Ness Ave",]$type <- "Control: Van Ness"
+sf_corridor[sf_corridor$name =="17th St",]$type <- "Treatment: 17th St"
+sf_corridor[sf_corridor$name=="18th St",]$type <- "Control: 18th St"
+sf_corridor$type <- as.factor(sf_corridor$type)
+
+sf_corridor <- sf_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,
+         Group=corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+
+sf_lehd <- st_read(dsn = con, query = "SELECT * FROM sf_lehd") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+sf_corridor_rac <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+                           a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+                           a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd03 as cd03, a.cd04 as cd04, b.fullname as Name, b.type as Type, b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+                           FROM sf_rac a, sf_corridor b
+                           WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
+sf_corridor_rac[sf_corridor_rac$name =="Van Ness Ave",]$type <- "Control: Van Ness"
+sf_corridor_rac[sf_corridor_rac$name=="Polk St",]$type <- "Treatment: Polk"
+sf_corridor_rac[sf_corridor_rac$name =="18th St",]$type <- "Control: 18th St"
+sf_corridor_rac[sf_corridor_rac$name=="17th St",]$type <- "Treatment: 17th St"
+
+sf_corridor_rac$type <- as.factor(sf_corridor_rac$type)
+
+sf_corridor_rac <- sf_corridor_rac %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,
+         Group=corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type=type)
+
+
+sf_rac <- st_read(dsn = con, query = "SELECT * FROM sf_rac") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02,
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+sf_emp_ratio <- employ_ratio_test(sf_corridor)
+
+sf_growth <- growth_rate(sf_corridor)
+
+# load nets
+sf_nets <- st_read(dsn = con, query = "select * FROM nets") %>% filter(city =="SAN FRANCISCO")
+
+sf_blocks <- left_join(as.data.frame(sf_corridor), unique(sf_lehd[,c(1,56)]), by =c("geoid" = "geoid10")) %>% 
+  mutate(geometry.x=NULL, geometry=geometry.y, geometry.y=NULL) %>% st_sf
+
+sf_nets_b <- st_join(sf_nets, unique(sf_blocks[,c(26:30,32)]) %>% st_sf, join=st_intersects, left=F)  
+names(sf_nets_b)  <- tolower(names(sf_nets_b))
+
+
+sf_nets_bf <- st_read(dsn = con, query = "select * FROM nets a, sf_corridor b
+WHERE ST_Intersects(ST_Buffer(b.geometry, 20), a.geometry);")
+
+
+ sf_polk_b <- sf_nets_b %>% 
+  filter(group==1) %>% 
+  gather(key, value, -c(1:10,89:97)) %>% 
+  separate(key, c("retail", "year"), sep=-2) %>% 
+  spread(retail, value) %>% 
+  mutate(biz1 = case_when(substr(naics,1,3) %in% c(441:454) ~ "Retail",
+                               substr(naics,1,3) %in% c(722) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+ 
+ sf_polk_bf <- sf_nets_bf %>% 
+  filter(group==1) %>% 
+  gather(key, value, -c(1:10,89:97)) %>% 
+  separate(key, c("retail", "year"), sep=-2) %>% 
+  spread(retail, value) %>% 
+  mutate(biz2 = case_when((substr(naics,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics,1,4) %in% c(8121,8123,8129)) ~ "Retail",
+                               substr(naics,1,4) %in% c(7224,7225) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+ 
+ sf_sev_b <- sf_nets_b %>% 
+  filter(group==2) %>% 
+  gather(key, value, -c(1:10,89:97)) %>% 
+  separate(key, c("retail", "year"), sep=-2) %>% 
+  spread(retail, value) %>% 
+  mutate(biz1 = case_when(substr(naics,1,3) %in% c(441:454) ~ "Retail",
+                               substr(naics,1,3) %in% c(722) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+ 
+ sf_sev_bf <- sf_nets_bf %>% 
+  filter(group==2) %>% 
+  gather(key, value, -c(1:10,89:97)) %>% 
+  separate(key, c("retail", "year"), sep=-2) %>% 
+  spread(retail, value) %>% 
+  mutate(biz2 = case_when((substr(naics,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics,1,4) %in% c(8121,8123,8129)) ~ "Retail",
+                               substr(naics,1,4) %in% c(7224,7225) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+
+# nets <- st_read(dsn = con, query = "select * from nets") %>% filter (city == "SAN FRANCISCO")
+
+nets <- setDT(sf_nets)
+nets <- setkey(nets, dunsnumber)
+nets_long <- melt(nets, id.vars = c("dunsnumber", "city"),
+                  measure.vars = 11:88,
+                  variable.factor = TRUE)
+
+sf_nets_a <- nets_long %>% 
+  separate(variable, c("retail", "year"), sep=-2) %>% 
+  spread(retail, value) %>% 
+  mutate(business1 = case_when(substr(naics,1,3) %in% c(441:454) ~ "Retail",
+                               substr(naics,1,3) %in% c(722) ~ "Food"),
+         business2 = case_when((substr(naics,1,3) %in% c(443,445,446,448,451,452,453)|substr(naics,1,4) %in% c(8121,8123,8129)) ~ "Retail",
+                               substr(naics,1,4) %in% c(7224,7225) ~ "Food"),
+         year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
+
+sf_nets1 <- sf_nets_a %>% 
+  group_by(year, business1) %>% 
+  summarise(emp = sum(emp, na.rm = T), sales= sum(sales, na.rm = T), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
+
+sf_nets2 <- sf_nets_a %>% 
+  group_by(year, business2) %>% 
+  summarise(emp = sum(emp, na.rm = T), sales= sum(sales, na.rm = T), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
+
+
+dbDisconnect(con)
+
+```
+
+# model
+```{r, echo=FALSE, results='asis'}
+
+sf_corridor<- sf_corridor %>% mutate (Type = case_when(Name == "17th St"| Name == "Polk St"|Name == "Valencia St"~ "Treatment", 
+                                                       TRUE ~ "Control"),
+                                      Type = as.factor(Type))
+sf_corridor$Type <- relevel(sf_corridor$Type,ref = ("Treatment"))
+
+#polk ave
+
+polk_agg_did <- did_agg_analysis(sf_corridor, group = 1, endyear = 2010)
+stargazer(polk_agg_did[[1]], polk_agg_did[[2]], polk_agg_did[[3]], 
+          title = "Polk Ave. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
+
+polk_agg_its <- agg_its_analysis(sf_corridor, group = 1, endyear = 2010)
+stargazer(polk_agg_its[[1]], polk_agg_its[[2]], polk_agg_its[[3]], 
+          title = "Polk Ave. Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
+
+# 17th street
+sevth_agg_did <- did_agg_analysis(sf_corridor, group = 2, endyear = 2012)
+stargazer(sevth_agg_did[[1]], sevth_agg_did[[2]], sevth_agg_did[[3]], 
+          title = "17th St. Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
+
+sevth_agg_its <- agg_its_analysis(sf_corridor, group = 2, endyear = 2012)
+stargazer(sevth_agg_its[[1]], sevth_agg_its[[2]], sevth_agg_its[[3]], 
+          title = "17th St. Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."), type = "html")
+
+
+```
+
+
+# NETS analysis
+## trend plot - industry type 1
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
+# one types of industry categories similar to LEHD
+sev_nets_b <- sf_sev_b %>% 
+  group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
+
+
+# employment plot
+# abousolute employment
+sev_nets1_emp <- sev_nets_b %>% select(-sales, -n, -emp_pest, -sales_pest) %>% 
+  spread(key = biz1, emp) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets1_emp $Type <- as.factor(sev_nets1_emp $Type)
+
+
+
+# sales plot
+# abousolute sales
+sev_nets1_sales <- sev_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets1_sales $Type <- as.factor(sev_nets1_sales$Type)
+
+
+
+
+
+```
+
+## trend plot - industry type 2
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
+# one types of industry categories similar to LEHD
+sev_nets_bf <- sf_sev_bf %>% 
+  group_by(fullname, type, buildstart, buildend, group, year, biz2) %>% 
+  summarise(emp = sum(emp), sales= sum(sales), n=n(),
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz2==c("Food", "Retail")) %>%
+ as.data.frame(.) %>% select(-geometry)
+
+
+# employment plot
+# abousolute employment
+sev_nets2_emp <- sev_nets_bf %>% select(-sales, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, emp) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets2_emp $Type <- as.factor(sev_nets2_emp $Type)
+
+
+# sales plot
+# abousolute sales
+sev_nets2_sales <- sev_nets_bf %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, sales) %>% 
+  rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+sev_nets2_sales $Type <- as.factor(sev_nets2_sales$Type)
+
+
+
+```
+
+
+# model
+```{r, echo=FALSE, results='asis'}
+# DID
+#employment
+sev_nets2_emp$Type <- relevel(sev_nets2_emp$Type,ref = "Treatment")
+sev_nets2_sales$Type <- relevel(sev_nets2_sales$Type,ref = "Treatment")
+
+sev_nets2_emp_did <- did_agg_analysis(filter(sev_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2012)
+
+sev_nets2_sales_did <- did_agg_analysis(filter(sev_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2012)
+
+stargazer(sev_nets2_emp_did[[1]], sev_nets2_emp_did[[2]], sev_nets2_emp_did[[3]],sev_nets2_sales_did[[1]], sev_nets2_sales_did[[2]], sev_nets2_sales_did[[3]], 
+          title = "17th Street Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail", "Food", "Retail","Food"), 
+          type = "html", dep.var.labels = c("Employment","Employment", "Sales", "Sales"), model.numbers = F)
+
+
+# ITS
+
+sev_nets2_emp_its <- agg_its_analysis(filter(sev_nets2_emp, year>2005), group = 2, endyear = 2012)
+sev_nets2_sales_its <- agg_its_analysis(filter(sev_nets2_sales, year>2005), group = 2, endyear = 2012)
+
+stargazer(sev_nets2_emp_its[[1]], sev_nets2_emp_its[[2]], sev_nets2_emp_its[[3]],sev_nets2_sales_its[[1]], sev_nets2_sales_its[[2]],  sev_nets2_sales_its[[2]],
+          title = "17th Street Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail", "Food", "Retail","Food"), 
+          type = "html", dep.var.labels = c("Employment","Employment", "Sales", "Sales"), model.numbers = F)
+
+
+```
