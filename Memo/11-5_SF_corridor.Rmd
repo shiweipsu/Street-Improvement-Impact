@@ -344,8 +344,8 @@ sf <- sf_lehd %>% group_by(year) %>%
 sevth_agg <- rbind(as.data.frame(sevth_agg), as.data.frame(sf))
 sevth_agg$Type <- as.factor(as.character(sevth_agg$Type))
 
-sevth_agg_retail_plot <- agg_index_trend_plot(sevth_agg, industry = "Retail", corridor_name = "sevth Ave.",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
-sevth_agg_food_plot <- agg_index_trend_plot(sevth_agg, industry = "Food/Accommodations", corridor_name = "sevth Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+sevth_agg_retail_plot <- agg_index_trend_plot(sevth_agg, industry = "Retail", corridor_name = "17th Street",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+sevth_agg_food_plot <- agg_index_trend_plot(sevth_agg, industry = "Food/Accommodations", corridor_name = "17th Street",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
 prow <- plot_grid(sevth_agg_retail_plot + theme(legend.position="none"),
                   sevth_agg_food_plot + theme(legend.position="none"), align = 'vh', hjust = -1, nrow = 1)

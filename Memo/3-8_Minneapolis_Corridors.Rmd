@@ -230,18 +230,18 @@ The Franklin Avenue corridors both have total employment percentiles in the top 
 
 #group 2
 
-franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2007")
-minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2007")
+franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2010")
+minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2010")
 
-franklin <- franklin %>% summarise(tot_emp = sum(C000)/nrow(franklin), retail_emp = sum(CNS07)/nrow(franklin), accom_emp = sum(CNS08)/nrow(franklin))
+franklin <- franklin %>% summarise(tot_emp = sum(C000)/nrow(franklin), retail_emp = sum(CNS07)/nrow(franklin), accom_emp = sum(CNS18)/nrow(franklin))
 
 minnehaha <- minnehaha %>% summarise(tot_emp = sum(C000)/nrow(minnehaha), retail_emp = sum(CNS07)/nrow(minnehaha), 
-accom_emp = sum(CNS08)/nrow(minnehaha))
+accom_emp = sum(CNS18)/nrow(minnehaha))
 
 #t-tests
 
-franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2007")
-minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2007")
+franklin <- minn_corridor %>% filter(Name == "Franklin Ave (improvement)", year == "2010")
+minnehaha <- minn_corridor %>% filter(Name == "Franklin Ave (control)", year == "2010")
 
 franklin <- franklin %>% 
   mutate(business = CNS07 + CNS18, service1 = CNS07 + CNS12 + CNS14 + 
@@ -261,6 +261,21 @@ minnehaha <- minnehaha %>%
 t.test(franklin$business, minnehaha$business)
 t.test(franklin$busi_perc1, minnehaha$busi_perc1)
 t.test(franklin$busi_perc2, minnehaha$busi_perc2)
+
+
+# t-tests: growth rate----
+
+franklin_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, grouptype=="improvement", year<=2010) 
+minnehaha_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==2, grouptype=="control", year<=2010) 
+
+t.test(franklin_growth$biz_growth,minnehaha_growth$biz_growth)
+t.test(franklin_growth$retail_growth,minnehaha$retail_growth)
+t.test(franklin_growth$food_accom_growth,minnehaha$food_accom_growth)
+
 ```
 
 
@@ -289,22 +304,22 @@ Both the Central and University Avenue corridors have total and retail employmen
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
-central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2007")
-university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2007")
+central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2011")
+university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2011")
 
 central <- central %>% summarise(tot_emp = sum(C000)/nrow(central), 
                                  retail_emp = sum(CNS07)/nrow(central),
-                                   accom_emp = sum(CNS08)/nrow(central))
+                                   accom_emp = sum(CNS18)/nrow(central))
 
 university <- university %>% 
   summarise(tot_emp = sum(C000)/nrow(university), 
             retail_emp = sum(CNS07)/nrow(university), 
-            accom_emp = sum(CNS08)/nrow(university))
+            accom_emp = sum(CNS18)/nrow(university))
 
 #t-tests
 
-central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2007")
-university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2007")
+central <- minn_corridor %>% filter(Name == "Central Ave (improvement)", year == "2011")
+university <- minn_corridor %>% filter(Name == "University Ave NE (control)", year == "2011")
 
 central <- central %>% mutate(business = CNS07 + CNS18,
                                   service1 = CNS07 + CNS12 + CNS14 + CNS15 + CNS16 + CNS17 + CNS18 + CNS19,
@@ -322,6 +337,19 @@ university <- university %>% mutate(business = CNS07 + CNS18,
 t.test(central$business, university$business)
 t.test(central$busi_perc1, university$busi_perc1)
 t.test(central$busi_perc2, university$busi_perc2)
+
+# t-tests: growth rate----
+
+central_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==3, grouptype=="improvement", year<=2011) 
+uni_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==3, grouptype=="control", year<=2011) 
+
+t.test(central_growth$biz_growth,uni_growth$biz_growth)
+t.test(central_growth$retail_growth,uni_growth$retail_growth)
+t.test(central_growth$food_accom_growth,uni_growth$food_accom_growth)
 ```
 
 
@@ -805,7 +833,7 @@ franklin_agg_retail_plot <- ggplot(franklin_agg,aes(x=year, y=CNS07,group=Type,c
   labs(title = "Retail Sales Comparison: Franklin Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
-franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18_,group=Type,colour=Type,shape=Type))+
+franklin_agg_accom_plot <- ggplot(franklin_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2011, xmax = 2012, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
   geom_point(size=3, fill="white") +

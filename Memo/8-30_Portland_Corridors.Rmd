@@ -207,6 +207,15 @@ t.test(stark_growth$food_accom_growth,everett_growth$food_accom_growth)
 
 stark_agg <- agg_trend_table(portland_corridor, group = 1)
 
+stark_agg1 <- stark_agg %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS07/37,
+                              Type == "Control: Alder"~ CNS07/26,
+                              Type == "Control: Everett" ~ CNS07/27),
+         CNS18_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS18/37,
+                              Type == "Control: Alder"~ CNS18/26,
+                              Type == "Control: Everett" ~ CNS18/27))
+
+
 agg_retail_trend_plot <- agg_trend_plot(stark_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
 
 agg_food_trend_plot <- agg_trend_plot(stark_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010)
@@ -224,9 +233,9 @@ portland <- portland_lehd %>% group_by(year) %>%
   summarise(CNS07 = sum(CNS07),
             CNS18 = sum(CNS18),
             business = CNS07 + CNS18) %>%
-  mutate(CNS07_sd = CNS07/242.452,
-         CNS18_sd = CNS18/225.31,
-         business_sd = business/467.76,
+  mutate(CNS07_sd = CNS07/309.39,
+         CNS18_sd = CNS18/301.37,
+         business_sd = business/610.76,
          Type = "City") %>%
   select(Type, year, CNS07_sd, CNS18_sd, business_sd)
 stark_agg <- rbind(as.data.frame(stark_agg), as.data.frame(portland))
@@ -235,7 +244,10 @@ stark_agg$Type <- as.factor(as.character(stark_agg$Type))
 stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 stark_agg_food_plot <- agg_index_trend_plot(stark_agg, industry = "Food/Accommodations", corridor_name = "Stark & Oak Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
-plot_grid(stark_agg_retail_plot,stark_agg_food_plot)
+prow <- plot_grid(stark_agg_retail_plot + theme(legend.position="none"),
+                  stark_agg_food_plot + theme(legend.position="none"), align = 'vh', hjust = -1, nrow = 1)
+legend_b <- get_legend(stark_agg_retail_plot + theme(legend.position="bottom"))
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(3, .2))
 ```
 
 ## trend analysis - table
@@ -243,7 +255,7 @@ plot_grid(stark_agg_retail_plot,stark_agg_food_plot)
 
 # compute post change table compare to base year
 post_change <- stark_agg %>% 
-  filter (year %in% c(2008, 2009, 2010, 2011)) %>% 
+  filter (year %in% c(2009, 2010, 2011, 2012)) %>% 
   group_by(Type) %>% 
   mutate(retail_growth =(CNS07_sd/lag(CNS07_sd)-1)*100,
          food_accom_growth = (CNS18_sd/lag(CNS18_sd)-1)*100)
@@ -254,7 +266,8 @@ post_change <- stark_agg %>%
 # model
 ```{r, echo=FALSE, results='asis'}
 
-portland_corridor$Type <- relevel(portland_corridor$Type,ref = "Treatment")
+portland_corridor$Type <- ifelse(portland_corridor$Type=="Treatment: Stark & Oak", "Treatment", portland_corridor$Type)
+portland_corridor$Type <- relevel(as.factor(portland_corridor$Type),ref = "Treatment")
 
 #stark ave
 
@@ -303,9 +316,9 @@ portland <- portland_lehd %>% group_by(year) %>%
   summarise(CNS07 = sum(CNS07),
             CNS18 = sum(CNS18),
             business = CNS07 + CNS18) %>%
-  mutate(CNS07_sd = CNS07/242.45,
-         CNS18_sd = CNS18/225.31,
-         business_sd = business/467.76,
+  mutate(CNS07_sd = CNS07/309.39,
+         CNS18_sd = CNS18/301.37,
+         business_sd = business/610.76,
          Type = "City") %>%
   select(Type, year, CNS07_sd, CNS18_sd, business_sd)
 stark_agg <- rbind(as.data.frame(stark_agg), as.data.frame(portland))
@@ -314,11 +327,14 @@ stark_agg$Type <- as.factor(as.character(stark_agg$Type))
 stark_agg_retail_plot <- agg_index_trend_plot(stark_agg, industry = "Retail", corridor_name = "Stark & Oak Ave.",industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
 stark_agg_food_plot <- agg_index_trend_plot(stark_agg, industry = "Food/Accommodations", corridor_name = "Stark & Oak Ave.",industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
-plot_grid(stark_agg_retail_plot,stark_agg_food_plot)
+prow <- plot_grid(stark_agg_retail_plot + theme(legend.position="none"),
+                  stark_agg_food_plot + theme(legend.position="none"), align = 'vh', hjust = -1, nrow = 1)
+legend_b <- get_legend(stark_agg_retail_plot + theme(legend.position="bottom"))
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(3, .2))
 
 # number of blocks: Stark 37, alder 26, everett 27
 post_change <- stark_agg %>% 
-  filter (year %in% c(2008, 2009, 2010, 2011)) %>% 
+  filter (year %in% c(2009, 2010, 2011, 2012)) %>% 
   group_by(Type) %>% 
   mutate(retail_growth =(CNS07_sd/lag(CNS07_sd)-1)*100,
          food_accom_growth = (CNS18_sd/lag(CNS18_sd)-1)*100)
@@ -364,6 +380,17 @@ stark_nets1_emp <- stark_nets_b %>% select(-sales, -n, -emp_pest, -sales_pest) %
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 stark_nets1_emp $Type <- as.factor(stark_nets1_emp $Type)
 
+nrow(portland_lehd %>% filter(year == 2009))
+stark_nets1_emp1 <- stark_nets1_emp %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS07/37,
+                              Type == "Control: Alder"~ CNS07/26,
+                              Type == "Control: Everett" ~ CNS07/27,
+                              Type == "City" ~ CNS07/7145),
+         CNS18_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS18/37,
+                              Type == "Control: Alder"~ CNS18/26,
+                              Type == "Control: Everett" ~ CNS18/27,
+                              Type == "City" ~ CNS18/7145))
+
 stark_emp_retail_trend_plot <- trend_plot(filter(stark_nets1_emp, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, y_lable = "Employment", index = "Total")
 
 stark_emp_food_trend_plot <- trend_plot(filter(stark_nets1_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Stark & Oak Street", construct_year = 2009, end_year = 2010, y_lable = "Employment", index = "Total")
@@ -405,6 +432,16 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 stark_nets1_sales <- stark_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 stark_nets1_sales $Type <- as.factor(stark_nets1_sales$Type)
+
+stark_nets1_sales1 <- stark_nets1_sales %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS07/37,
+                              Type == "Control: Alder"~ CNS07/26,
+                              Type == "Control: Everett" ~ CNS07/27,
+                              Type == "City" ~ CNS07/7145),
+         CNS18_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS18/37,
+                              Type == "Control: Alder"~ CNS18/26,
+                              Type == "Control: Everett" ~ CNS18/27,
+                              Type == "City" ~ CNS18/7145))
 
 stark_sales_retail_trend_plot <- trend_plot(filter(stark_nets1_sales, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, y_lable = "Sales", index = "Total")
 
@@ -461,6 +498,16 @@ stark_nets2_emp <- stark_nets_bf %>% select(-sales, -n, -emp_pest, -sales_pest) 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 stark_nets2_emp $Type <- as.factor(stark_nets2_emp $Type)
 
+stark_nets2_emp1 <- stark_nets2_emp %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS07/37,
+                              Type == "Control: Alder"~ CNS07/26,
+                              Type == "Control: Everett" ~ CNS07/27,
+                              Type == "City" ~ CNS07/7145),
+         CNS18_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS18/37,
+                              Type == "Control: Alder"~ CNS18/26,
+                              Type == "Control: Everett" ~ CNS18/27,
+                              Type == "City" ~ CNS18/7145))
+
 stark_emp_retail_trend_plot <- trend_plot(filter(stark_nets2_emp, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, y_lable = "Employment", index = "Total")
 
 stark_emp_food_trend_plot <- trend_plot(filter(stark_nets2_emp, Type!="City"), industry = "Food",industry_code = "CNS18", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, y_lable = "Employment", index = "Total")
@@ -501,6 +548,26 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(2, .2))
 stark_nets2_sales <- stark_nets_bf %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz2, sales) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
 stark_nets2_sales $Type <- as.factor(stark_nets2_sales$Type)
+
+stark_nets2_sales1 <- stark_nets2_sales %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS07/37,
+                              Type == "Control: Alder"~ CNS07/26,
+                              Type == "Control: Everett" ~ CNS07/27,
+                              Type == "City" ~ CNS07/7145),
+         CNS18_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS18/37,
+                              Type == "Control: Alder"~ CNS18/26,
+                              Type == "Control: Everett" ~ CNS18/27,
+                              Type == "City" ~ CNS18/7145))
+
+stark_nets2_sales1 <- stark_nets2_sales %>% 
+  mutate(CNS07_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS07/37,
+                              Type == "Control: Alder"~ CNS07/26,
+                              Type == "Control: Everett" ~ CNS07/27,
+                              Type == "City" ~ CNS07/7145),
+         CNS18_pb = case_when(Type == "Treatment: Stark & Oak" ~ CNS18/37,
+                              Type == "Control: Alder"~ CNS18/26,
+                              Type == "Control: Everett" ~ CNS18/27,
+                              Type == "City" ~ CNS18/7145))
 
 stark_sales_retail_trend_plot <- trend_plot(filter(stark_nets2_sales, Type!="City"), industry = "Retail", industry_code = "CNS07", corridor_name = "Stark & Oak Avenue", construct_year = 2009, end_year = 2010, y_lable = "Sales", index = "Total")
 

@@ -171,17 +171,17 @@ stark_race[stark_race$year<2009,][,c(3:8,10:15)] <- NA
 stark_race$Type <- as.factor(as.character(stark_race$Type))
   
 
-white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 86, 90)
+white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010, 86, 90)
 
-black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 1,5)
+black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010, 1,5)
 
-ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment",construct_year = 2009, end_year = 2010, 0,4)
+ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Street", cat = "Employment",construct_year = 2009, end_year = 2010, 0,4)
 
-asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,3,7)
+asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010,3,7)
 
-hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,0,4)
+hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,4)
 
-other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,0,4)
+other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010,0,4)
 
 mylegend<-g_legend(white_plot)
 
@@ -239,13 +239,13 @@ stark_edu[stark_edu$year<2009,][,c(3:6,8:11)] <- NA
 stark_edu$Type <- as.factor(as.character(stark_edu$Type))
   
 
-hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 0, 10)
+hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010, 0, 10)
 
-hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 10, 20)
+hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010, 10, 20)
 
-col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 20, 30)
+col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010, 20, 30)
 
-bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010,27.6,37.6)
+bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010,27.6,37.6)
 
 mylegend<-g_legend(hisch_plot)
 
@@ -306,17 +306,17 @@ stark_race <- rbind(as.data.frame(stark_race), as.data.frame(pdx_race))
 stark_race[stark_race$year<2009,][,c(3:8,10:15)] <- NA
 stark_race$Type <- as.factor(as.character(stark_race$Type))
 
-white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010, 79, 91)
+white_plot <- dist_trend_plot(stark_race,demo = "White", demo_code = "white_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010, 79, 91)
 
-black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010, 1,13)
+black_plot <- dist_trend_plot(stark_race,demo = "Black", demo_code = "black_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010, 1,13)
 
-ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Avenue",cat = "Residents", construct_year = 2009, end_year = 2010, 0,12)
+ameindian_plot <- dist_trend_plot(stark_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Stark & Oak Street",cat = "Residents", construct_year = 2009, end_year = 2010, 0,12)
 
-asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Avenue",cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
+asian_plot <- dist_trend_plot(stark_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Stark & Oak Street",cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
 
-hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
+hawaii_plot <- dist_trend_plot(stark_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
 
-other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Avenue",cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
+other_plot <- dist_trend_plot(stark_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Stark & Oak Street",cat = "Residents", construct_year = 2009, end_year = 2010,0,12)
 
 mylegend<-g_legend(white_plot)
 
@@ -370,13 +370,13 @@ stark_edu <- rbind(as.data.frame(stark_edu), as.data.frame(pdx_edu))
 stark_edu[stark_edu$year<2009,][,c(3:6,8:11)] <- NA
 stark_edu$Type <- as.factor(as.character(stark_edu$Type))
 
-hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010, 0, 15)
+hisch_under_plot <- dist_trend_plot(stark_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010, 0, 15)
 
-hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Avenue", cat = "Redidents", construct_year = 2009, end_year = 2010, 10, 25)
+hisch_plot <- dist_trend_plot(stark_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Stark & Oak Street", cat = "Redidents", construct_year = 2009, end_year = 2010, 10, 25)
 
-col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010, 12, 27)
+col_plot <- dist_trend_plot(stark_edu,demo = "College", demo_code = "col_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010, 12, 27)
 
-bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010,20,35)
+bach_plot <- dist_trend_plot(stark_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010,20,35)
 
 mylegend<-g_legend(hisch_plot)
 
@@ -420,7 +420,7 @@ stark_gender <- rbind(as.data.frame(stark_gender), as.data.frame(pdx_gender))
 stark_gender[stark_gender$year<2009,][,c(3,5)] <- NA
 stark_gender$Type <- as.factor(as.character(stark_gender$Type))
 
-gender_plot <- dist_trend_plot(stark_gender,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Avenue", cat = "Employment", construct_year = 2009, end_year = 2010, 30, 60)
+gender_plot <- dist_trend_plot(stark_gender,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Street", cat = "Employment", construct_year = 2009, end_year = 2010, 30, 60)
 
 stark_gender_rac <- portland_corridor_rac %>% as.data.frame() %>% filter(Group == 1) %>% 
   group_by(Type, year) %>% 
@@ -438,7 +438,7 @@ stark_gender_rac <- rbind(as.data.frame(stark_gender_rac), as.data.frame(pdx_gen
 stark_gender_rac[stark_gender_rac$year<2009,][,c(3,5)] <- NA
 stark_gender_rac$Type <- as.factor(as.character(stark_gender_rac$Type))
 
-gender_rac_plot <- dist_trend_plot(stark_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Avenue", cat = "Residents", construct_year = 2009, end_year = 2010, 30, 60)
+gender_rac_plot <- dist_trend_plot(stark_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Stark & Oak Street", cat = "Residents", construct_year = 2009, end_year = 2010, 30, 60)
 
 
 
