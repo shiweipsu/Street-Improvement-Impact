@@ -20,7 +20,7 @@ In order to make their cities more livable, policymakers and planning department
 
 DESCRIPTION OF CITY and CITY BIKE NETWORK and HISTORY HERE
 
-![Memphis Corridor](images/memphis_corridors2.png)
+![Memphis Corridor](images/memphis_corridors.png)
 
 
 # Data Sources/Methodology
@@ -84,7 +84,7 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, dplyr, dbplyr, stargazer,cowplot, gridExtra)
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, gridExtra,data.table)
 
 #query the corridors from bike_lanes
 user <- "shiwei"
@@ -109,6 +109,8 @@ cooper <- memphis_corridor %>% filter(name == "Cooper Street") %>% mutate(corrid
 memphis_corridor <-rbind(memphis_corridor, cooper)
 
 memphis_corridor$Type <- ifelse(is.na(memphis_corridor$buildstart),"Control", "Treatment")
+memphis_corridor[memphis_corridor$name =="Madison Avenue",]$Type <- "Treatment: Madison"
+memphis_corridor[memphis_corridor$name =="Broad Avenue",]$Type <- "Treatment: Broad"
 memphis_corridor[memphis_corridor$name =="Central Avenue",]$Type <- "Control: Central"
 memphis_corridor[memphis_corridor$name=="Cooper Street",]$Type <- "Control: Cooper"
 memphis_corridor[memphis_corridor$name=="Highland Street",]$Type <- "Control: Highland"
@@ -289,13 +291,55 @@ In terms of retail performance, the treatment corridor's retail employment exper
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
 
-madison_agg <- agg_trend_table(memphis_corridor, group = 1)
+madison_agg <- agg_trend_table(memphis_corridor, group = 1) 
 
-madison_retail_trend_plot <- agg_trend_plot(madison_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012)
+# add a new function to draw plots with 4 control corridors
+agg_trend_plot4 <- function(df_plot, industry, corridor_name, 
+                                 industry_code = c("CNS07", "CNS18", "business"), 
+                                 construct_year, end_year) {
+  
+  df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
 
-madison_food_trend_plot <- agg_trend_plot(madison_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Madision Avenue .", construct_year = 2011, end_year = 2012)
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
 
-plot_grid(madison_retail_trend_plot, madison_food_trend_plot)
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(size = 3, fill="white") +
+    scale_shape_manual(values=c(22,21,21,21,21))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
+         caption = "Shaded area represents the construction period") +
+    guides(title = "Street Type")
+  
+  return(ats_df)
+}
+
+madison_retail_trend_plot <- agg_trend_plot4(madison_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012)
+
+madison_food_trend_plot <- agg_trend_plot4(madison_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Madision Avenue .", construct_year = 2011, end_year = 2012)
+
+prow <- plot_grid(madison_retail_trend_plot + theme(legend.position="none"),
+                  madison_food_trend_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(madison_retail_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
 ```
 
 
@@ -403,11 +447,17 @@ In terms of retail performance, similar as Madison corridors, the treatment Broa
 
 broad_agg <- agg_trend_table(memphis_corridor, group = 2)
 
-agg_retail_trend_plot <- agg_trend_plot(broad_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011)
+broad_retail_trend_plot <- agg_trend_plot(broad_agg, industry = "Retail", industry_code = "CNS07", corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011)
 
-agg_food_trend_plot <- agg_trend_plot(broad_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Broad Avenue .", construct_year = 2010, end_year = 2011)
+broad_food_trend_plot <- agg_trend_plot(broad_agg, industry = "Food/Accommodataion",industry_code = "CNS18", corridor_name = "Broad Avenue .", construct_year = 2010, end_year = 2011)
 
-plot_grid(agg_retail_trend_plot, agg_food_trend_plot)
+prow <- plot_grid(broad_retail_trend_plot + theme(legend.position="none"),
+                  broad_food_trend_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(broad_retail_trend_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 ```
 
 ## Corridor Comparison Summary
@@ -424,24 +474,15 @@ The bike facility installation has taken place in 2011. In terms of retail emplo
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
 
-madison_agg <- agg_index_trend_table(memphis_corridor, group = 1, construct_year = 2011)
-madison_agg <- madison_agg[madison_agg$Type!="Control: Jackson",]
-madison_agg$Type <- as.character(madison_agg$Type)
-memphis <- memphis_lehd %>% group_by(year) %>%
-  summarise(CNS07 = sum(CNS07),
-            CNS18 = sum(CNS18),
-            business = CNS07 + CNS18) %>%
-  mutate(CNS07_sd = CNS07/400.22,
-         CNS18_sd = CNS18/291.02,
-         business_sd = business/691.24,
-         Type = "City") %>%
-  select(Type, year, CNS07_sd, CNS18_sd, business_sd)
-madison_agg <- rbind(as.data.frame(madison_agg), as.data.frame(memphis))
+madison_agg <- agg_index_trend_table(memphis_corridor, group = 1, construct_year = 2011) %>% 
+  filter(Type!="Control: Jackson")
+memphis_agg <- city_agg_index_trend_table(memphis_lehd, construct_year = 2011) 
+madison_agg <- bind_rows(madison_agg, memphis_agg)
 madison_agg$Type <- as.factor(madison_agg$Type)
 
-
-agg_lehd_trend_plot <- function(df_plot, industry, corridor_name, 
-                                 industry_code = c("CNS07", "CNS18", "CNS07_sd", "CNS18_sd"), 
+# creat function for plot with 5 categories
+agg_index_trend_plot5 <- function(df_plot, industry, corridor_name, 
+                                 industry_code = c("CNS07_sd", "CNS18_sd"), 
                                  construct_year, end_year) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
@@ -477,14 +518,17 @@ agg_lehd_trend_plot <- function(df_plot, industry, corridor_name,
 }
 
 
-madison_index_retail_plot <- agg_lehd_trend_plot(madison_agg_indexed, industry = "Retail", corridor_name = "Madison Ave.",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
-madison_index_food_plot <- agg_lehd_trend_plot(madison_agg_indexed, industry = "Food/Accommodations", corridor_name = "Madison Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+madison_index_retail_plot <- agg_index_trend_plot5(madison_agg %>% filter(year!=2004), industry = "Retail", corridor_name = "Madison Ave.",industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+madison_index_food_plot <- agg_index_trend_plot5(madison_agg %>% filter(year!=2004), industry = "Food/Accommodations", corridor_name = "Madison Ave.",industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+ # remove 2004 data for visual purpose, Cooper street has very high employment that year
 
-mylegend<-g_legend(madison_index_retail_plot)
-grid.arrange(arrangeGrob(madison_index_retail_plot + theme(legend.position="none"),
-                         madison_index_food_plot + theme(legend.position="none"),nrow=1),
-             mylegend, nrow=2,heights=c(10, 1))
+prow <- plot_grid(madison_index_retail_plot + theme(legend.position="none"),
+                  madison_index_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
 
+legend_b <- get_legend(madison_index_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
 
@@ -500,6 +544,7 @@ madison_agg$Type <- factor(madison_agg$Type)
 madison_agg$year <- as.numeric(madison_agg$year)
 madison_agg$sales_pest <- madison_agg$gross_sales/madison_agg$business
 
+# write function of make sales index table
 agg_sale_index_trend_table <- function(df, group, construct_year) {
   
   #prepare tables for plotting
@@ -508,7 +553,6 @@ agg_sale_index_trend_table <- function(df, group, construct_year) {
   
   base_year <-  df %>% filter(year == as.character(construct_year)) %>% 
     select(business_base = business, sales_base = gross_sales, Type, year)
-  
   
   df_plot <- df %>%  
     left_join(base_year, by = "Type") %>%
@@ -603,7 +647,6 @@ madison_sales_pest_plot <- agg_sales_trend_plot(madison_agg, industry = "Retail 
 
 madison_sales_indexed_plot <- agg_sales_trend_plot(madison_agg_indexed, industry = "Indexed Retail Gross Sales", corridor_name = "Madison Ave.",industry_code = "sales_sd", construct_year = 2011, end_year = 2012)
 
-
 mylegend<-g_legend(madison_estb_plot)
 
 grid.arrange(arrangeGrob(madison_estb_plot + theme(legend.position="none"),
@@ -642,25 +685,22 @@ Similar as DID analysis, two models, using retail gross sales and number of esta
 The bike facility installation has taken place in 2010. From the graphs, we can clearly observe the decrease trend of retail employment on Broad Avenue comparing with control corridors and city-wide trend after the street improvement project. However, food/accommodation sector shows opposite trend. The treatment corridor increase continuingly after street improvement, while it is similar to Cooper control corridor, it apparently performs better than Central control corridor and city-wide trend. To conclude, street improvement in Broad Avenue has negative impact on retail employment, but positive impact on food/accommodation employment.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
-
-broad_agg <- agg_index_trend_table(memphis_corridor, group = 2, construct_year = 2010)
-broad_agg$Type <- as.character(broad_agg$Type)
-memphis <- memphis_lehd %>% group_by(year) %>%
-  summarise(CNS07 = sum(CNS07),
-            CNS18 = sum(CNS18),
-            business = CNS07 + CNS18) %>%
-  mutate(CNS07_sd = CNS07/419.14,
-         CNS18_sd = CNS18/288.88,
-         business_sd = business/708.02,
-         Type = "City") %>%
-  select(Type, year, CNS07_sd, CNS18_sd, business_sd)
-broad_agg <- rbind(as.data.frame(broad_agg), as.data.frame(memphis))
+broad_agg <- agg_index_trend_table(memphis_corridor, group = 2, construct_year = 2010) 
+memphis_agg <- city_agg_index_trend_table(memphis_lehd, construct_year = 2011)
+broad_agg <- bind_rows(broad_agg, memphis_agg)
 broad_agg$Type <- as.factor(broad_agg$Type)
 
-broad_agg_retail_plot <- agg_index_trend_plot(broad_agg, industry = "Retail", corridor_name = "Broad Ave.",industry_code = "CNS07_sd", construct_year = 2010, end_year = 2011)
-broad_agg_food_plot <- agg_index_trend_plot(broad_agg, industry = "Food/Accommodations", corridor_name = "Broad Ave.",industry_code = "CNS18_sd", construct_year = 2010, end_year = 2011)
+broad_index_retail_plot <- agg_index_trend_plot(broad_agg, industry = "Retail", corridor_name = "Broad Ave.",industry_code = "CNS07_sd", construct_year = 2010, end_year = 2011)
+broad_index_food_plot <- agg_index_trend_plot(broad_agg, industry = "Food/Accommodations", corridor_name = "Broad Ave.",industry_code = "CNS18_sd", construct_year = 2010, end_year = 2011)
 
-plot_grid(broad_agg_retail_plot,broad_agg_food_plot)
+prow <- plot_grid(broad_index_retail_plot + theme(legend.position="none"),
+                  broad_index_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(broad_index_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
 
 ```
 

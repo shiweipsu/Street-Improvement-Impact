@@ -27,6 +27,10 @@ b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a
 FROM memphis_lehd a, memhpis_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
 
+cooper <- memphis_corridor %>% filter(name == "Cooper Street") %>% mutate(corridor_group =1)
+
+memphis_corridor <-rbind(memphis_corridor, cooper)
+
 memphis_corridor$Type <- ifelse(is.na(memphis_corridor$buildstart),"Control", "Treatment")
 memphis_corridor[memphis_corridor$name =="Central Avenue",]$Type <- "Control: Central"
 memphis_corridor[memphis_corridor$name=="Cooper Street",]$Type <- "Control: Cooper"

@@ -152,6 +152,10 @@ b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a
 FROM memphis_lehd a, memhpis_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);&quot;)
 
+cooper &lt;- memphis_corridor %&gt;% filter(name == &quot;Cooper Street&quot;) %&gt;% mutate(corridor_group =1)</code></pre>
+<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
+<pre class="r"><code>memphis_corridor &lt;-rbind(memphis_corridor, cooper)
+
 memphis_corridor$Type &lt;- ifelse(is.na(memphis_corridor$buildstart),&quot;Control&quot;, &quot;Treatment&quot;)
 memphis_corridor[memphis_corridor$name ==&quot;Central Avenue&quot;,]$Type &lt;- &quot;Control: Central&quot;
 memphis_corridor[memphis_corridor$name==&quot;Cooper Street&quot;,]$Type &lt;- &quot;Control: Cooper&quot;
@@ -173,7 +177,6 @@ memphis_sales &lt;- tbl(con, &quot;memphis_sales_tax&quot;) %&gt;%
   group_by(year,district_name, street_type, street_group, Type) %&gt;% 
   summarise(business = mean(businesses),
             gross_sales = sum(gross_sales))</code></pre>
-<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
 <div id="lehd-data" class="section level1">
 <h1>LEHD data</h1>
 <table style="text-align:center">
@@ -242,6 +245,43 @@ Accomodations Emp.
 </tr>
 <tr>
 <td style="text-align:left">
+TypeControl: Cooper
+</td>
+<td>
+-348.500<sup>***</sup>
+</td>
+<td>
+-196.250<sup>**</sup>
+</td>
+<td>
+-544.750<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(22.577)
+</td>
+<td>
+(78.337)
+</td>
+<td>
+(85.600)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 TypeControl: Highland
 </td>
 <td>
@@ -258,13 +298,13 @@ TypeControl: Highland
 <td style="text-align:left">
 </td>
 <td>
-(25.384)
+(22.577)
 </td>
 <td>
-(66.108)
+(78.337)
 </td>
 <td>
-(73.639)
+(85.600)
 </td>
 </tr>
 <tr>
@@ -282,10 +322,10 @@ TypeControl: Highland
 TypeControl: Union
 </td>
 <td>
--40.750
+-40.750<sup>*</sup>
 </td>
 <td>
-143.500<sup>**</sup>
+143.500<sup>*</sup>
 </td>
 <td>
 102.750
@@ -295,13 +335,13 @@ TypeControl: Union
 <td style="text-align:left">
 </td>
 <td>
-(25.384)
+(22.577)
 </td>
 <td>
-(66.108)
+(78.337)
 </td>
 <td>
-(73.639)
+(85.600)
 </td>
 </tr>
 <tr>
@@ -332,13 +372,50 @@ prepost
 <td style="text-align:left">
 </td>
 <td>
-(31.089)
+(27.652)
 </td>
 <td>
-(80.966)
+(95.943)
 </td>
 <td>
-(90.189)
+(104.839)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+TypeControl: Cooper:prepost
+</td>
+<td>
+14.750
+</td>
+<td>
+127.500
+</td>
+<td>
+142.250
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(39.105)
+</td>
+<td>
+(135.684)
+</td>
+<td>
+(148.264)
 </td>
 </tr>
 <tr>
@@ -369,13 +446,13 @@ TypeControl: Highland:prepost
 <td style="text-align:left">
 </td>
 <td>
-(43.966)
+(39.105)
 </td>
 <td>
-(114.503)
+(135.684)
 </td>
 <td>
-(127.546)
+(148.264)
 </td>
 </tr>
 <tr>
@@ -406,13 +483,13 @@ TypeControl: Union:prepost
 <td style="text-align:left">
 </td>
 <td>
-(43.966)
+(39.105)
 </td>
 <td>
-(114.503)
+(135.684)
 </td>
 <td>
-(127.546)
+(148.264)
 </td>
 </tr>
 <tr>
@@ -443,13 +520,13 @@ Constant
 <td style="text-align:left">
 </td>
 <td>
-(17.949)
+(15.965)
 </td>
 <td>
-(46.746)
+(55.393)
 </td>
 <td>
-(52.070)
+(60.529)
 </td>
 </tr>
 <tr>
@@ -471,13 +548,13 @@ Constant
 Observations
 </td>
 <td>
-36
+48
 </td>
 <td>
-36
+48
 </td>
 <td>
-36
+48
 </td>
 </tr>
 <tr>
@@ -485,13 +562,13 @@ Observations
 R<sup>2</sup>
 </td>
 <td>
-0.866
+0.925
 </td>
 <td>
-0.401
+0.434
 </td>
 <td>
-0.632
+0.711
 </td>
 </tr>
 <tr>
@@ -499,41 +576,41 @@ R<sup>2</sup>
 Adjusted R<sup>2</sup>
 </td>
 <td>
-0.844
+0.912
 </td>
 <td>
-0.301
+0.335
 </td>
 <td>
-0.571
+0.660
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-Residual Std. Error (df = 30)
+Residual Std. Error (df = 40)
 </td>
 <td>
-50.768
+45.155
 </td>
 <td>
-132.216
+156.674
 </td>
 <td>
-147.277
+171.201
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-F Statistic (df = 5; 30)
+F Statistic (df = 7; 40)
 </td>
 <td>
-38.762<sup>***</sup>
+70.415<sup>***</sup>
 </td>
 <td>
-4.010<sup>***</sup>
+4.387<sup>***</sup>
 </td>
 <td>
-10.322<sup>***</sup>
+14.042<sup>***</sup>
 </td>
 </tr>
 <tr>
