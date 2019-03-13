@@ -37,4 +37,10 @@ memphis_sales <- memphis_sales %>%
 
 dbWriteTable(conn = con, name = "memphis_sales_tax", value = memphis_sales, overwrite = TRUE)
 
+# cleaned by Minji, bring from downloads folder
+
+memphis_qcew <- read_csv("Data/memphis/memphis_qcew_cleaned_bf.csv")
+
+dbWriteTable(conn = con, name = "memphis_qcew", value = memphis_qcew, overwrite = TRUE)
+
 dbDisconnect(con)
