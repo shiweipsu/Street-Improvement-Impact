@@ -1,0 +1,440 @@
+---
+title: "test"
+author: "Wei Shi"
+date: "March 15, 2019"
+output: html_document
+---
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr, kableExtra, data.table, bindrcpp, knitr, pander)
+
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+minn_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.type as grouptype,  a.year as year, a.geometry as geom
+FROM minneapolis_lehd a, minneapolis_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+minn_corridor <- minn_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name)
+#add new colume of construct year as numeric
+
+minn_lehd <- st_read(dsn = con, "minneapolis_lehd") %>% as.data.frame() %>% 
+  select(-geometry)
+
+minn_lehd <- minn_lehd %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
+
+minn_corridor <- minn_corridor %>% rename(geometry = geom, Type = grouptype)
+
+minn_sale <- tbl(con, "minn_sales_tax") %>% collect()
+minn_qcew <- tbl(con, "minneapolis_qcew_modified") %>% collect()
+
+```
+
+# functions
+```{r message=FALSE, warning=FALSE, include=FALSE}
+percent <- function(x, digits = 2, format = "f", ...) {
+  paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+
+lehd_t <- function(df, construction_year){
+  base_start= construction_year-3
+  base_end = construction_year-1
+  post_start=construction_year+1
+  post_end=construction_year+3
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+    select(Type, CNS07, CNS18) %>% 
+  group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07),0), CNS18=round(mean(CNS18),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+            select(year, Type, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  lehd <- merge(base,post, by="Type") %>% 
+    select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) %>% mutate_at(vars(contains("CNS18_")), percent)
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(lehd)<-coln
+
+  return(lehd)
+}
+
+
+sales_t <- function(df, construction_year){
+  base_start= ifelse(construction_year==2012,construction_year-4, construction_year-3)
+  base_end = ifelse(construction_year==2012,construction_year-2, construction_year-1)
+  post_start=ifelse(construction_year==2012,construction_year+2, construction_year+1)
+  post_end=ifelse(construction_year==2009,construction_year+5, construction_year+5)
+  # sales data miss 2011 and 2013 data, to keep three data points before and after, different corridor use different start and end years 
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+    select(Type, CNS07, CNS18) %>% 
+  group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07,na.rm=T),0), CNS18=round(mean(CNS18,na.rm=T),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+            select(year, Type, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  sales <- merge(base,post, by="Type") %>% 
+    select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) %>% mutate_at(vars(contains("CNS18_")), percent)
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(sales)<-coln
+
+  return(sales)
+}
+
+qcew_t <- function(df, construction_year){
+  base_start= construction_year-3
+  base_end = construction_year-1
+  post_start=construction_year+1
+  post_end=construction_year+3
+  
+  df <- df %>% rename(CNS07=avg_emp) %>% 
+    group_by(year, Type) %>% 
+    summarise(CNS07=mean(CNS07,na.rm=T)) %>% 
+    mutate(CNS18=0, business=CNS07+CNS18) %>% select(year, Type, CNS07, CNS18, business) 
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+    select(Type, CNS07, CNS18) %>% 
+  group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07),0), CNS18=round(mean(CNS18),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+            select(year, Type, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  qcew <- merge(base,post, by="Type") %>% 
+    select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) 
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(qcew)<-coln
+  
+  qcew[is.na(qcew)]<-NA
+  qcew[qcew==0]<-NA
+
+  return(qcew)
+}
+
+plot_t <- function(df){
+  options(knitr.kable.NA = '-')
+  plot <- knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,3,5),background="#ccffcc") %>% 
+  group_rows("LEHD: (employment)",1,2) %>% 
+  group_rows("Sales: (sales revenue, $)",3,4) %>% 
+  group_rows("QCEW: (employment)",5,6) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "1st year growth rate is defined as the growth rate of the year after construction compared to baseline."))
+
+  return(plot)
+
+}
+
+plot_tc <- function(df){
+  options(knitr.kable.NA = '-')
+  plot <- knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,3,5),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
+
+  return(plot)
+}
+
+```
+
+# riverside
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+riverside_lehd <- agg_trend_table(minn_corridor, group = 1) %>% 
+  mutate(Type =ifelse(Type == "control", "Control: Cedar Ave", "Treatment")) 
+
+lehd <- lehd_t(riverside_lehd, 2009)
+
+
+riverside_sale <- agg_trend_table(minn_sale, group = 1) %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Cedar Ave"))
+sales <- sales_t(riverside_sale, 2009)
+
+
+riverside_qcew <- minn_qcew %>% filter(corridors == "Riverside Ave" | corridors == "Cedar Ave") %>% 
+  mutate(Type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Cedar Ave")) 
+
+qcew <- qcew_t(riverside_qcew, 2009)
+
+
+# make combined table         
+t <- rbind(lehd, sales, qcew)
+ 
+plot_t(t)
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD: \n (employment)",2), rep("Sales: \n(sales revenue, $)",2),rep("QCEW: \n(employment)",2)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+plot_tc(t_c)
+
+```
+
+
+# franklin
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+franklin_lehd <- agg_trend_table(minn_corridor, group = 2) %>% 
+  mutate(Type =ifelse(Type == "control", "Control: Cedar Ave", "Treatment")) 
+
+lehd <- lehd_t(franklin_lehd, 2011)
+
+
+franklin_sale <- agg_trend_table(minn_sale, group = 2) 
+sales <- sales_t(franklin_sale, 2011)
+
+
+franklin_qcew <- minn_qcew %>% filter(corridors == "Franklin Ave") %>% 
+  mutate(Type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Cedar Ave")) 
+
+qcew <- qcew_t(riverside_qcew, 2011)
+
+
+# make combined table         
+t <- rbind(lehd, qcew)
+ 
+knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>%
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,3),background="#ccffcc") %>% 
+  group_rows("LEHD: (employment)",1,2) %>% 
+  group_rows("QCEW: (employment)",3,4) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "1st year growth rate is defined as the growth rate of the year after construction compared to baseline."))
+
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD: \n (employment)",2), rep("QCEW: \n(employment)",2)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,3),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
+
+```
+
+
+
+# central
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+central_lehd <- agg_trend_table(minn_corridor, group = 3) %>% 
+  mutate(Type =ifelse(Type == "control", "Control: University Ave", "Treatment")) 
+
+lehd <- lehd_t(central_lehd, 2012)
+
+
+central_sale <- agg_trend_table(minn_sale, group = 3) %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: University Ave"))
+sales <- sales_t(central_sale, 2012)
+
+
+central_qcew <- minn_qcew %>% filter(corridors == "Central Ave" | corridors == "University Ave") %>% 
+  mutate(Type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: University Ave")) 
+
+qcew <- qcew_t(central_qcew, 2012)
+
+
+# make combined table         
+t <- rbind(lehd, sales, qcew)
+ 
+plot_t(t)
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD: \n (employment)",2), rep("Sales: \n(sales revenue, $)",2),rep("QCEW: \n(employment)",2)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+plot_tc(t_c)
+
+```
+
+
+# lyndale
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+lyndale_lehd <- agg_trend_table(minn_corridor, group = 4) %>% 
+  mutate(Type =ifelse(Type == "control", "Control: Grand Ave", "Treatment")) 
+
+lehd <- lehd_t(lyndale_lehd, 2008)
+
+
+lyndale_sale <- agg_trend_table(minn_sale, group = 4) %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Grand Ave"))
+sales <- sales_t(lyndale_sale, 2008)
+
+
+lyndale_qcew <- minn_qcew %>% filter(corridors == "Lyndale Ave S" | corridors == "Grand Ave") %>% 
+  mutate(Type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Grand Ave")) 
+
+qcew <- qcew_t(lyndale_qcew, 2012)
+
+
+# make combined table         
+t <- rbind(lehd, sales, qcew)
+ 
+plot_t(t)
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD: \n (employment)",2), rep("Sales: \n(sales revenue, $)",2),rep("QCEW: \n(employment)",2)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+plot_tc(t_c)
+
+```
+
+# North second
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+lyndale_lehd <- agg_trend_table(minn_corridor, group = 5) %>% 
+  mutate(Type =ifelse(Type == "control", "Control: Broadway Ave", "Treatment")) 
+
+lehd <- lehd_t(lyndale_lehd, 2011)
+
+
+lyndale_sale <- agg_trend_table(minn_sale, group = 5) %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Broadway Ave"))
+
+base <- filter(lyndale_sale, year%in%(2008:2010)) %>% 
+    select(Type, CNS07, CNS18) %>% 
+  group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07,na.rm=T),0), CNS18=round(mean(CNS18,na.rm=T),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- lyndale_sale %>% filter (year %in% c(2012:2015)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=2009, business=CNS07+CNS18) %>% 
+            select(year, Type, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  sales <- merge(base,post, by="Type")
+  sales[is.na(sales)] <- NA
+  sales<- sales %>% select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) 
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(sales)<-coln
+
+
+lyndale_qcew <- minn_qcew %>% filter(corridors == "North 2nd Street" | corridors == "Broadway Ave") %>% 
+  mutate(Type = case_when(street_type == "improvement" ~ "Treatment",
+                                 street_type == "control" ~ "Control: Broadway Ave")) 
+
+qcew <- qcew_t(lyndale_qcew, 2011)
+
+
+# make combined table         
+t <- rbind(lehd, sales, qcew)
+ 
+plot_t(t)
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD: \n (employment)",2), rep("Sales: \n(sales revenue, $)",2),rep("QCEW: \n(employment)",2)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+plot_tc(t_c)
+
+```
