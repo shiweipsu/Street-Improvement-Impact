@@ -1,11 +1,9 @@
 ---
 title: "Minneapolis Case Study"
-author: "Jamaal Green"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  word_document: 
-    reference_docx: "docx_reference2.docx"
-
+  word_document:
+    reference_docx: docx_reference2.docx
+always_allow_html: yes
 ---
 
 ```{r setup,include=FALSE}
@@ -94,10 +92,10 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr)
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr, kableExtra, data.table, bindrcpp, knitr)
 
 
-user <- "jamgreen"
+user <- "shiwei"
 host <- "pgsql102.rc.pdx.edu"
 pw <- scan(here::here("batteries.pgpss"), what = "")
 dbname <- "bike_lanes"
@@ -167,10 +165,17 @@ riverside <- minn_corridor %>% filter(Name == "Riverside Ave (improvement site)"
 
 cedar <- minn_corridor %>% filter(Name == "Cedar Ave (control)", year == "2008")
 
-riverside <- riverside %>% summarise(TotEmp = sum(C000)/nrow(riverside), RetailEmp = sum(CNS07)/nrow(riverside), AccomEmp = sum(CNS08)/nrow(riverside))
+riverside <- riverside %>% summarise(TotEmp = sum(C000)/nrow(riverside), RetailEmp = sum(CNS07)/nrow(riverside), AccomEmp = sum(CNS18)/nrow(riverside))
 # get employment at block level, divided by nrow()
 
-cedar <- cedar %>% summarise(TotEmp = sum(C000)/nrow(cedar), RetailEmp = sum(CNS07)/nrow(cedar),AccomEmp = sum(CNS08)/nrow(cedar))
+cedar <- cedar %>% summarise(TotEmp = sum(C000)/nrow(cedar), RetailEmp = sum(CNS07)/nrow(cedar),AccomEmp = sum(CNS18)/nrow(cedar))
+
+minn_lehd_2008 <- minn_lehd %>% filter(year == "2008", CNS07+CNS18 > 0)
+
+quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2008$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(minn_lehd_2008$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(minn_lehd_2008$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
 
 #t-tests----
 
@@ -205,8 +210,8 @@ The following table shows total, retail, and accommodations employment for River
 
 | Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
 |----------------|---------|------------|-----------|---------|------------|-----------|
-| Riverside Ave. | 345     | 18          | 6         | 85-90      | 80-85  | 65-70     |
-| Cedar Ave.     | 61      | 13          | 1         | 55-60      | 75-80  | 50-55     |
+| Riverside Ave. | 345     | 18         | 7         | 85-90   | 80-85      | 60-65     |
+| Cedar Ave.     | 61      | 13         | 10        | 55-60   | 75-80      | 65-70     |
 
 Table 1: Riverside and Cedar Avenue Employment Percentiles
 
@@ -237,6 +242,13 @@ franklin <- franklin %>% summarise(tot_emp = sum(C000)/nrow(franklin), retail_em
 
 minnehaha <- minnehaha %>% summarise(tot_emp = sum(C000)/nrow(minnehaha), retail_emp = sum(CNS07)/nrow(minnehaha), 
 accom_emp = sum(CNS18)/nrow(minnehaha))
+
+minn_lehd_2010 <- minn_lehd %>% filter(year == "2010", CNS07+CNS18 > 0)
+
+quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2010$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(minn_lehd_2010$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(minn_lehd_2010$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
 
 #t-tests
 
@@ -279,10 +291,10 @@ t.test(franklin_growth$food_accom_growth,minnehaha$food_accom_growth)
 ```
 
 
-| Corridor           | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
-|--------------------|---------|------------|-----------|---------|------------|-----------|
-| Franklin (improvement) | 74     | 10         | 0         | 60-65      | 70-75         | N/A       |
-| Franklin (control) | 77    | 1         | 8       | 60-65      | 40-45         | 70-75        |
+| Corridor              | Tot Emp | Retail Emp | Food Emp | Tot (%) | Retail (%) | Food (%) |
+|-----------------------|---------|------------|----------|---------|------------|----------|
+| Franklin (improvement)| 59      | 8          | 8        | 60-65   | 70-75      | 60-65    |
+| Franklin (control)    | 103     | 1          | 5        | 70-75   | 40-45      | 55-60    |
 
 Table 2: Franklin Ave. Corridors Employment Percentiles
 
@@ -315,6 +327,13 @@ university <- university %>%
   summarise(tot_emp = sum(C000)/nrow(university), 
             retail_emp = sum(CNS07)/nrow(university), 
             accom_emp = sum(CNS18)/nrow(university))
+
+minn_lehd_2011 <- minn_lehd %>% filter(year == "2011", CNS07+CNS18 > 0)
+
+quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2011$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(minn_lehd_2011$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(minn_lehd_2011$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
 
 #t-tests
 
@@ -353,10 +372,10 @@ t.test(central_growth$food_accom_growth,uni_growth$food_accom_growth)
 ```
 
 
-| Corridor       | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
-|----------------|---------|------------|-----------|---------|------------|-----------|
-| Central Ave    | 60     | 8         | 91        | 55-60      | 65-70         | 60-65        |
-| University Ave | 54    | 7        | 0         | 55-60      | 65-70         | N/A       |
+| Corridor       | Tot Emp | Retail Emp | Food Emp | Tot (%) | Retail (%) | Food (%) |
+|----------------|---------|------------|----------|---------|------------|----------|
+| Central Ave    | 77      | 10         | 5        | 65-70   | 75-80      | 55-60    |
+| University Ave | 50      | 6          | 15       | 55-60   | 65-70      | 70-75    |
 
 Table 3: Central and University Avenue Corridors Employment Percentiles
 
@@ -383,12 +402,19 @@ grand <- minn_corridor %>% filter(Name == "Grand Ave (control)", year == "2007")
 lyndale <- lyndale %>% 
   summarise(tot_emp = sum(C000)/nrow(lyndale), 
             retail_emp = sum(CNS07)/nrow(lyndale),
-            accom_emp = sum(CNS08)/nrow(lyndale))
+            accom_emp = sum(CNS18)/nrow(lyndale))
 
 grand <- grand %>% 
   summarise(tot_emp = sum(C000)/nrow(grand), 
            retail_emp = sum(CNS07)/nrow(grand),
-          accom_emp = sum(CNS08)/nrow(grand))
+          accom_emp = sum(CNS18)/nrow(grand))
+
+minn_lehd_2007 <- minn_lehd %>% filter(year == "2007", CNS07+CNS18 > 0)
+
+quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2007$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(minn_lehd_2007$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(minn_lehd_2007$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
 
 #t-tests
 
@@ -417,10 +443,10 @@ t.test(lyndale$busi_perc2, grand$busi_perc2)
 
 ```
 
-| Corridor | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
-|----------|---------|------------|-----------|---------|------------|-----------|
-| Lyndale  | 41     | 7        | 1         | 50-55      | 65-70         | 50-55       |
-| Grand    | 12      | 1         | 0         | 25-30      | 40-45         | N/A       |
+| Corridor | Tot Emp | Retail Emp | Food Emp | Tot (%) | Retail (%) | Food (%)  |
+|----------|---------|------------|----------|---------|------------|-----------|
+| Lyndale  | 41      | 7          | 4        | 50-55   | 60-65      | 50-55     |
+| Grand    | 12      | 1          | 1        | 25-30   | 30-40      | 45-50     |
 
 Table 4: Lyndale and Grand Avenue Corridors Employment Percentiles
 
@@ -445,12 +471,12 @@ broadway <- minn_corridor %>% filter(Name == "Broadway Ave (control)", year == "
 
 second <- second %>% summarise(tot_emp = sum(C000)/nrow(second), 
                                retail_emp = sum(CNS07)/nrow(second),
-                               accom_emp = sum(CNS08)/nrow(second))
+                               accom_emp = sum(CNS18)/nrow(second))
 
 broadway <- broadway %>% 
   summarise(tot_emp = sum(C000)/nrow(broadway), 
             retail_emp = sum(CNS07)/nrow(broadway),
-            accom_emp = sum(CNS08)/nrow(broadway))
+            accom_emp = sum(CNS18)/nrow(broadway))
 
 #t-tests
 
@@ -480,10 +506,10 @@ t.test(second$busi_perc2, broadway$busi_perc2)
 ```
 
 
-| Corridor   | Tot Emp | Retail Emp | Accom Emp | Tot (%) | Retail (%) | Accom (%) |
-|------------|---------|------------|-----------|---------|------------|-----------|
-| Second St. | 132    | 4.5         | 1         | 70-75      | 55-60         | 50-55       |
-| Broadway   | 36     | 7         | 0         | 45-50      | 65-70         | N/A        |
+| Corridor   | Tot Emp | Retail Emp | Food Emp | Tot (%) | Retail (%) | Food (%) |
+|------------|---------|------------|----------|---------|------------|----------|
+| Second St. | 132     | 5          | 7        | 75-80   | 55-60      | 60-65    |
+| Broadway   | 36      | 7          | 5        | 50-55   | 65-70      | 55-60    |
 
 Table 5: North 2nd Street and Broadway Corridors Employment Profile
 
@@ -503,10 +529,9 @@ The table in the following shows the summary of above similarity analysis for tr
 
 Riverside retail employment trends seem to suggest a possible positive effect of the bike infrastructure installation with a major jump in employment in the two years immediately after construction and positively trending employment growth since the initial jumps. The comparison corridor's (Cedar Avenue) employment remains basically unchanged except for a minor bump between 2010 and 2011 where employment returns to 2009 levels. 
 
+The Riverside accommodations patterns are more mixed. Employment growth for the improvement corridor is more robust and consistent after construction compared to the control corridor. The trend analysis here implies a potential positive effect of the infrastructure construction but given the control corridor's positive trends it is not clear that the infrastructure development itself has an independent effect.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
-
-source(here::here("Code/corridor_comparison_functions.R"))
 
 minn_corridor <- minn_corridor %>% rename(geometry = geom, Type = grouptype)
 
@@ -525,12 +550,15 @@ riverside_agg_retail <- city_agg_index_trend_one_control_plot(riverside_agg_idx,
 riverside_agg_accom <- city_agg_index_trend_one_control_plot(riverside_agg_idx, industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
 
 
-plot_grid(riverside_agg_retail, riverside_agg_accom, align = "h")
+prow <- plot_grid(riverside_agg_retail + theme(legend.position="none"),
+                  riverside_agg_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(riverside_agg_retail + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
-
-
-The Riverside accommodations patterns are more mixed. Employment growth for the improvement corridor is more robust and consistent after construction compared to the control corridor. The trend analysis here implies a potential positive effect of the infrastructure construction but given the control corridor's positive trends it is not clear that the infrastructure development itself has an independent effect.
 
 
 #### Sales Tax 
@@ -541,8 +569,11 @@ In terms of retail sales, Riverside remains consistently lower than Cedar Avenue
 
 While Cedar Avenue is the dominant corridor in terms of retail sales, both corridors track each other much more closely when examining restaurant sales tax receipts. Both Cedar and Riverside have consistent positive growth basically over the whole study period. Both corridors also have significant jumps in the rate of growth immediately post-construction though Cedar's rate is greater. 
 
+Comparing the trends for the Riverside corridor it is not immediately apparent that the construction had an impact on retail or restaurant sales. In both cases, the treatment and control corridors largely follow each other in terms of growth, except for a dramatic drop and recovery in retail sales between 2013 and 2014. Given the sensitivity of sales tax as a measure it is unlikely that drop, and subsequent recovery, are a reaction to construction completed years before. In the case of restaurant sales, both corridors experienced dramatic growth, though the improved corridor's rate of growth is more modest, both corridors have significantly more restaurant sales post construction. 
 
-```{r riverside_sales, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
+The indexed plots give us an alternative view of the corridors that reinforce what the non-indexed plots have shown us. Retail sales values, indexed to 2009, highlight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
+
+```{r , echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=1}
 
 con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
                  password = pw, port = 5433)
@@ -569,8 +600,9 @@ riverside_agg_retail_plot <- ggplot(riverside_agg,aes(x=year, y=CNS07,group=Type
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
-  scale_y_continuous(labels = scales::dollar)
+  labs(title = "Retail Sales Comparison: \nRiverside Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar) +
+  theme(legend.position = "none")
 
 riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
@@ -579,20 +611,9 @@ riverside_agg_accom_plot <- ggplot(riverside_agg,aes(x=year, y=CNS18,group=Type,
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sales Tax") +
-  scale_y_continuous(labels = scales::dollar)
-
-plot_grid(riverside_agg_retail_plot, riverside_agg_accom_plot, ncol = 1)
-
-
-```
-
-Comparing the trends for the Riverside corridor it is not immediately apparent that the construction had an impact on retail or restaurant sales. In both cases, the treatment and control corridors largely follow each other in terms of growth, except for a dramatic drop and recovery in retail sales between 2013 and 2014. Given the sensitivity of sales tax as a measure it is unlikely that drop, and subsequent recovery, are a reaction to construction completed years before. In the case of restaurant sales, both corridors experienced dramatic growth, though the improved corridor's rate of growth is more modest, both corridors have significantly more restaurant sales post construction. 
-
-
-```{r riverside_sales_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
-
-#riverside graphs-------------
+  labs(title = "Restaurant Sales Comparison: \nRiverside Ave", x="Year",y="Sales Tax") +
+  scale_y_continuous(labels = scales::dollar) +
+  theme(legend.position = "none")
 
 riverside_agg_idx <- agg_index_trend_table (minn_sale, group = 1,2009)
 
@@ -609,8 +630,9 @@ riverside_agg_retail_idx_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS07_sd
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
-       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
+  labs(title = "Retail Sales Comparison: \nRiverside Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period") +
+  theme(legend.position = "none")
 
 riverside_agg_idx_accom_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2009, xmax = 2010, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
@@ -619,16 +641,23 @@ riverside_agg_idx_accom_plot <- ggplot(riverside_agg_idx,aes(x=year, y=CNS18_sd,
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Restaurant Sales Comparison: Riverside Ave", x="Year",y="Sale Index",
-       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period")
+  labs(title = "Restaurant Sales Comparison: \nRiverside Ave", x="Year",y="Sale Index",
+       caption = "Sales tax is indexed to 2009 \n Shaded Area is Construction Period") +
+  theme(legend.position = "none")
 
-plot_grid(riverside_agg_retail_idx_plot, riverside_agg_idx_accom_plot, ncol = 1)
+prow <- plot_grid(riverside_agg_retail_plot,
+                  riverside_agg_accom_plot,
+                  riverside_agg_retail_idx_plot,
+                  riverside_agg_idx_accom_plot,
+                  align = 'vh', hjust = -1, nrow = 2)
+
+legend_b <- get_legend(riverside_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 
 ```
 
-
-The indexed plots give us an alternative view of the corridors that reinforce what the non-indexed plots have shown us. Retail sales values, indexed to 2009, highlight the consistent growth of retail on Cedar and the relatively weak growth of Riverside in clearer terms. Looking at this plot it becomes clear that Riverside, in terms of retail sides, has yet to recover to its 2009 levels. The restaurant sales index plot tracks closely to the non-indexed plot because both corridors have grown consistently over time.
 
 #### QCEW
 
@@ -636,7 +665,11 @@ As mentioned earlier the QCEW data provided by the state will give us much more 
 
 The Riverside Avenue trend analysis shows that there was a large jump in business activity on Riverside the first quarter of 2005 with consistent overall growth in employment and wages. This large jump in growth was related to the addition of a new, large establishment on the corridor as the total number of retail establishments grew from 4 to 5 in 2005. This large establishment is a clear driver in the growth of employment and wages. Also, note that there does not seem to be any immediately apparent relationship in employment or wage growth and the infrastructure construction period.  
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+The indexed employment and wage figures offer a clearer picture of the dramatic growth of Riverside Ave, even accounting for the large jump in employment in 2005. Principally, note that employment growth for Riverside and Cedar has recovered to 2009 levels with Riverside showing robust growth post-recession and a flattening in the past three years. Cedar, on the other hand, has steadily lost employment post recession after a large bump and is also now hovering around its 2009 employment levels.
+
+Wage growth, though, for both corridors has been on a largely positive trajectory from even before the construction period, though Riverside has seen higher wage growth, relative to its 2009 base year, than Cedar has. Again, note that there does not seem to be any immediately evident connection between wage growth and the corridor construction.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=1.8}
 
 con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
                  password = pw, port = 5433)
@@ -680,12 +713,11 @@ qc_1 <- ggplot(riverside_qcew,
     scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
     geom_point(size = 3, fill = "white") +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Employment Change",
-              subtitle = "QCEW NAICS 442-453",
-       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  labs(x = "Quarter", y = "Employment", title = "Retail Employment Comparison \nRiverside Ave ") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::comma) +
-    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))+
+  theme(legend.position = "none")
 
 qc_2 <- ggplot(riverside_qcew, 
               aes(x = year_quarter, y = total_wages, group = street_type, 
@@ -699,23 +731,11 @@ qc_2 <- ggplot(riverside_qcew,
   scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
     geom_point(size = 3, fill = "white") +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Total Wages",
-              subtitle = "QCEW NAICS 442-453",
-       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development") +
+  labs(x = "Quarter", y = "Wages", title = "Retail Total Wages \nRiverside Ave ") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
   scale_y_continuous(labels = scales::dollar) +
-    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
-
-plot_grid(qc_1, qc_2, ncol = 1)
-
-```
-
-The indexed employment and wage figures offer a clearer picture of the dramatic growth of Riverside Ave, even accounting for the large jump in employment in 2005. Principally, note that employment growth for Riverside and Cedar has recovered to 2009 levels with Riverside showing robust growth post-recession and a flattening in the past three years. Cedar, on the other hand, has steadily lost employment post recession after a large bump and is also now hovering around its 2009 employment levels.
-
-Wage growth, though, for both corridors has been on a largely positive trajectory from even before the construction period, though Riverside has seen higher wage growth, relative to its 2009 base year, than Cedar has. Again, note that there does not seem to be any immediately evident connection between wage growth and the corridor construction.
-
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))+
+  theme(legend.position = "none")
 
 qc_idx1 <- ggplot(riverside_qcew, 
               aes(x = year_quarter, y = avg_emp_idx, group = street_type, 
@@ -729,12 +749,11 @@ qc_idx1 <- ggplot(riverside_qcew,
   scale_x_yearqtr() +
     scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Employment Growth",
-              subtitle = "QCEW NAICS 442-453",
-       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2009") +
+  labs(x = "Quarter", y = "Indexed Employment", title = "Riverside Ave Retail\n Employment Growth",
+       caption = "Data are indexed to the first quarter of 2009") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
-  scale_y_continuous(labels = scales::percent) +
-    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
+  theme(legend.position = "none")
 
 qc_idx2 <- ggplot(riverside_qcew, 
               aes(x = year_quarter, y = wage_idx, group = street_type, 
@@ -748,17 +767,25 @@ qc_idx2 <- ggplot(riverside_qcew,
   scale_x_yearqtr() +
   scale_color_manual(values = c("#00BFC4", "#F8766D")) +
   theme_minimal() +
-  labs(x = "Quarter", y = "", title = "Riverside Ave Retail\n Total Wage Change",
-              subtitle = "QCEW NAICS 442-453",
-       caption = "Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development, data are indexed to the first quarter of 2009") +
+  labs(x = "Quarter", y = "Indexed Wages", title = "Riverside Ave Retail\n Total Wage Change",
+       caption = "Data are indexed to the first quarter of 2009") +
   guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
-  scale_y_continuous(labels = scales::percent) +
-    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))+
+  theme(legend.position = "none")
 
-plot_grid(qc_idx1, qc_idx2,  ncol = 1)
+prow <- plot_grid(qc_1,
+                  qc_2,
+                  qc_idx1,
+                  qc_idx2,
+                  align = 'vh', hjust = -1, nrow = 4)
+
+legend_b <- get_legend(qc_1 + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 
 ```
+
 
 ### Difference-in-Difference
 
@@ -789,7 +816,7 @@ The QCEW ITS estimates are mixed. For employment, the ITS estimates show a posit
 Retail employment does show consistent, though moderate, growth for the improvement corridor though the control corridor has a dramatic spike in employment between 2014 and 2015. In terms of overall trends, the control corridor has consistently higher year over year growth compared to the treatment corridor. 
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
 
 franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
 minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
@@ -802,7 +829,14 @@ franklin_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = franklin_
 
 franklin_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = franklin_agg, industry = "Accommodations", corridor_name = "Franklin Ave.", control_corridor = "Franklin Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
-plot_grid(franklin_idx_retail, franklin_idx_accom, align = "h")
+prow <- plot_grid(franklin_idx_retail + theme(legend.position="none"),
+                  franklin_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(franklin_idx_retail + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
 
 ```
 
@@ -1025,7 +1059,7 @@ The QCEW ITS models largely do not find an effect of construction except for the
 Central Avenue shows a clear positive retail employment trend post-construction for the treatment corridor that eventually overtakes the control corridor in the latest period. Note that both corridors have positive employment trends post-construction though the control corridor has its most dramatic year to year growth during the construction period. 
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
 
 
 central_agg <- agg_index_trend_table(minn_corridor, group = 3, construct_year = 2012)
@@ -1037,7 +1071,13 @@ central_agg_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = centra
 
 central_agg_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = central_agg, industry = "Accommodations", corridor_name = "Central Ave.", control_corridor = "University Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
 
-plot_grid(central_agg_idx_retail, central_agg_idx_accom, align = "h")
+prow <- plot_grid(central_agg_idx_retail + theme(legend.position="none"),
+                  central_agg_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(central_agg_idx_accom + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
 
@@ -1049,7 +1089,7 @@ The accommodations employment trend is more ambiguous. The treatment corridor sa
 Sales tax receipts for Central Ave do not necessarily signal an effect of lane installation in one way or the other. While Central's receipts, overall, have grown for both retail and restaurant sales, the positive growth trends for both industries start either before or at the beginning of the construction period.  The rate of change in growth, though, in restaurant receipts for both Central accelerates post-construction. While not definitive, the restaurant receipts hint at a potential relationship with the new infrastructure that our econometric models will be better able to explore.   
 
 
-```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
+```{r central_sales_tax, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=1.0}
 
 central_agg <- agg_trend_table (minn_sale, group = 3)
 
@@ -1066,7 +1106,7 @@ central_agg_retail_plot <- ggplot(central_agg,aes(x=year, y=CNS07,group=Type,col
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
+  labs(title = "Retail Sales Comparison: \nCentral Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
 central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
@@ -1076,16 +1116,8 @@ central_agg_accom_plot <- ggplot(central_agg,aes(x=year, y=CNS18,group=Type,colo
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sales Tax") +
+  labs(title = "Restaurant Sales Comparison: \nCentral Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
-
-plot_grid(central_agg_retail_plot, central_agg_accom_plot, ncol = 1)
-
-```
-
-The index value plots bring the difference in growth rates between the two corridors into stark relief. Central has fared much better over the course of the study period exhibiting robust growth in retail and restaurant sales. The post-construction growth bump is especially apparent in the restaurant sales indexed plot. University Ave's flattened growth in both restaurant and retail sales is especially striking in comparison to university's consistent growth. 
-
-```{r central_sales_tax_idx, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
 
 central_agg_idx <- agg_index_trend_table (minn_sale, group = 3,2012)
 central_agg_idx <- central_agg_idx %>% 
@@ -1095,7 +1127,6 @@ central_agg_idx <- central_agg_idx %>%
 central_agg_idx$Type <- factor(central_agg_idx$Type, levels = c("Treatment", "Control: University Ave."))
 
 
-
 central_agg_idx_retail_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS07_sd,group=Type,colour=Type,shape=Type))+
   geom_rect(aes(xmin = 2012, xmax = 2013, ymin = -Inf, ymax = Inf),fill = "darkolivegreen1",linetype=0,alpha = 0.03) +
   geom_line() + 
@@ -1103,7 +1134,7 @@ central_agg_idx_retail_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS07_sd,gro
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Central Ave", x="Year",y="Sale Index",
+  labs(title = "Retail Sales Comparison: \nCentral Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
 central_agg_idx_accom_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
@@ -1113,12 +1144,22 @@ central_agg_idx_accom_plot <- ggplot(central_agg_idx,aes(x=year, y=CNS18_sd,grou
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Restaurant Sales Comparison: Central Ave", x="Year",y="Sale Index",
+  labs(title = "Restaurant Sales Comparison: \nCentral Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2012 \n Shaded Area is Construction Period")
 
-plot_grid(central_agg_idx_retail_plot, central_agg_idx_accom_plot, ncol = 1)
+prow <- plot_grid(central_agg_retail_plot+ theme(legend.position="none"),
+                  central_agg_accom_plot + theme(legend.position = "none"),
+                  central_agg_idx_retail_plot + theme(legend.position="none"),
+                  central_agg_idx_accom_plot  + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 2)
+
+legend_b <- get_legend(central_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
+
+The index value plots bring the difference in growth rates between the two corridors into stark relief. Central has fared much better over the course of the study period exhibiting robust growth in retail and restaurant sales. The post-construction growth bump is especially apparent in the restaurant sales indexed plot. University Ave's flattened growth in both restaurant and retail sales is especially striking in comparison to university's consistent growth. 
 
 #### QCEW
 
@@ -1274,7 +1315,7 @@ The QCEW ITS models for Central Ave offer a mixed set of conclusions. For employ
 
 Retail employment on the Lyndale Avenue corridor looks to only have just recovered its employment since the recession though its growth pattern has been much more consistent than its comparison corridor. Interestingly, both the improved and control corridors saw a spike in retail employment in 2015. This is generally good news for the corridors though we the trend analysis does not show any real impact of the street improvement itself on retail employment. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
 
 lyndale_trend <- agg_index_trend_table(minn_corridor, group = 4, construct_year = 2008)
 minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2008)
@@ -1293,7 +1334,14 @@ lyndale_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = lyndale_tre
 # 
 # lyndale_idx_accom <- city_agg_index_trend_plot(lyndale_trend, industry = "Accommodations", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009, corridor_name = "Lyndale Ave. S")
 
-plot_grid(lyndale_idx_retail, lyndale_idx_accom, align = "h")
+
+prow <- plot_grid(lyndale_idx_retail + theme(legend.position="none"),
+                  lyndale_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(lyndale_idx_retail + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
 
@@ -1304,7 +1352,7 @@ In terms of accommodations employment, the treatment corridor shows no real effe
 
 The Lyndale Ave corridor also displays ambiguous impacts of new cycling infrastructure on retail and restaurant demand. There is a  minor bump post construction for retail that results in increased growth over time signaling a possible effect of construction. Restaurant sales tax growth, though, is clearly tied to some major increase in demand nearly a decade after construction. Additionally, the growth in restaurant sales tax receipts was less than that of its control corridor both in absolute and relative terms. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=1.0}
 
 lyndale_agg <- agg_trend_table(minn_sale, group = 4)
 
@@ -1323,7 +1371,7 @@ lyndale_agg_retail_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS07,group=Type,col
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Lyndale Ave S.", x="Year",y="Sales Tax") +
+  labs(title = "Retail Sales Comparison: \nLyndale Ave S.", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
 
 lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colour=Type,shape=Type))+
@@ -1333,18 +1381,8 @@ lyndale_agg_accom_plot <- ggplot(lyndale_agg,aes(x=year, y=CNS18,group=Type,colo
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Restaurant Sales Comparison: Lyndale Ave S.", x="Year",y="Sales Tax") +
+  labs(title = "Restaurant Sales Comparison: \nLyndale Ave S.", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
-
-plot_grid(lyndale_agg_retail_plot, lyndale_agg_accom_plot, ncol = 1)
-
-
-```
-
-The index plots echo the conclusions seen in the absolute value plots. In particular, notice the dramatic decline of retail sales for Grand Ave compared to the modest, but steady, growth in receipts on Lyndale. Grand performs better when examining restaurant sales growing at a faster rate than Lyndale until the final year where Lyndale experiences a monster jump in growth. But as mentioned earlier, these graphs do not provide compelling visual clues as to the effect of new infrastructure on sales tax receipts. 
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.75}
 
 lyndale_agg_idx <- agg_index_trend_table (minn_sale, group = 4,2008)
 
@@ -1362,7 +1400,7 @@ lyndale_agg_idx_retail_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS07_sd,gro
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
+  labs(title = "Retail Sales Comparison: \nLyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
 lyndale_agg_idx_accom_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS18_sd,group=Type,colour=Type,shape=Type))+
@@ -1372,13 +1410,22 @@ lyndale_agg_idx_accom_plot <- ggplot(lyndale_agg_idx,aes(x=year, y=CNS18_sd,grou
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Restaurant Sales Comparison: Lyndale Ave", x="Year",y="Sale Index",
+  labs(title = "Restaurant Sales Comparison: \nLyndale Ave", x="Year",y="Sale Index",
        caption = "Sales tax is indexed to 2008 \n Shaded Area is Construction Period")
 
-plot_grid(lyndale_agg_idx_retail_plot, lyndale_agg_idx_accom_plot, ncol = 1)
+prow <- plot_grid(lyndale_agg_retail_plot + theme(legend.position="none"),
+                  lyndale_agg_accom_plot + theme(legend.position="none"),
+                  lyndale_agg_idx_retail_plot + theme(legend.position="none"),
+                  lyndale_agg_idx_accom_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 2)
 
+legend_b <- get_legend(lyndale_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
+
+The index plots echo the conclusions seen in the absolute value plots. In particular, notice the dramatic decline of retail sales for Grand Ave compared to the modest, but steady, growth in receipts on Lyndale. Grand performs better when examining restaurant sales growing at a faster rate than Lyndale until the final year where Lyndale experiences a monster jump in growth. But as mentioned earlier, these graphs do not provide compelling visual clues as to the effect of new infrastructure on sales tax receipts. 
 
 
 #### QCEW
@@ -1545,7 +1592,7 @@ The ITS results are also mixed. In terms of employment, the ITS model has a nega
 North 2nd Street's employment trends point towards a probable impact of street improvement as the overall trend was negative before construction, with a minor rebound immediately pre-construction, a dip during construction, and then rebound in all periods post-construction.
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.5}
 
 north_agg <- agg_index_trend_table(minn_corridor, group = 5, construct_year = 2011)
 minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
@@ -1564,7 +1611,13 @@ north_accom_idx <- city_agg_index_trend_one_control_plot(df_plot = north_agg, in
 # 
 # north_accom_idx <- city_agg_index_trend_plot(north_agg, industry = "Accommodation", corridor_name = "North 2nd St.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
-plot_grid(north_retail_idx, north_accom_idx, align = "h")
+prow <- plot_grid(north_retail_idx + theme(legend.position="none"),
+                  north_accom_idx + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(north_retail_idx + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
 
@@ -1578,7 +1631,7 @@ At first glance, North 2nd potential offers dramatic evidence of a positive effe
 We do not include the restaurant sales tax values because no restaurant sales tax was collected on North 2nd until 2014.
 
 
-```{r north_sales, echo=FALSE, fig.asp=.75, fig.width=9, message=FALSE, warning=FALSE}
+```{r north_sales, echo=FALSE, fig.asp=.5, fig.width=9, message=FALSE, warning=FALSE}
 
 second_agg <- agg_trend_table(minn_sale, group = 5)
 
@@ -1596,19 +1649,8 @@ second_agg_retail_plot <- ggplot(second_agg,aes(x=year, y=CNS07,group=Type,colou
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sales Tax") +
+  labs(title = "Retail Sales Comparison: \nNorth Second Ave", x="Year",y="Sales Tax") +
   scale_y_continuous(labels = scales::dollar)
-
-
-
-plot(second_agg_retail_plot)
-
-
-```
-
-The index plot highlights the immense rate of growth North 2nd has seen in retail sales since 2012 and the relatively static nature of retail activity on West Broadway. Again, it is unlikely that the new infrastructure is the principle cause of such a dramatic jump in sales, but consistent growth over time after the initial jump may be, in some part, connected to the new infrastructure.  
-
-```{r eval=FALSE, echo=FALSE, fig.asp=.75, fig.width=9, message=FALSE, warning=FALSE}
 
 second_agg_idx <- agg_index_trend_table(minn_sale, group = 5,2012)
 
@@ -1626,15 +1668,21 @@ second_agg_idx_retail_plot <- ggplot(second_agg_idx,aes(x=year, y=CNS07_sd,group
   scale_shape_manual(values=c(22,21))+
   scale_x_continuous(breaks=c(2004,2006,2008,2010,2012,2014,2016)) +
   theme_minimal() +
-  labs(title = "Retail Sales Comparison: North Second Ave", x="Year",y="Sales Tax",
+  labs(title = "Retail Sales Comparison: \nNorth Second Ave", x="Year",y="Sales Tax",
        caption = "Sales Tax values are indexed to 2012 due to missing data in 2011") 
 
+prow <- plot_grid(second_agg_retail_plot + theme(legend.position="none"),
+                  second_agg_idx_retail_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
 
+legend_b <- get_legend(second_agg_retail_plot + theme(legend.position="bottom"))
 
-plot(second_agg_idx_retail_plot)
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 
 ```
+
+The index plot highlights the immense rate of growth North 2nd has seen in retail sales since 2012 and the relatively static nature of retail activity on West Broadway. Again, it is unlikely that the new infrastructure is the principle cause of such a dramatic jump in sales, but consistent growth over time after the initial jump may be, in some part, connected to the new infrastructure.  
 
 #### QCEW
 
