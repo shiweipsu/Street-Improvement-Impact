@@ -89,29 +89,73 @@ $\beta_3$ indicates the slope change following the intervention
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, sf, ggplot2, ggthemes, dplyr, stargazer,cowplot)
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr, kableExtra, data.table, bindrcpp, knitr)
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
 
 source(here::here("Code/corridor_comparison_functions.R"))
 
-seattle_corridor <- st_read(here::here("Data/Seattle/seattle_corridor_lehd_wgs84.geojson"))
+seattle_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.corr_name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.study_cont as grouptype,  a.year as year, a.geometry as geom
+FROM seattle_lehd a, seattle_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+seattle_corridor <- seattle_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type = grouptype, geometry = geom)
+  
 seattle_corridor <- seattle_corridor %>% 
-  mutate(CNS07=ifelse(Corr_Name=="E Olive Way" & GEOID10==530330084003000 & year==2006, 5, CNS07))%>%  # might be a data input error, replace it with average of the previous and next year
-  rename(Name=Corr_Name,
-         Type=Study_Cont) 
-#add new colume of construct year as numeric
+  mutate(CNS07=ifelse(Name=="E Olive Way" & geoid==530330084003000 & year==2006, 5, CNS07)) # might be a data input error, replace it with average of the previous and next year
+
 
 seattle_corridor$Type <- as.character(seattle_corridor$Type)
+seattle_corridor[seattle_corridor$Name =="1st Ave",]$Type <- "Control: 1st Ave"
+seattle_corridor[seattle_corridor$Name=="4th Ave",]$Type <- "Control: 4th Ave"
 seattle_corridor[seattle_corridor$Name =="15th Ave E",]$Type <- "Control: 15th Ave E"
 seattle_corridor[seattle_corridor$Name=="E Olive Way",]$Type <- "Control: E Olive Way"
 seattle_corridor[seattle_corridor$Name=="University Way NE",]$Type <- "Control: University Way NE"
 seattle_corridor[seattle_corridor$Name=="NE 45th St",]$Type <- "Control: NE 45th St"
 seattle_corridor$Type <- as.factor(seattle_corridor$Type)
 
-seattle_lehd <- st_read(here::here("Data/Seattle/seattle_lehd.geojson")) %>% as.data.frame()
+seattle_lehd <- st_read(dsn = con, "seattle_lehd") %>% as.data.frame() %>% 
+  select(-geometry) %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
 
 seattle_emp_ratio <- employ_ratio_test(seattle_corridor)
 
 seattle_growth <- growth_rate(seattle_corridor)
+
+# load qcew data
+seattle_qcew <- tbl(con, "seattle_qcew") %>% collect()
+replaceCommas<-function(x){
+  x<-as.numeric(gsub("\\,", "", x))
+}
+seattle_qcew$employment <- replaceCommas(seattle_qcew$employment)
+
+seattle_qcew <- seattle_qcew %>% spread(NACIS, employment) %>% 
+  rename(Name = corridor, CNS07="44-45", CNS18="72") %>% 
+  mutate(CNS07 = as.numeric(CNS07), CNS18 = as.numeric(CNS18), BuildStart = NA, BuildEnd=NA) %>% 
+  mutate(BuildStart = case_when(Name=="2nd Avenue" ~ 2014,
+                                Name=="Broadway" ~ 2013,
+                                Name=="Roosevelt"~2016),
+         BuildEnd = case_when(Name=="2nd Avenue" ~ 2014,
+                                Name=="Broadway" ~ 2014,
+                                Name=="Roosevelt"~2016))
+
+seattle_qcew[seattle_qcew$Name =="1st Avenue",]$Type <- "Control: 1st Ave"
+seattle_qcew[seattle_qcew$Name=="4th Avenue",]$Type <- "Control: 4th Ave"
+seattle_qcew[seattle_qcew$Name =="15th Avenue",]$Type <- "Control: 15th Ave"
+seattle_qcew[seattle_qcew$Name=="Olive Way",]$Type <- "Control: Olive Way"
+seattle_qcew[seattle_qcew$Name=="University Way",]$Type <- "Control: University Way"
+seattle_qcew[seattle_qcew$Name=="45th Street",]$Type <- "Control:45th St"
+seattle_qcew$Type <- as.factor(seattle_qcew$Type)
 
 ```
 
@@ -433,6 +477,24 @@ plot_grid(secondave_agg_retail_plot,secondave_agg_food_plot)
 
 #### Sales Data
 
+#### QCEW Data
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
+second <- agg_index_trend_table(seattle_qcew %>% mutate(geometry=0), group=1, construct_year = 2014) %>% 
+  mutate(Type=as.factor(Type))
+
+secondave_agg_retail_plot <- agg_index_trend_plot(second, industry = "Retail", corridor_name = "2nd Ave.",industry_code = "CNS07_sd", construct_year = 2014, end_year = 2015)
+secondave_agg_food_plot <- agg_index_trend_plot(second, industry = "Food/Accommodations", corridor_name = "2nd Ave.",industry_code = "CNS18_sd", construct_year = 2014, end_year = 2015)
+
+prow <- plot_grid(secondave_agg_retail_plot + theme(legend.position="none"),
+                  secondave_agg_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(secondave_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
+
+
 ### 4.1.2 DID Analysis
 As mentioned in the introduction, difference-in-difference (DID) is a linear modeling approach that infers casual relationship. The causal effect is estimated through the difference between change in the variable of interest in the treatment group before and after it is treated compared with the corresponding change in control group.
 
@@ -445,7 +507,12 @@ stargazer(secondave_did_agg[[1]],secondave_did_agg[[2]],secondave_did_agg[[3]],t
 
 ```
 
-#### Sales Data
+#### QCEW Data
+```{r message=FALSE, warning=FALSE, include=FALSE}
+secondave_did_agg <- did_agg_analysis(seattle_qcew,group = 1, 2014)
+stargazer(secondave_did_agg[[1]],secondave_did_agg[[2]],secondave_did_agg[[3]],type = "text", title = "Second Avenue Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+```
 
 ### 4.1.3 ITS Analysis
 Interrupted time series is an econometric technique that estimates how street improvements impact corridor economic vitality from a longitudinal perspective. If the treatment has a causal impact, the post-intervention series will have a different level or slope than the pre-intervention series. In our research, interrupted-time series will be used to distinguish differences in growth before and after a specific time break point where the installation of new bicycled facility happens. The estimation of pre-post parameter indicates the impact of interruption on change of interested outcome variable, while the estimation of ts_year:prepost parameter indicates the impact of interruption on slope change.  
@@ -460,7 +527,13 @@ stargazer(secondave_its_agg[[1]],secondave_its_agg[[2]],secondave_its_agg[[3]],t
 
 As the construction year is 2014,  three models, using retail employment, food/accommodation employment and business employment (sum of the previous two) as dependent variable, are estimated. The key interest term in the table is Study:prepost variable. This DID estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent. The 2nd Avenue treatment corridor does not exhibit a statistically significant effect of new bicycle infrastructure replacement.
 
-#### Sales Data
+#### QCEW Data
+```{r message=FALSE, warning=FALSE, include=FALSE}
+secondave_its_agg <- agg_its_analysis(seattle_qcew,group = 1, 2014)
+stargazer(secondave_its_agg[[1]],secondave_its_agg[[2]],secondave_its_agg[[3]],type = "text", title = "Second Avenue Corridor Interrupted Time Series Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+
+```
 
 
 ## 4.2 Broadway Corridor
@@ -479,7 +552,23 @@ plot_grid(brwy_agg_retail_plot,brwy_agg_food_plot)
 
 ```
 
-#### Sales Data
+#### QCEW Data
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
+brwy <- agg_index_trend_table(seattle_qcew %>% mutate(geometry=0), group=2, construct_year = 2013) %>% 
+  mutate(Type=as.factor(Type))
+
+brwy[brwy==0] <- NA
+brwy_agg_retail_plot <- agg_index_trend_plot(brwy[!is.na(brwy$CNS07_sd),], industry = "Retail", corridor_name = "Broadway",industry_code = "CNS07_sd", construct_year = 2013, end_year = 2014) 
+brwy_agg_food_plot <- agg_index_trend_plot(brwy, industry = "Food/Accommodations", corridor_name = "Broadway",industry_code = "CNS18_sd", construct_year = 2013, end_year = 2014)
+
+prow <- plot_grid(brwy_agg_retail_plot + theme(legend.position="none"),
+                  brwy_agg_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(brwy_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
 
 ### 4.2.2 DID Analysis
 #### LEHD
@@ -491,7 +580,12 @@ stargazer(broadway_did_agg[[1]],broadway_did_agg[[2]],broadway_did_agg[[3]],type
 
 Although the trend graph shows negative effect of bike lane installation on retail employment, the DID estimators for retail employment is not statistically significant, which indicates the effect of treatment is not apparent. The big jump of food/accommodation employment in Broadway treatment corridor is consistent with the DID estimator, that a statistically significant positive effect of new bicycle infrastructure replacement on food/accommodation employment.
 
-#### Sales Data
+#### QCEW Data
+```{r message=FALSE, warning=FALSE, include=FALSE}
+broadway_did_agg <- did_agg_analysis(seattle_qcew,group = 2, 2013)
+stargazer(broadway_did_agg[[1]],broadway_did_agg[[2]],broadway_did_agg[[3]],type = "text", title = "Broadway Corridor Difference-in-Difference Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+```
+
 
 ### 4.2.3 ITS Analysis
 #### LEHD
@@ -499,18 +593,39 @@ Although the trend graph shows negative effect of bike lane installation on reta
 broadway_its_agg <- agg_its_analysis(seattle_corridor,group = 2, 2013)
 stargazer(broadway_its_agg[[1]],broadway_its_agg[[2]],broadway_its_agg[[3]],type = "text", title = "Broadway Corridor Interrupted Time Series Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
 
-
 ```
 
 The ITS estimators for all three models are statistically insignificant, which indicates the effect of treatment is not apparent. Although there is a big jump of food/accommodation employment in Broadway treatment corridor, the causal inference does not exhibit a statistically significant effect of new bicycle infrastructure replacement on employment according to ITS analysis.
 
-#### Sales Data
+#### QCEWs Data
+```{r message=FALSE, warning=FALSE, include=FALSE}
+broadway_its_agg <- agg_its_analysis(seattle_qcew,group = 2, 2013)
+stargazer(broadway_its_agg[[1]],broadway_its_agg[[2]],broadway_its_agg[[3]],type = "text", title = "Broadway Corridor Interrupted Time Series Estimates", column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+```
 
 
 ## 4.3 Roosevelt Way Corridor
 The installation of bike lane on Roosevelt Way is in 2016, where the most recent LEHD data is 2015. Therefore, we cannot analyze the impact of bike lane installation using LEHD data. The following analysis only apply retail sales data.
 
 ### 4.3.1 Trend Analysis
+#### QCEW
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=0.5}
+roos <- agg_index_trend_table(seattle_qcew %>% mutate(geometry=0), group=3, construct_year = 2016) %>% 
+  mutate(Type=as.factor(Type))
+
+roos[roos==0] <- NA
+roos_agg_retail_plot <- agg_index_trend_plot(roos[!is.na(roos$CNS07_sd),], industry = "Retail", corridor_name = "Roosevelt",industry_code = "CNS07_sd", construct_year = 2016, end_year = 2017) 
+roos_agg_food_plot <- agg_index_trend_plot(roos, industry = "Food/Accommodations", corridor_name = "Roosevelt",industry_code = "CNS18_sd", construct_year = 2016, end_year = 2017)
+
+prow <- plot_grid(roos_agg_retail_plot + theme(legend.position="none"),
+                  roos_agg_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(roos_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
 
 ### 4.3.2 DID Analysis
 
