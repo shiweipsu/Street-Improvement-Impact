@@ -23,8 +23,8 @@ seattle_lehd$BLOCKCE10 <- NULL
 
 names(seattle_lehd) <- tolower(names(seattle_lehd))
 
-seattle_lehd <- seattle_lehd %>% filter(!is.na(state))
+seattle_lehd <- seattle_lehd %>% filter(!is.na(state)) %>% st_transform(5070)
 
-st_write(seattle_lehd, dsn = con, overwrite = TRUE, "seattle_lehd")
+st_write(seattle_lehd, dsn = con, overwrite = TRUE, "seattle_lehd", ,geom_col="geometry")
 
 dbDisconnect(con)
