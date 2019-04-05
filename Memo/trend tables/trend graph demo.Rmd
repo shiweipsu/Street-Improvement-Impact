@@ -1,0 +1,186 @@
+---
+title: "test"
+author: "Wei Shi"
+date: "April 4, 2019"
+output: html_document
+---
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9, fig.asp=.5}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr, kableExtra, data.table, bindrcpp, knitr)
+
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+minn_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.type as grouptype,  a.year as year, a.geometry as geom
+FROM minneapolis_lehd a, minneapolis_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+minn_corridor <- minn_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name)
+#add new colume of construct year as numeric
+
+minn_lehd <- st_read(dsn = con, "minneapolis_lehd") %>% as.data.frame() %>% 
+  select(-geometry)
+
+minn_lehd <- minn_lehd %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
+
+
+agg_index_trend_table <- function(df, group, construct_year) {
+  
+  #prepare tables for plotting
+  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geom)
+  
+  start= construct_year-3
+  end=construct_year-1
+
+  df <- df %>% filter(Group == 2) %>%
+    mutate(business = CNS07 + CNS18)
+  
+
+  df_agg <- df %>% group_by(year, Type) %>%
+    summarise(CNS07 = sum(CNS07, na.rm = TRUE),
+              CNS18 = sum(CNS18, na.rm = TRUE),
+              business = sum(business, na.rm = TRUE))
+  
+  base_year <-  df_agg %>% filter(year %in% c(start:end)) %>% group_by(Type) %>% 
+    summarise(CNS07_base = mean(CNS07), CNS18_base = mean(CNS18), business_base = mean(business))
+  
+  
+  df_plot <- df_agg %>%  
+    left_join(base_year, by = "Type") %>%
+    mutate(CNS07_sd = CNS07/CNS07_base*100,
+           CNS18_sd = CNS18/CNS18_base*100,
+           business_sd = business/business_base*100) %>%
+    select(Type, year = year, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+  
+  return(df_plot)
+  
+}
+
+city_agg_index_trend_table <- function(df, construct_year) {
+  
+  if(class(df) == "sf") {
+    
+    df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+    
+  } else {
+    
+    df
+  }
+  
+  df <- df %>% mutate(business = CNS07 + CNS18)
+  
+  start= construct_year-3
+  end=construct_year-1
+  
+  df_agg <- df %>% group_by(year) %>%
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business)) %>% 
+    mutate(Type = "city")
+  
+  base_year <-  df_agg %>% filter(year %in% c(start:end)) %>% group_by(Type) %>% 
+    summarise(CNS07_base = mean(CNS07), CNS18_base = mean(CNS18), business_base = mean(business))
+  
+  df_plot <- df_agg %>%  
+    left_join(base_year,by="Type") %>%
+    mutate(CNS07_sd = CNS07/CNS07_base*100,
+           CNS18_sd = CNS18/CNS18_base*100,
+           business_sd = business/business_base*100,
+           Type = "city") %>%
+    select(Type, year, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+  
+  return(df_plot)
+  
+}
+
+minn_corridor <- minn_corridor %>% rename(Type=grouptype)
+franklin_agg <- agg_index_trend_table(minn_corridor, group = 2, construct_year  = 2011)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
+
+franklin_agg <- bind_rows(franklin_agg, minn_agg)
+
+city_agg_index_trend_one_control_plot <- function(df_plot, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+  
+df_plot <- df_plot %>% 
+    mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+                            Type == "control" ~ paste0("Control: ", control_corridor),
+                            Type == "city" ~ "City"))
+
+df_plot$Type <- factor(df_plot$Type, 
+                       levels = c("Treatment", paste0("Control: ", control_corridor), "City"))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment Index",
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Employment is indexed to the baseline years (3 years pre-construction)")) +
+    guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+
+franklin_idx_retail <- city_agg_index_trend_one_control_plot(df_plot = franklin_agg, industry = "Retail",
+                                                            corridor_name = "Franklin Ave.", control_corridor = "Franklin Ave.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+franklin_idx_accom <- city_agg_index_trend_one_control_plot(df_plot = franklin_agg, industry = "Food", corridor_name = "Franklin Ave.", control_corridor = "Franklin Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+prow <- plot_grid(franklin_idx_retail + theme(legend.position="none"),
+                  franklin_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(franklin_idx_retail + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
