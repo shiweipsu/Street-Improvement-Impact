@@ -1,5 +1,5 @@
 ---
-title: "test"
+title: "Minneapolis trend tables"
 author: "Wei Shi"
 date: "March 15, 2019"
 output: html_document
