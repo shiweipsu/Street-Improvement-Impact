@@ -110,7 +110,7 @@ agg_trend_plot_emp <- function(df_plot, industry, corridor_name,
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Employment is indexed to the baseline years (3 years pre-construction)")) +
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
     guides(title = "Street Type") 
   
   return(ats_df)
@@ -245,7 +245,7 @@ agg_trend_plot_estb <- function(df_plot, industry, corridor_name,
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Count Comparison:\n {corridor_name}"), x="Year",y="Number of establishments",
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Employment is indexed to the baseline years (3 years pre-construction)")) +
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
     guides(title = "Street Type") 
   
   return(ats_df)
