@@ -31,10 +31,10 @@
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>-13621847.37706069089472294</xmin>
-      <ymin>6039850.52123623806983232</ymin>
-      <xmax>-13612613.93886701576411724</xmax>
-      <ymax>6053700.18366735707968473</ymax>
+      <xmin>-13647168.51227882876992226</xmin>
+      <ymin>6025621.6361187556758523</ymin>
+      <xmax>-13587834.32078999653458595</xmax>
+      <ymax>6060651.52833344507962465</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -148,9 +148,9 @@
             </layer>
           </symbol>
         </lineStyle>
-        <StartPoint x="255.707" y="76.4696"/>
-        <StopPoint x="255.707" y="103.806"/>
-        <ComposerItem pagey="75.7625" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="255" y="75.7625" visibility="1" zValue="9" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="1.41421" outlineWidth="0.3" excludeFromExports="0" uuid="{34b9c923-da4a-4c8a-aebe-51d4bb814686}" height="28.7505" itemRotation="0" frame="false" pagex="255">
+        <StartPoint x="255.707" y="71.4373"/>
+        <StopPoint x="255.707" y="106.526"/>
+        <ComposerItem pagey="70.7302" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="255" y="70.7302" visibility="1" zValue="9" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="1.41421" outlineWidth="0.3" excludeFromExports="0" uuid="{34b9c923-da4a-4c8a-aebe-51d4bb814686}" height="36.5032" itemRotation="0" frame="false" pagex="255">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -178,9 +178,9 @@
             </layer>
           </symbol>
         </lineStyle>
-        <StartPoint x="255.293" y="104.513"/>
-        <StopPoint x="218.049" y="104.513"/>
-        <ComposerItem pagey="102.806" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="216.342" y="102.806" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="40.6582" outlineWidth="0.3" excludeFromExports="0" uuid="{9fec0905-4f63-432c-a806-8b3ac867dec0}" height="3.41421" itemRotation="0" frame="false" pagex="216.342">
+        <StartPoint x="255.293" y="106.513"/>
+        <StopPoint x="218.049" y="106.513"/>
+        <ComposerItem pagey="104.806" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="216.342" y="104.806" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="40.6582" outlineWidth="0.3" excludeFromExports="0" uuid="{9fec0905-4f63-432c-a806-8b3ac867dec0}" height="3.41421" itemRotation="0" frame="false" pagex="216.342">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -202,7 +202,7 @@
             <prop k="style" v="solid"/>
           </layer>
         </symbol>
-        <ComposerItem pagey="0.15" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="-0.674136" y="0.15" visibility="1" zValue="7" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="297.524" outlineWidth="0.3" excludeFromExports="0" uuid="{032d45ad-e3a7-4885-9d3a-ad4836d225a0}" height="207.484" itemRotation="0" frame="false" pagex="-0.674136">
+        <ComposerItem pagey="0.15" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0.15" y="0.15" visibility="1" zValue="7" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="296.7" outlineWidth="0.3" excludeFromExports="0" uuid="{032d45ad-e3a7-4885-9d3a-ad4836d225a0}" height="207.484" itemRotation="0" frame="false" pagex="0.15">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -257,7 +257,7 @@
         </styles>
         <layer-tree-group expanded="1" checked="Qt::Checked" name="">
           <customproperties/>
-          <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="seattle_corridors20190411055811168" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 sslmode=disable key='gid' srid=5070 type=MultiLineStringM table=&quot;public&quot;.&quot;seattle_corridors&quot; (geom) sql=" name="seattle_corridors">
+          <layer-tree-layer expanded="1" providerKey="postgres" checked="Qt::Checked" id="seattle_corridors_copy20190411113651790" source="dbname='bike_lanes' host=pgsql102.rc.pdx.edu port=5433 sslmode=disable key='gid' srid=5070 type=MultiLineStringM table=&quot;public&quot;.&quot;seattle_corridors&quot; (geom) sql=" name="seattle_corridors copy">
             <customproperties>
               <property key="legend/title-label" value="Seattle Corridors"/>
             </customproperties>
@@ -279,7 +279,7 @@
         </ComposerItem>
       </ComposerLegend>
       <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="1" previewMode="Cache" drawCanvasItems="true">
-        <Extent ymin="6024069.56554155796766281" xmin="-13648650.51037062890827656" ymax="6070006.75982768181711435" xmax="-13587796.68139964900910854"/>
+        <Extent ymin="6020741.55525472946465015" xmin="-13647168.51227882876992226" ymax="6065531.6091974712908268" xmax="-13587834.32078999653458595"/>
         <LayerSet/>
         <Grid/>
         <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{ec98a965-4b80-426d-b263-1b67b961760e}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
@@ -355,7 +355,7 @@
         </ComposerItem>
       </ComposerMap>
       <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="0" previewMode="Cache" drawCanvasItems="true">
-        <Extent ymin="6038907.11807548068463802" xmin="-13626589.3717893548309803" ymax="6055169.20729375723749399" xmax="-13609857.8199809230864048"/>
+        <Extent ymin="6038907.11807548068463802" xmin="-13626589.3717893548309803" ymax="6055169.23911917582154274" xmax="-13609857.8199809230864048"/>
         <LayerSet/>
         <Grid/>
         <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{7c49fdff-e300-4230-af23-bee901051517}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
@@ -407,7 +407,7 @@
           <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
         </ComposerMapGrid>
         <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-        <ComposerItem pagey="0" page="1" id="" lastValidViewScaleFactor="1.99718" positionMode="0" positionLock="false" x="0" y="0" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="213.782" outlineWidth="0.3" excludeFromExports="0" uuid="{dfe3cce4-31a0-41a7-a265-f4280ab3eb50}" height="207.784" itemRotation="0" frame="false" pagex="0">
+        <ComposerItem pagey="0" page="1" id="" lastValidViewScaleFactor="2.03119" positionMode="0" positionLock="true" x="0" y="0" visibility="1" zValue="1" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="213.782" outlineWidth="0.3" excludeFromExports="0" uuid="{dfe3cce4-31a0-41a7-a265-f4280ab3eb50}" height="207.784" itemRotation="0" frame="false" pagex="0">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
           <customproperties/>
@@ -461,7 +461,7 @@
           <customproperties/>
         </ComposerItem>
       </ComposerShape>
-      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="11.0225" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="../../../../../../PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_02.svg" northOffset="0" pictureHeight="17.5275" mapId="-1" anchorPoint="0">
+      <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="11.0224" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="../../../../../../PROGRA~1/QGIS2~1.18/apps/qgis/svg/arrows/NorthArrow_02.svg" northOffset="0" pictureHeight="17.5275" mapId="-1" anchorPoint="0">
         <ComposerItem pagey="5.05602" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="254.942" y="5.05602" visibility="1" zValue="4" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="16.5163" outlineWidth="0.3" excludeFromExports="0" uuid="{1689e3b7-e117-43c2-a6da-4a686bcee92c}" height="17.5275" itemRotation="0" frame="false" pagex="254.942">
           <FrameColor alpha="255" red="0" blue="0" green="0"/>
           <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
@@ -515,7 +515,7 @@
         </ComposerItem>
       </ComposerLegend>
       <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="0" previewMode="Cache" drawCanvasItems="true">
-        <Extent ymin="6048942.0354454331099987" xmin="-13620214.99629997834563255" ymax="6053720.21239574626088142" xmax="-13613425.55397464334964752"/>
+        <Extent ymin="6048942.0354454331099987" xmin="-13620214.99629997834563255" ymax="6053720.22016841359436512" xmax="-13613425.55397464334964752"/>
         <LayerSet/>
         <Grid/>
         <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{f9367e55-c207-499a-b2cf-d384ff5ba15b}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
@@ -1913,8 +1913,6 @@ def my_form_open(dialog, layer, feature):
             </layer>
           </symbol>
         </source-symbol>
-        <colorramp type="randomcolors" name="[source]"/>
-        <invertedcolorramp value="0"/>
         <rotation/>
         <sizescale scalemethod="diameter"/>
       </renderer-v2>
@@ -3077,8 +3075,6 @@ def my_form_open(dialog, layer, feature):
             </layer>
           </symbol>
         </source-symbol>
-        <colorramp type="randomcolors" name="[source]"/>
-        <invertedcolorramp value="0"/>
         <rotation/>
         <sizescale scalemethod="diameter"/>
       </renderer-v2>
@@ -3686,8 +3682,6 @@ def my_form_open(dialog, layer, feature):
             </layer>
           </symbol>
         </source-symbol>
-        <colorramp type="randomcolors" name="[source]"/>
-        <invertedcolorramp value="0"/>
         <rotation/>
         <sizescale scalemethod="diameter"/>
       </renderer-v2>

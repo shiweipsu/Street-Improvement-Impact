@@ -1,0 +1,413 @@
+---
+title: "seattle"
+author: "Wei Shi"
+date: "April 11, 2019"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr, kableExtra, data.table, bindrcpp, knitr, pander)
+
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+
+source(here::here("Code/corridor_comparison_functions.R"))
+seattle_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.corr_name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.study_cont as grouptype,  a.year as year, a.geometry as geom
+FROM seattle_lehd a, seattle_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+seattle_corridor <- seattle_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type = grouptype, geometry = geom)
+  
+seattle_corridor <- seattle_corridor %>% 
+  mutate(CNS07=ifelse(Name=="E Olive Way" & geoid==530330084003000 & year==2006, 5, CNS07)) # might be a data input error, replace it with average of the previous and next year
+
+
+seattle_corridor$Type <- as.character(seattle_corridor$Type)
+seattle_corridor[seattle_corridor$Name =="1st Ave",]$Type <- "Control: 1st Ave"
+seattle_corridor[seattle_corridor$Name=="4th Ave",]$Type <- "Control: 4th Ave"
+seattle_corridor[seattle_corridor$Name =="15th Ave E",]$Type <- "Control: 15th Ave E"
+seattle_corridor[seattle_corridor$Name=="E Olive Way",]$Type <- "Control: E Olive Way"
+seattle_corridor[seattle_corridor$Name=="University Way NE",]$Type <- "Control: University Way NE"
+seattle_corridor[seattle_corridor$Name=="NE 45th St",]$Type <- "Control: NE 45th St"
+seattle_corridor$Type <- as.factor(seattle_corridor$Type)
+
+seattle_lehd <- st_read(dsn = con, "seattle_lehd") %>% as.data.frame() %>% 
+  select(-geometry) %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
+
+seattle_emp_ratio <- employ_ratio_test(seattle_corridor)
+
+seattle_growth <- growth_rate(seattle_corridor)
+
+# load qcew data
+seattle_qcew <- tbl(con, "seattle_qcew") %>% collect()
+replaceCommas<-function(x){
+  x<-as.numeric(gsub("\\,", "", x))
+}
+seattle_qcew$employment <- replaceCommas(seattle_qcew$employment)
+
+seattle_qcew <- seattle_qcew %>% spread(NACIS, employment) %>% 
+  rename(Name = corridor, CNS07="44-45", CNS18="72") %>% 
+  mutate(CNS07 = as.numeric(CNS07), CNS18 = as.numeric(CNS18), BuildStart = NA, BuildEnd=NA) %>% 
+  mutate(BuildStart = case_when(Name=="2nd Avenue" ~ 2014,
+                                Name=="Broadway" ~ 2013,
+                                Name=="Roosevelt"~2016),
+         BuildEnd = case_when(Name=="2nd Avenue" ~ 2014,
+                                Name=="Broadway" ~ 2014,
+                                Name=="Roosevelt"~2016))
+
+seattle_qcew[seattle_qcew$Name =="1st Avenue",]$Type <- "Control: 1st Ave"
+seattle_qcew[seattle_qcew$Name=="4th Avenue",]$Type <- "Control: 4th Ave"
+seattle_qcew[seattle_qcew$Name =="15th Avenue",]$Type <- "Control: 15th Ave"
+seattle_qcew[seattle_qcew$Name=="Olive Way",]$Type <- "Control: Olive Way"
+seattle_qcew[seattle_qcew$Name=="University Way",]$Type <- "Control: University Way"
+seattle_qcew[seattle_qcew$Name=="45th Street",]$Type <- "Control:45th St"
+seattle_qcew$Type <- as.factor(seattle_qcew$Type)
+
+```
+
+
+# functions
+```{r message=FALSE, warning=FALSE, include=FALSE}
+percent <- function(x, digits = 2, format = "f", ...) {
+  paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+
+lehd_t <- function(df, construction_year){
+  base_start= construction_year-3
+  base_end = construction_year-1
+  post_start=construction_year+1
+  post_end=construction_year+3
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+    select(Type, CNS07, CNS18) %>% 
+  group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07),0), CNS18=round(mean(CNS18),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+            select(year, Type, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  lehd <- merge(base,post, by="Type") %>% 
+    select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) %>% mutate_at(vars(contains("CNS18_")), percent)
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(lehd)<-coln
+
+  return(lehd)
+}
+
+
+sales_t <- function(df, construction_year){
+  base_start= construction_year-3
+  base_end = construction_year-1
+  post_start=construction_year+1
+  post_end=construction_year+3
+  
+  df <- df %>% mutate(CNS18=0) %>% rename(CNS07=tax_revenue)
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+    group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1), CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07,na.rm=T),0), CNS18=round(mean(CNS18,na.rm=T),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2) %>% 
+            select(year, Type, CNS07, CNS18)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  sales <- merge(base,post, by="Type") %>% 
+    select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) %>% mutate_at(vars(contains("CNS18_")), percent)
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(sales)<-coln
+
+  return(sales)
+}
+
+qcew_t <- function(df, construction_year){
+  base_start= construction_year-3
+  base_end = construction_year-1
+  post_start=construction_year+1
+  post_end=construction_year+3
+  
+  df <- df %>% rename(CNS07=avg_emp) %>% 
+    group_by(year, Type) %>% 
+    summarise(CNS07=mean(CNS07,na.rm=T)) %>% 
+    mutate(CNS18=0, business=CNS07+CNS18) %>% select(year, Type, CNS07, CNS18, business) 
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+    select(Type, CNS07, CNS18) %>% 
+  group_by(Type) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07),0), CNS18=round(mean(CNS18),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+            select(year, Type, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+    group_by(Type) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), Type ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  qcew <- merge(base,post, by="Type") %>% 
+    select(Type, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(Type)) %>% mutate_at(vars(contains("CNS07_")), percent) 
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(qcew)<-coln
+  
+  qcew[is.na(qcew)]<-NA
+  qcew[qcew==0]<-NA
+
+  return(qcew)
+}
+
+plot_t <- function(df){
+  options(knitr.kable.NA = '-')
+  plot <- knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,3,5),background="#ccffcc") %>% 
+  group_rows("LEHD: (employment)",1,2) %>% 
+  group_rows("Sales: (sales revenue, $)",3,4) %>% 
+  group_rows("QCEW: (employment)",5,6) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "1st year growth rate is defined as the growth rate of the year after construction compared to baseline."))
+
+  return(plot)
+
+}
+
+plot_tc <- function(df){
+  options(knitr.kable.NA = '-')
+  plot <- knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,3,5),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
+
+  return(plot)
+}
+
+```
+
+# second
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+second_lehd <- agg_trend_table(seattle_corridor, group = 1)
+pseudo2016 <- second_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2016, CNS07=NA, CNS18=NA, business=NA)
+pseudo2017 <- second_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2017, CNS07=NA, CNS18=NA, business=NA)
+pseudo2018 <- second_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2018, CNS07=NA, CNS18=NA, business=NA)
+second_lehd <- bind_rows(second_lehd%>%ungroup()%>%mutate(year = as.numeric(year)), pseudo2016, pseudo2017, pseudo2018)
+ 
+lehd <- lehd_t(second_lehd, 2014)
+
+
+second_qcew <- agg_trend_table(seattle_qcew, group = 1)
+qcew <- lehd_t(second_qcew, 2014)
+
+
+# make combined table         
+t <- rbind(lehd, qcew)
+t[t=="NA%"]<-NA
+ 
+options(knitr.kable.NA = '-')
+  knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,4),background="#ccffcc") %>% 
+  group_rows("LEHD: [employment]",1,3) %>% 
+  group_rows("QCEW: [employment]",4,6) %>% 
+  footnote(number = c("Baseline is defined as the average of the three years prior to the construction year;",
+             "Pre-growth rate is defined as the average of the baseline annual growth rates;",
+             "Post-growth rate is defined as the average annual growth rate of three time points after the construction year"))
+
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD\n[employment]",3), rep("QCEW\n[employment]",3)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+options(knitr.kable.NA = '-')
+  knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,4),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of the three years prior to the construction year;",
+             "Pre-growth rate is defined as the average of the baseline annual growth rates;",
+             "Post-growth rate is defined as the average annual growth rate of three time points after the construction year"))
+
+```
+
+
+# broadway
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+brdwy_lehd <- agg_trend_table(seattle_corridor, group = 2)
+pseudo2016 <- brdwy_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2016, CNS07=NA, CNS18=NA, business=NA)
+pseudo2017 <- brdwy_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2017, CNS07=NA, CNS18=NA, business=NA)
+pseudo2018 <- brdwy_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2018, CNS07=NA, CNS18=NA, business=NA)
+brdwy_lehd <- bind_rows(brdwy_lehd%>%ungroup()%>%mutate(year = as.numeric(year)), pseudo2016, pseudo2017, pseudo2018)
+ 
+lehd <- lehd_t(brdwy_lehd, 2013)
+
+
+brdwy_qcew <- agg_trend_table(seattle_qcew, group = 2)
+qcew <- lehd_t(brdwy_qcew, 2013)
+
+
+# make combined table         
+t <- rbind(lehd, qcew)
+t[t=="NA%"]<-NA
+ 
+options(knitr.kable.NA = '-')
+  knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,4),background="#ccffcc") %>% 
+  group_rows("LEHD: [employment]",1,3) %>% 
+  group_rows("QCEW: [employment]",4,6) %>% 
+  footnote(number = c("Baseline is defined as the average of the three years prior to the construction year;",
+             "Pre-growth rate is defined as the average of the baseline annual growth rates;",
+             "Post-growth rate is defined as the average annual growth rate of three time points after the construction year"))
+
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD\n[employment]",3), rep("QCEW\n[employment]",3)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+options(knitr.kable.NA = '-')
+  knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,4),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of the three years prior to the construction year;",
+             "Pre-growth rate is defined as the average of the baseline annual growth rates;",
+             "Post-growth rate is defined as the average annual growth rate of three time points after the construction year"))
+
+```
+
+
+# roosevelt
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+roos_lehd <- agg_trend_table(seattle_corridor, group = 3)
+pseudo2016 <- roos_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2016, CNS07=NA, CNS18=NA, business=NA)
+pseudo2017 <- roos_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2017, CNS07=NA, CNS18=NA, business=NA)
+pseudo2018 <- roos_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2018, CNS07=NA, CNS18=NA, business=NA)
+pseudo2019 <- roos_lehd[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2019, CNS07=NA, CNS18=NA, business=NA)
+roos_lehd <- bind_rows(roos_lehd%>%ungroup()%>%mutate(year = as.numeric(year)), pseudo2016, pseudo2017, pseudo2018, pseudo2019)
+ 
+lehd <- lehd_t(roos_lehd, 2016)
+
+
+roos_qcew <- agg_trend_table(seattle_qcew, group = 3)
+pseudo2018 <- roos_qcew[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2018, CNS07=NA, CNS18=NA, business=NA)
+pseudo2019 <- roos_qcew[c(1:3),]%>% ungroup()%>%
+  mutate(year = 2019, CNS07=NA, CNS18=NA, business=NA)
+roos_qcew <- bind_rows(roos_qcew%>%ungroup()%>%mutate(year = as.numeric(year)),pseudo2018, pseudo2019)
+qcew <- lehd_t(roos_qcew, 2016)
+
+
+# make combined table         
+t <- rbind(lehd, qcew)
+t[t=="NA%"]<-NA
+ 
+options(knitr.kable.NA = '-')
+  knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,4),background="#ccffcc") %>% 
+  group_rows("LEHD: [employment]",1,3) %>% 
+  group_rows("QCEW: [employment]",4,6) %>% 
+  footnote(number = c("Baseline is defined as the average of the three years prior to the construction year;",
+             "Pre-growth rate is defined as the average of the baseline annual growth rates;",
+             "Post-growth rate is defined as the average annual growth rate of three time points after the construction year"))
+
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD\n[employment]",3), rep("QCEW\n[employment]",3)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+options(knitr.kable.NA = '-')
+  knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,4),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of the three years prior to the construction year;",
+             "Pre-growth rate is defined as the average of the baseline annual growth rates;",
+             "Post-growth rate is defined as the average annual growth rate of three time points after the construction year"))
+
+```

@@ -7,26 +7,78 @@ output: html_document
 #seattle model outputs...DiD and ITS
 
 ```{r, echo=FALSE, results='asis'}
-
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
-p_load(here, stargazer, sf, ggplot2, ggthemes, cowplot, dplyr)
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, lubridate, dplyr, dbplyr, stargazer,cowplot, zoo, tidyr, kableExtra, data.table, bindrcpp, knitr)
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
 source(here::here("Code/corridor_comparison_functions.R"))
 
+seattle_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.corr_name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.study_cont as grouptype,  a.year as year, a.geometry as geom
+FROM seattle_lehd a, seattle_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
 
-seattle_corridor <- st_read(here::here("Data/Seattle/seattle_corridor_lehd_wgs84.geojson"))
+seattle_corridor <- seattle_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name, Type = grouptype, geometry = geom)
+  
 seattle_corridor <- seattle_corridor %>% 
-  mutate(CNS07=ifelse(Corr_Name=="E Olive Way" & GEOID10==530330084003000 & year==2006, 5, CNS07))%>%  # might be a data input error, replace it with average of the previous and next year
-  rename(Name=Corr_Name,
-         Type=Study_Cont) 
-#add new colume of construct year as numeric
+  mutate(CNS07=ifelse(Name=="E Olive Way" & geoid==530330084003000 & year==2006, 5, CNS07)) # might be a data input error, replace it with average of the previous and next year
+
 
 seattle_corridor$Type <- as.character(seattle_corridor$Type)
+seattle_corridor[seattle_corridor$Name =="1st Ave",]$Type <- "Control: 1st Ave"
+seattle_corridor[seattle_corridor$Name=="4th Ave",]$Type <- "Control: 4th Ave"
 seattle_corridor[seattle_corridor$Name =="15th Ave E",]$Type <- "Control: 15th Ave E"
 seattle_corridor[seattle_corridor$Name=="E Olive Way",]$Type <- "Control: E Olive Way"
 seattle_corridor[seattle_corridor$Name=="University Way NE",]$Type <- "Control: University Way NE"
 seattle_corridor[seattle_corridor$Name=="NE 45th St",]$Type <- "Control: NE 45th St"
 seattle_corridor$Type <- as.factor(seattle_corridor$Type)
 
+seattle_lehd <- st_read(dsn = con, "seattle_lehd") %>% as.data.frame() %>% 
+  select(-geometry) %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
+
+seattle_emp_ratio <- employ_ratio_test(seattle_corridor)
+
+seattle_growth <- growth_rate(seattle_corridor)
+
+# load qcew data
+seattle_qcew <- tbl(con, "seattle_qcew") %>% collect()
+replaceCommas<-function(x){
+  x<-as.numeric(gsub("\\,", "", x))
+}
+seattle_qcew$employment <- replaceCommas(seattle_qcew$employment)
+
+seattle_qcew <- seattle_qcew %>% spread(NACIS, employment) %>% 
+  rename(Name = corridor, CNS07="44-45", CNS18="72") %>% 
+  mutate(CNS07 = as.numeric(CNS07), CNS18 = as.numeric(CNS18), BuildStart = NA, BuildEnd=NA) %>% 
+  mutate(BuildStart = case_when(Name=="2nd Avenue" ~ 2014,
+                                Name=="Broadway" ~ 2013,
+                                Name=="Roosevelt"~2016),
+         BuildEnd = case_when(Name=="2nd Avenue" ~ 2014,
+                                Name=="Broadway" ~ 2014,
+                                Name=="Roosevelt"~2016))
+
+seattle_qcew[seattle_qcew$Name =="1st Avenue",]$Type <- "Control: 1st Ave"
+seattle_qcew[seattle_qcew$Name=="4th Avenue",]$Type <- "Control: 4th Ave"
+seattle_qcew[seattle_qcew$Name =="15th Avenue",]$Type <- "Control: 15th Ave"
+seattle_qcew[seattle_qcew$Name=="Olive Way",]$Type <- "Control: Olive Way"
+seattle_qcew[seattle_qcew$Name=="University Way",]$Type <- "Control: University Way"
+seattle_qcew[seattle_qcew$Name=="45th Street",]$Type <- "Control:45th St"
+seattle_qcew$Type <- as.factor(seattle_qcew$Type)
+```
+
+
+```{r, echo=FALSE, results='asis'}
 # second ave
 seattle_corridor <- seattle_corridor[seattle_corridor$Name!="1st Avenue",]
 seattle_corridor$Type <- relevel(seattle_corridor$Type,ref = "Study")
@@ -49,6 +101,45 @@ stargazer(broadway_did_agg[[1]],broadway_did_agg[[2]],broadway_did_agg[[3]],type
 
 broadway_its_agg <- agg_its_analysis(seattle_corridor,group = 2, 2013)
 stargazer(broadway_its_agg[[1]],broadway_its_agg[[2]],broadway_its_agg[[3]],type = "html", 
+          title = "Broadway Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+ 
+
+```
+
+```{r, echo=FALSE, results='asis'}
+# second ave
+seattle_qcew$Type <- relevel(seattle_qcew$Type,ref = "Treatment")
+
+secondave_did_agg <- did_agg_analysis(seattle_qcew,group = 1, 2014)
+stargazer(secondave_did_agg[[1]],secondave_did_agg[[2]],secondave_did_agg[[3]],type = "html", 
+          title = "Second Avenue Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+secondave_its_agg <- agg_its_analysis(seattle_qcew,group = 1, 2014)
+stargazer(secondave_its_agg[[1]],secondave_its_agg[[2]],secondave_its_agg[[3]],type = "html", 
+          title = "Second Avenue Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+# broadway
+broadway_did_agg <- did_agg_analysis(seattle_qcew,group = 2, 2013)
+stargazer(broadway_did_agg[[1]],broadway_did_agg[[2]],broadway_did_agg[[3]],type = "html", 
+          title = "Broadway Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+broadway_its_agg <- agg_its_analysis(seattle_qcew,group = 2, 2013)
+stargazer(broadway_its_agg[[1]],broadway_its_agg[[2]],broadway_its_agg[[3]],type = "html", 
+          title = "Broadway Corridor Interrupted Time Series Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+# roosevelt
+roos_did_agg <- did_agg_analysis(seattle_qcew,group = 3, 2016)
+stargazer(roos_did_agg[[1]],roos_did_agg[[2]],roos_did_agg[[3]],type = "html", 
+          title = "Broadway Corridor Difference-in-Difference Estimates", 
+          column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
+
+roos_its_agg <- agg_its_analysis(seattle_qcew,group = 3, 2016)
+stargazer(roos_its_agg[[1]],roos_its_agg[[2]],roos_its_agg[[3]],type = "html", 
           title = "Broadway Corridor Interrupted Time Series Estimates", 
           column.labels  = c("Retail Emp.", "Accomodations Emp.", "'Business' Emp."))
  
