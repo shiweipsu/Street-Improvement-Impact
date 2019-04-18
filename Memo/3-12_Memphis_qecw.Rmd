@@ -4,9 +4,10 @@ author: "Minji Cho"
 output:
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
-```{r}
+```{r, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
 
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
 p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dplyr, dbplyr, stargazer,cowplot, lubridate, gridExtra,data.table)
@@ -177,7 +178,7 @@ agg_trend_plot_wage <- function(df_plot, industry, corridor_name,
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Wage Comparison:\n {corridor_name}"), x="Year",y="Wage (in millions)",
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Wage is indexed to the baseline years (3 years pre-construction)")) +
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
     guides(title = "Street Type") 
   
   return(ats_df)
@@ -375,13 +376,13 @@ did_agg_analysis_qcew_w <- function(df_did, group, endyear){
 ```
 
 ## Madison Ave
-Three models, using retail employment, food employment and business employment/wage (sum of the previous two) as dependent variables, are estimated. The key interest term in the table is DID estimator variable, which infers the difference between treatment and control corridors.
+Six models, using retail, food and business (sum of the previous two) in terms of employment and total wages as dependent variables, are estimated. The key interest term in the table is DID estimator variable, which infers the difference between treatment and control corridors.
 
-In terms of employment, the corridor shows some mixed results depending on control corridors. In the cases of the Cooper Street and Highland Street, the difference terms for food and business employment are negative and significant. It means that the Madison Avenue treatment corridor have positive effects of infrastructure construction on the number of food and business employment. On the other hand, the difference terms for retail and business employment of the Union Avenue exhibit a statistically significant and positive effect. These results indicate that the Madison Avenue treatment corridor has negative impact on the number of retail and business employment when we use the Union Avenue as control group.
+In terms of employment, the corridor shows some mixed results depending on control corridors. In the cases of the Cooper Street and Highland Street, the difference terms for food and business employment are negative and significant. It means that the Madison Avenue treatment corridor has positive effects of infrastructure construction on the number of food and business employment. On the other hand, the difference terms for retail and business employment of the Union Avenue exhibit a statistically significant and positive effect. These results indicate that the Madison Avenue treatment corridor has negative impacts on the number of retail and business employment when we use the Union Avenue as a control group.
 
-In the cases of wage, the difference terms for the Cooper Street and Highland Street are significant, while those for the Union Avenue do not show statistically significant effects. The results for the Cooper Street and Highland Street, however, are not consistent. On one hand, the difference terms for retail wage are significant and positve. On the other hand, those for food wage are significant and negative. These results indicate that the Madison Avenue treatment corridor has positive effects on the wage of food industry, while it affects wage of retail negatively. The difference terms for business, however, is not significant.
+In the cases of wage, the difference terms for the Cooper Street and Highland Street are significant, while those for the Union Avenue do not show statistically significant effects. The results for the Cooper Street and Highland Street, however, are equivocal. On one hand, the difference terms for total wage of retail are significant and positve. On the other hand, those for total wage of food industry are significant and negative. These results indicate that the Madison Avenue treatment corridor has positive effects on the wage of food industry, while it affects wage of retail negatively. The difference terms for business, however, are not significant.
 
-To sum up, there are different results when using the Cooper Street or Highland Street as control groups and when using the Union Avenue. Considering the trends analysis presented above, the reason why these results are derived is that the Union Avenue might be not appropriate as a control group. In short, the difference terms for the Union Avenue may not reflect the effect of a treatment excluding the effects of extraneous factors.
+To sum up, there are different results when using the Cooper Street or Highland Street as control groups and when using the Union Avenue. Considering the trends analysis presented above, the reason why these results are derived is that the Union Avenue might be not appropriate as a control group. In short, the difference terms for the Union Avenue may not reflect well the effect of the treatment excluding the effects of extraneous factors.
 
 ```{r, echo=FALSE, results='asis'}
 ## Reference change
@@ -403,9 +404,9 @@ stargazer(madison_agg_did_qcew_w[[1]], madison_agg_did_qcew_w[[2]], madison_agg_
 
 ## Broad Ave
 
-Three models, using retail employment, food employment and business employment/wage (sum of the previous two) as dependent variables, are estimated. The key interest term in the table is DID estimator variable, which infers the difference between treatment and control corridors.
+We estimated six models which employ employment and wages of retail, food, and business (sum of the previous two) as dependent variables. The key interest term in the table is DID estimator variable, which infers the difference between treatment and control corridors.
 
-The Broad Avenue treatment corridor shows a statistically significant and negative effects of infrastructure construction on the number of employment and wage when using the Cooper Street as a control group. When we employ the Central Avenue as a control group, however, the difference terms are not statistically significant. These inconsistent results indicate that additional analyses are necessary to identify the effects of treatment on employment and wage.
+The Broad Avenue treatment corridor shows a statistically significant and negative effects of infrastructure construction on the number of employment and wage when using the Cooper Street as a control group. When we employ the Central Avenue as a control group, however, the difference terms are not statistically significant. These inconsistent results indicate that additional analyses like interrupted time series analysis (ITS) are necessary to identify the effects of treatment on employment and wage.
 
 ```{r, echo=FALSE, results='asis'}
 
@@ -427,7 +428,7 @@ stargazer(broad_agg_did_qcew_w[[1]], broad_agg_did_qcew_w[[2]], broad_agg_did_qc
 ```
           
 # Interrupted Time Series (ITS) Analysis
-```{r}
+```{r, echo=FALSE, results='asis'}
 
 # Defining function: agg_its_analysis_qcew_e, agg_its_analysis_qcew_w
 
@@ -477,9 +478,7 @@ agg_its_analysis_qcew_w <- function(df_its, group, endyear){
 
 In the case of employment, *prepost* terms are significant and postivie for both retail and food, while *ts_year:prepost* coefficients are not. These results represent that the Madison Avenue corridor contributes to the increase in the level of employment for retail and food industry, although it cannot lead to significant effects on the slope changes.
 
-In terms of wage, both *prepost* and *ts_year:prepost* terms are significant for both retail and food. In particular, *prepost* coefficients are negative and *ts_year:prepost* terms are positive. This result should be interpreted with the trend analyses because there might be misrepresentation in the estimation process. Considering both results, the treatment has a negative effect on the level of retail wage, but, at the same, it converts the slope of wage change to be positive. In other words, the treatment can contribute to the increase in retail wage in the long term, even though it makes the level of wage decrease.
-
-In the cases of food and total business, it is infered that the treatment does not negatively affect the level of wage, although the coefficient is significant and negative. In short, the treatment has a positive effect on the slope of food wage.
+In terms of wage, both *prepost* and *ts_year:prepost* terms are significant for both retail and food. In particular, *prepost* coefficients are negative and *ts_year:prepost* terms are positive. These results should be interpreted with the trend analyses because it is possible to mistrepresent the results of estimation. Considering both results, the treatment has a negative effect on the level of total wage of retail, but, at the same, it converts the slope of wage change to be positive. In other words, the treatment can contribute to the increase in retail wage in the long term, even though it makes the level of wage decrease. In the cases of food and total business, it is infered that the treatment does not negatively affect the level of wage, although the coefficient is significant and negative. In short, the treatment has a positive effect on the slope of food wage.
 
 ```{r, echo=FALSE, results='asis'}
 madison_agg_its_e <- agg_its_analysis_qcew_e(memphis_qcew, group = 1, endyear = 2011)
@@ -496,9 +495,9 @@ stargazer(madison_agg_its_w[[1]], madison_agg_its_w[[2]], madison_agg_its_w[[3]]
 
 #Broad Ave.
 
-In the case of retail employment,the *ts_year* and *prepost* coefficients are significant and positive, while the *ts_year:prepost* term is not significant. This result indicates that the Broad Avenue corridor exhibits a level change from the pre-treatment trend patterns which are an increasing pattern over time period. In terms of food and business employment, of the various coefficients, only the *prepost* terms are statistically significant and positive. This result mirrors the visual trends analyses of employments that show a clear jump after construction.
+In the case of employment of retail,the *ts_year* and *prepost* coefficients are significant and positive, while the *ts_year:prepost* term is not significant. This result indicates that the Broad Avenue corridor exhibits a level change from the pre-treatment trend patterns which are an increasing pattern over time period. In terms of food and business employment, of the various coefficients, only the *prepost* terms are statistically significant and positive. This result mirrors the visual trends analyses of employment that show a clear jump after construction.
 
-In terms of wage, the results of ITS estimates are mixed. First, the *ts_year* coefficient of retail wage is significant and positive. Others, however, are not significant. This result means that the Broad Avenue corridor does not have a significant effect on retail wage. In the case of food industry, on the other hand, all coefficients are significant. Especially, *ts_year* and *ts_year:prepost* terms are positive and *prepost* term is negative. Considering the trend of food wage, however, it is infered that the *prepost* term becomes negative in the estimation process, although treatment does not reduce the level of wage in food industry. Finally, *ts_year* and *ts_year:prepost* terms are significant and postive in terms of business wage. This result indicates that the treatment cannot lead to the change in the level of business wage, but it results in the increase in the slope of business wage change.
+In terms of wage, the results of ITS estimates are mixed. First, the *ts_year* coefficient of retail wage is significant and positive. Others, however, are not significant. This result means that the Broad Avenue corridor does not have a significant effect on total wage of retail. In the case of food industry, on the other hand, all coefficients are significant. Especially, *ts_year* and *ts_year:prepost* terms are positive and *prepost* term is negative. Considering the trend of total wage of food industry, however, it is infered that the *prepost* term gets to have the negative value in the estimation process, although treatment does not make the level of wage of food industry reduce in reality. Finally, *ts_year* and *ts_year:prepost* terms are significant and postive in terms of total wage of business. This result indicates that the treatment cannot lead to the change in the level of business wage, but it results in the increase in the slope of business wage change.
 
 
 ```{r, echo=FALSE, results='asis'}
