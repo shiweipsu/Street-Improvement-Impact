@@ -438,3 +438,576 @@ names(t_c)<-coln
 plot_tc(t_c)
 
 ```
+
+```{r, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+minn_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, 
+b.type as grouptype,  a.year as year, a.geometry as geom
+FROM minneapolis_lehd a, minneapolis_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+minn_corridor <- minn_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, Group = corridor_group, BuildStart = buildstart, BuildEnd = buildend, Name = name)
+#add new colume of construct year as numeric
+
+minn_lehd <- st_read(dsn = con, "minneapolis_lehd") %>% as.data.frame() %>% 
+  select(-geometry)
+
+minn_lehd <- minn_lehd %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08,CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19)
+
+
+minn_emp_ratio <- employ_ratio_test(minn_corridor)
+
+minn_growth <- growth_rate(minn_corridor)
+
+minn_lehd_2007 <- minn_lehd %>% filter(year == "2007", CNS07+CNS18 > 0)
+
+#prep quantile dataframe
+
+p <- seq(0,1, by = .05)
+
+quant_df <- data.frame(q_tot_emp = quantile(minn_lehd_2007$C000, probs = p, na.rm = TRUE),
+                       q_retail = quantile(minn_lehd_2007$CNS07, probs = p, na.rm = TRUE),
+                       q_food_accom = quantile(minn_lehd_2007$CNS18, probs = p, na.rm = TRUE),
+                       probs = p)
+
+```
+
+
+```{r, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+#Define functions: trend_agg_plot_LEHD, trend_agg_index_plot_LEHD, trend_agg_index_plot_city_LEHD
+
+#trend_agg_plot_LEHD
+
+trend_agg_plot_LEHD <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07", "CNS18", "business"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year",y={base},
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+#trend_agg_index_plot_LEHD
+
+trend_agg_index_plot_LEHD <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year",y={base},
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {base} is indexed to the baseline years (3 years pre-construction)")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+
+#trend_agg_index_plot_city_LEHD
+trend_agg_index_plot_city_LEHD <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+  
+  df_plot <- df_plot %>% 
+    mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+                            Type == "control" ~ paste0("Control: ", control_corridor),
+                            Type == "city" ~ "City"))
+
+  df_plot$Type <- factor(df_plot$Type, 
+                       levels = c("Treatment", paste0("Control: ", control_corridor), "City"))
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year",y={base},
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {base} is indexed to the baseline years (3 years pre-construction)")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+```
+
+# Trend Analysis
+
+## Riverside Avenue
+
+### LEHD
+
+```{r, fig.width = 10, echo=FALSE, message=FALSE, warning=FALSE}
+
+minn_corridor <- minn_corridor %>% rename(geometry = geom, Type = grouptype)
+
+#riverside index table and plot
+riverside_agg_idx <- agg_index_trend_table(minn_corridor, group = 1, construct_year = 2009)
+
+#city agg plots
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2009)
+
+riverside_agg_idx <- bind_rows(riverside_agg_idx, minn_agg)
+riverside_agg_idx <- riverside_agg_idx %>% filter(!is.na(year))
+
+riverside_agg_retail <- trend_agg_index_plot_city_LEHD(riverside_agg_idx, base = "Employment", industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom <- trend_agg_index_plot_city_LEHD(riverside_agg_idx, base = "Employment", industry = "Accommodations", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+prow <- plot_grid(riverside_agg_retail + theme(legend.position="none"),
+                  riverside_agg_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(riverside_agg_retail + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+#### Sales Tax
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10, fig.height= 10}
+
+#prep corridor sales tax df from Wei---------------
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
+
+riverside_agg <- agg_trend_table(minn_sale, group = 1)
+riverside_agg <- riverside_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Cedar Ave."))
+riverside_agg$Type <- factor(riverside_agg$Type, levels = c("Treatment", "Control: Cedar Ave."))
+
+riverside_agg_idx <- agg_index_trend_table (minn_sale, group = 1,2009)
+riverside_agg_idx <- riverside_agg_idx %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Cedar Ave.")) 
+riverside_agg_idx$Type <- factor(riverside_agg_idx$Type, levels = c("Treatment", "Control: Cedar Ave."))
+
+#riverside graphs------------
+
+riverside_agg_retail_plot <- trend_agg_plot_LEHD(riverside_agg, base = "Sales Tax", industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07", construct_year = 2009, end_year = 2010)
+
+riverside_agg_accom_plot <- trend_agg_plot_LEHD(riverside_agg, base = "Sales Tax", industry = "Restaurant", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS18", construct_year = 2009, end_year = 2010)
+ 
+riverside_agg_retail_idx_plot <- trend_agg_index_plot_LEHD(riverside_agg_idx, base = "Sales Tax", industry = "Retail", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS07_sd", construct_year = 2009, end_year = 2010)
+
+riverside_agg_idx_accom_plot <- trend_agg_index_plot_LEHD(riverside_agg_idx, base = "Sales Tax", industry = "Restaurant", corridor_name = "Riverside Ave.", control_corridor = "Cedar Ave.", industry_code = "CNS18_sd", construct_year = 2009, end_year = 2010)
+
+prow <- plot_grid(riverside_agg_retail_plot + theme(legend.position="none"),
+                  riverside_agg_accom_plot + theme(legend.position="none"),
+                  riverside_agg_retail_idx_plot + theme(legend.position="none"),
+                  riverside_agg_idx_accom_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 2)
+
+legend_b <- get_legend(riverside_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+## Franklin Avenue
+
+### Trend Analysis
+
+#### LEHD
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
+
+#making plots for franklin Ave.
+#franklin index table and plot
+franklin_agg_idx <- agg_index_trend_table(minn_corridor, group = 2, construct_year = 2011)
+
+#city agg plots
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
+
+franklin_agg_idx <- bind_rows(franklin_agg_idx, minn_agg)
+franklin_agg_idx <- franklin_agg_idx %>% filter(!is.na(year))
+
+franklin_agg_retail <- trend_agg_index_plot_city_LEHD(franklin_agg_idx, base = "Employment", industry = "Retail", corridor_name = "Franklin Ave.",
+                                                       control_corridor = "Franklin Ave.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+franklin_agg_accom <- trend_agg_index_plot_city_LEHD(franklin_agg_idx, base = "Employment", industry = "Accommodations", corridor_name = "Franklin Ave.",
+                                                      control_corridor = "Franklin Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+prow <- plot_grid(franklin_agg_retail + theme(legend.position="none"),
+                  franklin_agg_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(franklin_agg_retail + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+
+```
+
+## Central Avenue
+
+### Aggregated Trend Analysis
+
+####  LEHD
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
+
+central_agg <- agg_index_trend_table(minn_corridor, group = 3, construct_year = 2012)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2012)
+
+central_agg <- bind_rows(central_agg, minn_agg)
+
+central_agg_idx_retail <- trend_agg_index_plot_city_LEHD(df_plot = central_agg, base = "Employment", industry = "Retail", corridor_name = "Central Ave.",
+                                                                control_corridor = "University Ave,", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+
+central_agg_idx_accom <- trend_agg_index_plot_city_LEHD(df_plot = central_agg, base = "Employment", industry = "Accommodations", corridor_name = "Central Ave.",
+                                                               control_corridor = "University Ave,", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+
+prow <- plot_grid(central_agg_idx_retail + theme(legend.position="none"),
+                  central_agg_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(central_agg_idx_accom + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+#### Sales Tax 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10, fig.height=10}
+
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
+
+central_agg <- agg_trend_table(minn_sale, group = 3)
+central_agg <- central_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: University Ave."))
+central_agg$Type <- factor(central_agg$Type, levels = c("Treatment", "Control: University Ave."))
+
+central_agg_idx <- agg_index_trend_table (minn_sale, group = 3,2012)
+central_agg_idx <- central_agg_idx %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: University Ave.")) 
+central_agg_idx$Type <- factor(central_agg_idx$Type, levels = c("Treatment", "Control: University Ave."))
+
+central_agg_retail_plot <- trend_agg_plot_LEHD(central_agg, base = "Sales Tax", industry = "Retail", corridor_name = "Central Ave.",
+                                               control_corridor = "University Ave.", industry_code = "CNS07", construct_year = 2012, end_year = 2013)
+
+central_agg_accom_plot <- trend_agg_plot_LEHD(central_agg, base = "Sales Tax", industry = "Restaurant", corridor_name = "Central Ave.",
+                                              control_corridor = "University Ave.", industry_code = "CNS18", construct_year = 2012, end_year = 2013)
+ 
+central_agg_retail_idx_plot <- trend_agg_index_plot_LEHD(central_agg_idx, base = "Sales Tax", industry = "Retail", corridor_name = "Central Ave.",
+                                                         control_corridor = "University Ave.", industry_code = "CNS07_sd", construct_year = 2012, end_year = 2013)
+
+central_agg_idx_accom_plot <- trend_agg_index_plot_LEHD(central_agg_idx, base = "Sales Tax", industry = "Restaurant", corridor_name = "Central Ave.",
+                                                        control_corridor = "University Ave.", industry_code = "CNS18_sd", construct_year = 2012, end_year = 2013)
+
+prow <- plot_grid(central_agg_retail_plot + theme(legend.position="none"),
+                  central_agg_accom_plot + theme(legend.position="none"),
+                  central_agg_retail_idx_plot + theme(legend.position="none"),
+                  central_agg_idx_accom_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 2)
+
+legend_b <- get_legend(central_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+## Lyndale Avenue South
+
+### Aggregated Trend Analysis
+
+#### LEHD
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
+
+lyndale_agg <- agg_index_trend_table(minn_corridor, group = 4, construct_year = 2008)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2008)
+
+lyndale_agg <- bind_rows(lyndale_agg, minn_agg)
+
+lyndale_agg_idx_retail <- trend_agg_index_plot_city_LEHD(df_plot = lyndale_agg, base = "Employment", industry = "Retail", corridor_name = "Lyndale Ave. S.",
+                                                                control_corridor = "Grand Ave.", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009)
+
+lyndale_agg_idx_accom <- trend_agg_index_plot_city_LEHD(df_plot = lyndale_agg, base = "Employment", industry = "Accommodations", corridor_name = "Lyndale Ave. S.",
+                                                               control_corridor = "Grand Ave.", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009)
+
+prow <- plot_grid(lyndale_agg_idx_retail + theme(legend.position="none"),
+                  lyndale_agg_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(lyndale_agg_idx_accom + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+#### Sales Tax 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10, fig.height= 10}
+
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
+
+lyndale_agg <- agg_trend_table(minn_sale, group = 4)
+lyndale_agg <- lyndale_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Grand Ave."))
+lyndale_agg$Type <- factor(lyndale_agg$Type, levels = c("Treatment", "Control: Grand Ave."))
+
+lyndale_agg_idx <- agg_index_trend_table (minn_sale, group = 4, 2008)
+lyndale_agg_idx <- lyndale_agg_idx %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: Grand Ave.")) 
+lyndale_agg_idx$Type <- factor(lyndale_agg_idx$Type, levels = c("Treatment", "Control: Grand Ave."))
+
+lyndale_agg_retail_plot <- trend_agg_plot_LEHD(lyndale_agg, base = "Sales Tax", industry = "Retail", corridor_name = "Lyndale Ave. S.",
+                                               control_corridor = "Grand Ave.", industry_code = "CNS07", construct_year = 2008, end_year = 2009)
+
+lyndale_agg_accom_plot <- trend_agg_plot_LEHD(lyndale_agg, base = "Sales Tax", industry = "Restaurant", corridor_name = "Lyndale Ave. S.",
+                                              control_corridor = "Grand Ave.", industry_code = "CNS18", construct_year = 2008, end_year = 2009)
+ 
+lyndale_agg_retail_idx_plot <- trend_agg_index_plot_LEHD(lyndale_agg_idx, base = "Sales Tax", industry = "Retail", corridor_name = "Lyndale Ave. S.",
+                                                         control_corridor = "Grand Ave.", industry_code = "CNS07_sd", construct_year = 2008, end_year = 2009)
+
+lyndale_agg_idx_accom_plot <- trend_agg_index_plot_LEHD(lyndale_agg_idx, base = "Sales Tax", industry = "Restaurant", corridor_name = "Lyndale Ave. S.",
+                                                        control_corridor = "Grand Ave.", industry_code = "CNS18_sd", construct_year = 2008, end_year = 2009)
+
+prow <- plot_grid(lyndale_agg_retail_plot + theme(legend.position="none"),
+                  lyndale_agg_accom_plot + theme(legend.position="none"),
+                  lyndale_agg_retail_idx_plot + theme(legend.position="none"),
+                  lyndale_agg_idx_accom_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 2)
+
+legend_b <- get_legend(lyndale_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+## North 2nd Street
+
+### Aggregated Trend Analysis
+
+#### LEHD
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
+
+north_agg <- agg_index_trend_table(minn_corridor, group = 5, construct_year = 2011)
+minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
+
+north_agg <- bind_rows(north_agg, minn_agg)
+
+north_agg_idx_retail <- trend_agg_index_plot_city_LEHD(df_plot = north_agg, base = "Employment", industry = "Retail", corridor_name = "North 2nd St.",
+                                                                control_corridor = "Broadway Ave.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+north_agg_idx_accom <- trend_agg_index_plot_city_LEHD(df_plot = north_agg, base = "Employment", industry = "Accommodations", corridor_name = "North 2nd St.",
+                                                               control_corridor = "Broadway Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+
+prow <- plot_grid(north_agg_idx_retail + theme(legend.position="none"),
+                  north_agg_idx_accom + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(north_agg_idx_accom + theme(legend.position="bottom"))
+
+plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+#### Sales Tax 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
+
+minn_sale <- tbl(con, "minn_sales_tax")
+minn_sale <- collect(minn_sale)
+
+north_agg <- agg_trend_table(minn_sale, group = 5)
+north_agg <- north_agg %>% 
+  mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: West Broadway"))
+north_agg$Type <- factor(north_agg$Type, levels = c("Treatment", "Control: West Broadway"))
+
+north_agg_idx <- agg_index_trend_table(minn_sale, group = 5,2012)
+
+north_agg_idx <- north_agg_idx %>% 
+  mutate(Type = stringr::str_trim(Type, "both"),
+         Type = case_when(Type == "Improvement" ~ "Treatment",
+                          Type == "Control" ~ "Control: West Broadway"))
+north_agg_idx$Type <- factor(north_agg_idx$Type, levels = c("Treatment", "Control: West Broadway"))
+
+north_agg_retail_plot <- trend_agg_plot_LEHD(north_agg, base = "Sales Tax", industry = "Retail", corridor_name = "North 2nd St.",
+                                               control_corridor = "West Broadway", industry_code = "CNS07", construct_year = 2011, end_year = 2012)
+ 
+north_agg_retail_idx_plot <- trend_agg_index_plot_LEHD(north_agg_idx, base = "Sales Tax", industry = "Retail", corridor_name = "North 2nd St.",
+                                                       control_corridor = "West Broadway", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+
+prow <- plot_grid(north_agg_retail_plot + theme(legend.position="none"),
+                  north_agg_retail_idx_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(north_agg_retail_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+
+```
+
+#Define fuctions: trend_agg_plot_qcew, trend_agg_index_plot_qcew
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.asp=.75}
+
+#trend_agg_plot_qcew
+
+trend_agg_plot_qcew <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                base_code = c("avg_emp", "total_wages"), 
+                                construct_year, end_year, construct_year2, end_year2) {
+  
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year_quarter, y = get(base_code), group = street_type, colour = street_type, shape = street_type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+    theme_minimal() +
+    labs(title = glue("{corridor_name} {industry}\n {base} Change"), x="Quarter",y={base}, subtitle = "QCEW NAICS 442-453",
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Data Source: QCEW data provided by Minnesota's and Dept. of Employment\n and Economic Development")) +
+    guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+    scale_y_continuous(labels = scales::comma) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+  
+  return(ats_df)
+}
+
+dbDisconnect(con)
+
+```
