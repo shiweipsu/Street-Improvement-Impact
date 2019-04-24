@@ -33,7 +33,7 @@ memphis_qcew$Type <- as.factor(memphis_qcew$Type)
 dbDisconnect(con)
 
 
-# Defining function: agg_trend_table_qcew
+# Defining function: agg_trend_table_qcew, agg_index_trend_table
 
 agg_trend_table_qcew <- function(df, group) {
        df <- if(class(df) == "sf") {
@@ -55,6 +55,44 @@ df_plot <- df %>% group_by(year, Type) %>%
   return(df_plot)
 }
 
+
+agg_index_trend_table <- function(df, group, construct_year) {
+       df <- as.data.frame(df, stringsAsFactors = FALSE)
+       
+       start= construct_year-3
+       end=construct_year-1
+
+       df_agg <- df %>% group_by(year, Type) %>%
+       summarise(emp_food = sum(emp_food),
+                 emp_retail = sum(emp_retail),
+                 wage_food = sum(wage_food),
+                 wage_retail = sum(wage_retail),
+                 estb_food = sum(estb_food),
+                 estb_retail = sum(estb_retail))
+  
+       base_year <-  df_agg %>% filter(year %in% c(start:end)) %>% group_by(Type) %>% 
+       summarise(emp_food_b = mean(emp_food),
+                 emp_retail_b = mean(emp_retail),
+                 wage_food_b = mean(wage_food),
+                 wage_retail_b = mean(wage_retail),
+                 estb_food_b = mean(estb_food),
+                 estb_retail_b = mean(estb_retail))
+  
+  
+       df_plot <- df_agg %>%  
+       left_join(base_year, by = "Type") %>%
+       mutate(emp_food_sd = emp_food/emp_food_b*100,
+              emp_retail_sd = emp_retail/emp_retail_b*100,
+              wage_food_sd = wage_food/wage_food_b*100,
+              wage_retail_sd = wage_retail/wage_retail_b*100,
+              estb_food_sd = estb_food/estb_food_b*100,
+              estb_retail_sd = estb_retail/estb_retail_b*100) %>%
+       select(Type, year = year, emp_food_sd, emp_retail_sd,
+              wage_food_sd, wage_retail_sd, estb_food_sd, estb_retail_sd)
+  
+  return(df_plot)
+}
+
 ```
 
 # Trend Comparisons
@@ -70,7 +108,7 @@ madison_agg <- agg_trend_table_qcew (memphis_qcew, group = 1)
 # add a new function to draw plots with 4 control corridors
 agg_trend_plot_emp <- function(df_plot, industry, corridor_name, 
                                  industry_code = c("emp_retail", "emp_food"), 
-                                 construct_year, end_year) {
+                                 construct_year, end_year, index) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
   
@@ -111,7 +149,7 @@ agg_trend_plot_emp <- function(df_plot, industry, corridor_name,
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Employment Comparison:\n {corridor_name}"), x="Year",y="Employment",
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {index}")) +
     guides(title = "Street Type") 
   
   return(ats_df)
@@ -138,7 +176,7 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 # add a new function to draw plots with 4 control corridors
 agg_trend_plot_wage <- function(df_plot, industry, corridor_name, 
                                  industry_code = c("wage_retail", "wage_food"), 
-                                 construct_year, end_year) {
+                                 construct_year, end_year, index) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
   
@@ -178,7 +216,7 @@ agg_trend_plot_wage <- function(df_plot, industry, corridor_name,
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Wage Comparison:\n {corridor_name}"), x="Year",y="Wage (in millions)",
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {index}")) +
     guides(title = "Street Type") 
   
   return(ats_df)
@@ -205,7 +243,7 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 # add a new function to draw plots with 4 control corridors
 agg_trend_plot_estb <- function(df_plot, industry, corridor_name, 
                                  industry_code = c("estb_retail", "estb_food"), 
-                                 construct_year, end_year) {
+                                 construct_year, end_year, index) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
   
@@ -246,7 +284,7 @@ agg_trend_plot_estb <- function(df_plot, industry, corridor_name,
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
     labs(title = glue("{industry} Count Comparison:\n {corridor_name}"), x="Year",y="Number of establishments",
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {index}")) +
     guides(title = "Street Type") 
   
   return(ats_df)
@@ -270,19 +308,39 @@ plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ### Employment trend comparison
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10, fig.height= 10}
 
 broad_agg <- agg_trend_table_qcew (memphis_qcew, group = 2)
+broad_agg_idx <- agg_index_trend_table(emphis_qcew, group = 2, construct_year = 2010)
+broad_agg <- bind_rows(broad_agg_idx, broad_agg)
 
-broad_retail_trend_plot <- agg_trend_plot_emp(broad_agg, industry = "Retail", industry_code = "emp_retail", corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011)
+broad_agg_retail_plot <- agg_trend_plot_emp(broad_agg, industry = "Retail", industry_code = "emp_retail",
+                                            corridor_name = "Broad Avenue",
+                                            construct_year = 2010, end_year = 2011,
+                                            index = "")
 
-broad_food_trend_plot <- agg_trend_plot_emp(broad_agg, industry = "Food",industry_code = "emp_food", corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011)
+broad_agg_food_plot <- agg_trend_plot_emp(broad_agg, industry = "Food",industry_code = "emp_food",
+                                          corridor_name = "Broad Avenue",
+                                          construct_year = 2010, end_year = 2011,
+                                          index = "")
 
-prow <- plot_grid(broad_retail_trend_plot + theme(legend.position="none"),
-                  broad_food_trend_plot + theme(legend.position="none"),
-                  align = 'vh', hjust = -1, nrow = 1)
+broad_agg_retail_idx_plot <- agg_trend_plot_emp(broad_agg, industry = "Retail", industry_code = "emp_retail",
+                                            corridor_name = "Broad Avenue",
+                                            construct_year = 2010, end_year = 2011,
+                                            index = "employment is indexed to the baseline years (3 years pre-construction)")
 
-legend_b <- get_legend(broad_retail_trend_plot + theme(legend.position="bottom"))
+broad_agg_idx_food_plot <- agg_trend_plot_emp(broad_agg, industry = "Food",industry_code = "emp_food",
+                                          corridor_name = "Broad Avenue",
+                                          construct_year = 2010, end_year = 2011,
+                                          index = "employment is indexed to the baseline years (3 years pre-construction)")
+
+prow <- plot_grid(broad_agg_retail_plot + theme(legend.position="none"),
+                  broad_agg_food_plot + theme(legend.position="none"),
+                  broad_agg_retail_idx_plot + theme(legend.position="none"),
+                  broad_agg_idx_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 2)
+
+legend_b <- get_legend(riverside_agg_retail_plot + theme(legend.position="bottom"))
 
 plot_grid( prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
