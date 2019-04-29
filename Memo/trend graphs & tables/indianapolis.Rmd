@@ -411,3 +411,898 @@ options(knitr.kable.NA = '-')
              "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
 
 ```
+
+
+
+##Trend plots functions
+
+```{r, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+#Define functions: agg_index_trend_table, trend_agg_plot_LEHD, trend_agg_index_plot_LEHD, trend_agg_index_plot_city_LEHD
+
+#agg_index_trend_table
+agg_index_trend_table <- function(df, group, construct_year) {
+  
+  #prepare tables for plotting
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  
+  df <- df %>% filter(Group == group)
+  
+  start= construct_year-3
+  end=construct_year-1
+
+  df <- df %>% mutate(business = CNS07 + CNS18)
+  
+
+  df_agg <- df %>% group_by(year, Type) %>%
+    summarise(CNS07 = sum(CNS07, na.rm = TRUE),
+              CNS18 = sum(CNS18, na.rm = TRUE),
+              business = sum(business, na.rm = TRUE))
+  
+  base_year <-  df_agg %>% filter(year %in% c(start:end)) %>% group_by(Type) %>% 
+    summarise(CNS07_base = mean(CNS07), CNS18_base = mean(CNS18), business_base = mean(business))
+  
+  
+  df_plot <- df_agg %>%  
+    left_join(base_year, by = "Type") %>%
+    mutate(CNS07_sd = CNS07/CNS07_base*100,
+           CNS18_sd = CNS18/CNS18_base*100,
+           business_sd = business/business_base*100) %>%
+    select(Type, year = year, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+  
+  return(df_plot)
+  
+}
+
+city_agg_index_trend_table <- function(df, construct_year) {
+  
+  if(class(df) == "sf") {
+    
+    df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
+    
+  } else {
+    
+    df
+  }
+  
+  df <- df %>% mutate(business = CNS07 + CNS18)
+  
+  start= construct_year-3
+  end=construct_year-1
+  
+  df_agg <- df %>% group_by(year) %>%
+    summarise(CNS07 = sum(CNS07),
+              CNS18 = sum(CNS18),
+              business = sum(business)) %>% 
+    mutate(Type = "city")
+  
+  base_year <-  df_agg %>% filter(year %in% c(start:end)) %>% group_by(Type) %>% 
+    summarise(CNS07_base = mean(CNS07), CNS18_base = mean(CNS18), business_base = mean(business))
+  
+  df_plot <- df_agg %>%  
+    left_join(base_year,by="Type") %>%
+    mutate(CNS07_sd = CNS07/CNS07_base*100,
+           CNS18_sd = CNS18/CNS18_base*100,
+           business_sd = business/business_base*100,
+           Type = "city") %>%
+    select(Type, year, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+  
+  return(df_plot)
+  
+}
+
+#trend_agg_plot_LEHD
+
+trend_agg_plot_LEHD <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07", "CNS18", "business"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey90",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year",y={base},
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+#trend_agg_plot_LEHD_sa
+
+trend_agg_plot_LEHD_sa <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07", "CNS18", "business"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code)/1000000, 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year",y=paste({base}," (in millions)"),
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+#trend_agg_index_plot_LEHD
+
+trend_agg_index_plot_LEHD <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey90",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year",y=paste({base}," Index"),
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {base} is indexed to the baseline years (3 years pre-construction)")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+
+#trend_agg_index_plot_city_LEHD
+trend_agg_index_plot_city_LEHD <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                      industry_code = c("CNS07_sd", "CNS18_sd", "business_sd"), 
+                                      construct_year, end_year, construct_year2, end_year2) {
+  
+  df_plot <- df_plot %>% 
+    mutate(Type = case_when(Type == "improvement" ~ "Treatment",
+                            Type == "control" ~ paste0("Control: ", control_corridor),
+                            Type == "city" ~ "City"))
+
+  df_plot$Type <- factor(df_plot$Type, 
+                       levels = c("Treatment", paste0("Control: ", control_corridor), "City"))
+
+  ##convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
+  
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), 
+                                group = Type, colour = Type, shape=Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey90",linetype=0,alpha = 0.03) +
+    
+    geom_point(size = 3, fill="white") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("{industry} {base} Comparison:\n {corridor_name}"), x="Year", y=paste({base}," Index"),
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {base} is indexed to the baseline years (3 years pre-construction)")) + guides(title = "Street Type") 
+  
+  return(ats_df)
+}
+
+#trend_agg_plot_qcew
+trend_agg_plot_qcew <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                base_code = c("avg_emp", "total_wages","tax_revenue"), construct_year) {
+
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = quarter, y = get(base_code), group = type, colour = type, shape = type)) + 
+  geom_line() + 
+    
+  geom_rect(aes(xmin = construct_year-0.5, 
+                xmax = construct_year+0.5, 
+                ymin = -Inf, ymax = Inf),
+                fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+  geom_rect(aes(xmin = construct_year-3.5, 
+                xmax = construct_year-0.5, 
+                ymin = -Inf, ymax = Inf),
+              fill = "grey90",linetype=0,alpha = 0.03) +
+    
+  scale_x_yearqtr() +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = glue("{industry} {base} Comparison:\n {corridor_name}"),
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::comma) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+  
+  return(ats_df)
+}
+
+#trend_agg_plot_qcew_d
+trend_agg_plot_qcew_d <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                base_code = c("avg_emp", "total_wages","tax_revenue"), construct_year) {
+
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = quarter, y = get(base_code)/1000000, group = type, colour = type, shape = type)) + 
+  geom_line() + 
+    
+  geom_rect(aes(xmin = construct_year-0.5, 
+                xmax = construct_year+0.5, 
+                ymin = -Inf, ymax = Inf),
+                fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+  geom_rect(aes(xmin = construct_year-3.5, 
+                xmax = construct_year-0.5, 
+                ymin = -Inf, ymax = Inf),
+              fill = "grey90",linetype=0,alpha = 0.03) +
+    
+  scale_x_yearqtr() +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = paste({base}," (in millions)"), title = glue("{industry} {base} Comparison:\n {corridor_name}"),
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+  
+  return(ats_df)
+}
+
+#trend_agg_plot_qcew_p
+trend_agg_plot_qcew_p <- function(df_plot, base, industry, corridor_name, control_corridor, 
+                                base_code = c("avg_emp", "total_wages","tax_revenue_idx"), construct_year) {
+
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = quarter, y = get(base_code)*100, group = type, colour = type, shape = type)) + 
+  geom_line() + 
+    
+  geom_rect(aes(xmin = construct_year-0.5, 
+                xmax = construct_year+0.5, 
+                ymin = -Inf, ymax = Inf),
+                fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+  geom_rect(aes(xmin = construct_year-3.5, 
+                xmax = construct_year-0.5, 
+                ymin = -Inf, ymax = Inf),
+              fill = "grey90",linetype=0,alpha = 0.03) +
+    
+  scale_x_yearqtr() +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+  theme_minimal() +
+    geom_point(size = 3, fill = "white") +
+  labs(x = "Quarter", y = "", title = glue("{industry} {base} Comparison:\n {corridor_name}"),
+       caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Data are indexed to the baseline years (3 years pre-construction)")) +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+ # scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5))
+  
+  return(ats_df)
+}
+```
+
+##  Virginia Avenue
+### Aggregated Trend Analysis
+#### LEHD 
+
+In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Meridian corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Prospect and Shelby corridors while the Meridian corridor shows much more volatility over the study period.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+virginia_agg <- agg_trend_table(indy_corridor, group = 1) %>% filter(Type!="Control: Meridian")
+
+virginia_agg$Type <- factor(virginia_agg$Type, levels = c("Treatment","Control: Prospect","Control: Shelby")) 
+
+agg_retail_trend_plot <-trend_agg_plot_LEHD(virginia_agg, base = "Employment", industry = "Retail", industry_code = "CNS07", corridor_name = "Virginia Ave.", construct_year = 2011, end_year = 2012, construct_year2 = 2008, end_year2 = 2010)
+
+agg_food_trend_plot <- trend_agg_plot_LEHD(virginia_agg, base = "Employment", industry = "Food", industry_code = "CNS18", corridor_name = "Virginia Ave.", construct_year = 2011, end_year = 2012, construct_year2 = 2008, end_year2 = 2010)
+
+prow <- plot_grid(agg_retail_trend_plot + theme(legend.position="none"),
+                  agg_food_trend_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(agg_food_trend_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width= 9.5, fig.asp=.5}
+
+indy_corridor <- indy_corridor %>% 
+  rename(geometry = geom)
+
+va_index <- agg_index_trend_table(indy_corridor, group = 1, construct_year = 2011)
+
+indy_index <- city_agg_index_trend_table(indy_lehd, construct_year = 2011)
+
+va_index <- bind_rows(va_index, indy_index)
+
+va_index <- va_index %>% mutate(Type = if_else(Type == "city", "City", Type)) %>% filter(Type !="Control: Meridian")
+
+va_index$Type <- factor(va_index$Type, levels = c("Treatment", "Control: Prospect", "Control: Shelby","City")) 
+
+
+va_city_idx_retail_plot <- trend_agg_index_plot_LEHD(va_index, base="Employment", industry="Retail", industry_code = "CNS07_sd", corridor_name = "Virginia Ave.", construct_year = 2011, end_year = 2012, construct_year2 = 2008, end_year2 = 2010)
+
+va_city_idx_food_plot <- trend_agg_index_plot_LEHD(va_index, base="Employment", industry="Food", industry_code = "CNS18_sd", corridor_name = "Virginia Ave.", construct_year = 2011, end_year = 2012, construct_year2 = 2008, end_year2 = 2010)
+
+
+prow <- plot_grid(va_city_idx_retail_plot + theme(legend.position="none"),
+                  va_city_idx_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(va_city_idx_retail_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
+
+####  Sales Tax 
+
+In terms of sales tax revenue and growth patterns, all three corridors are appropriately comparable. Meridian has a much higher absolute amount of tax receipts, but its trajectory, though more unstable, is still generally positive and matches those of the other corridors in the set. Virginia Ave itself sees steady and increasing tax revenue over time with anomalous spike in 2014 but it quickly returns to normal. Shelby and Prospect mirror Virginia Avenue in terms of total tax receipts and also generally follow growth trends, though both have more modest growth over time than Virginia. The t-test comparison of corridor growth rates came back non-significant for all three corridors giving us qualified confidence that these are appropriate comparators.  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.75}
+
+#query the sales tax from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+indy_sales <- dbReadTable(conn = con, name = "indy_sales_tax")
+
+
+va_sales <- indy_sales %>% filter(group == 2)
+
+va_sales$type <- as.character(va_sales$type)
+va_sales[va_sales$corridor =="Meridian",]$type <- "Control: Meridian"
+va_sales[va_sales$corridor=="Prospect",]$type <- "Control: Prospect"
+va_sales[va_sales$corridor=="Shelby",]$type <- "Control: Shelby"
+va_sales[va_sales$corridor=="Virginia Ave",]$type <- "Treatment"
+
+va_sales <- filter(va_sales, type!="Control: Meridian")
+
+va_sales$type <- factor(va_sales$type,levels = c("Treatment",  "Control: Prospect", "Control: Shelby"))
+
+va_sales_agg <- va_sales %>% mutate(year = substr(quarter,1,4)) %>% 
+ filter(year %in% (2008:2010)) %>% 
+  group_by(type) %>% 
+  mutate(tax_revenue_base = mean(tax_revenue)) %>% 
+  select(corridor, type, tax_revenue_base) %>% unique()
+
+va_sales <- va_sales %>% 
+  left_join(va_sales_agg, by = c("corridor" = "corridor", "type" = "type"))
+
+va_sales <- va_sales %>% 
+  mutate(tax_revenue_idx = tax_revenue/tax_revenue_base)
+
+va_p1 <- ggplot(va_sales, aes(x = quarter, y = tax_revenue/1000, shape = type,
+                              group = type, colour = type)) +
+                  geom_rect(aes(xmin = as.Date("2011-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2012-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+                    geom_rect(aes(xmin = as.Date("2008-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2011-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+                  geom_line() +
+                  geom_point(size = 3, fill="white") +
+                 #scale_shape_manual(values=c(22,21,21,23))+
+                 scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+                 theme_minimal()  +
+    labs(title = "Sales Tax Comparison:\n Virginia Ave.", x="Year",y="Sales Tax (in thousand)",
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
+    guides(shape = guide_legend(title = "Street Type"), colour = guide_legend(title = "Street Type")) +
+  scale_y_continuous(labels = scales::dollar)
+
+va_p2 <- ggplot(va_sales, aes(x = quarter, y = tax_revenue_idx*100, shape = type,
+                              group = type, colour = type)) +
+                  geom_rect(aes(xmin = as.Date("2011-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2012-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+                    geom_rect(aes(xmin = as.Date("2008-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2011-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+                  geom_line() +
+                  geom_point(size = 3, fill="white") +
+                 #scale_shape_manual(values=c(22,21,21,23))+
+                 scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+                 theme_minimal()  +
+    labs(title = "Sales Tax Comparison:\n Virginia Ave.", x="Year",y="Sales Tax Index",
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Data are indexed to the baseline years (3 years pre-construction)")) +
+    guides(shape = guide_legend(title = "Street Type"), colour = guide_legend(title = "Street Type")) 
+
+
+plot_grid(va_p1, va_p2, ncol = 1)
+```
+
+####  QCEW 
+
+As mentioned earlier, the advantage of using QCEW data is the ability to get greater industrial detail in addition to establishment counts and total wages. In the case of Virginia Avenue, the ability to isolate slightly more detailed industries, in this case food and drinking places (NAICS code 722) gives us a clearer idea of the growth in our industries of interest. Note, for example, that the growth in food and drinking places employment is more dramatic for Virginia Avenue but the overall pattern remains similar to the LEHD estimates. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width= 9.5, fig.asp=.75}
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+indy_qcew <- tbl(con, "indy_qcew_modified")
+indy_qcew <- collect(indy_qcew)
+
+indy_qcew$corridor_name <- stringr::str_trim(indy_qcew$corridor_name, "both")
+
+indy_qcew$corridor_type <- factor(indy_qcew$corridor_type, levels = c("treatment", "control"))
+
+indy_qcew <- indy_qcew %>% 
+  mutate(year_quarter = paste0(year,"-",qtr), 
+          year_quarter = as.yearqtr(year_quarter)) %>% 
+  filter(naics_code != "suppressed") %>% 
+  mutate(naics_label = case_when(naics_code == "722" ~ "Food/Drinking Places",
+                                 naics_code == "448" ~ "Clothing Stores",
+                                 naics_code == "721" ~ "Accommodation"))
+
+
+va_qcew <- indy_qcew %>% filter(corridor_group == 1)
+va_qcew <- va_qcew %>% 
+  mutate(corridor_name = case_when(corridor_name == "shelby" ~ "Control: Shelby",
+                                   corridor_name == "virginia ave" ~ "Treatment: Virginia",
+                                   corridor_name == "prospect" ~ "Control: Prospect",
+                                   corridor_name == "meridian" ~ "Control: Meridian"))
+
+va_qcew$corridor_name <- factor(va_qcew$corridor_name,
+                                levels = c("Treatment: Virginia",
+                                           "Control: Shelby",
+                                           "Control: Prospect",
+                                           "Control: Meridian"))
+
+va_qcew <- filter(va_qcew, corridor_name!="Control: Meridian")
+
+va_qcew_agg <- va_qcew  %>% 
+ filter(naics_code ==722,year %in% (2008:2010)) %>% 
+  group_by(corridor_name) %>% 
+  mutate(base_wage = mean(qtr_wages), base_emp = mean(employment)) %>% 
+  select(corridor_name,  base_wage, base_emp) %>% unique()
+
+va_qcew <- va_qcew %>% 
+  left_join(va_qcew_agg, by = c("corridor_name" = "corridor_name"))
+
+va_qcew <- va_qcew %>% 
+  mutate(wage_idx = qtr_wages/base_wage,
+         emp_idx = employment/base_emp)
+
+#plot check 1 for virginia
+
+qc1 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
+              aes(x = year_quarter, y = employment, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2012, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2011, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "Employment", title = "Food and Drinking Places Employment Comparison\nVirginia Ave ",
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+      theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+
+
+qc2 <- ggplot(va_qcew %>%  filter(naics_code == "722"), 
+              aes(x = year_quarter, y = qtr_wages/1000, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2011, 
+                  xmax = 2012, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = 2008, 
+                  xmax = 2011, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+  theme_minimal() +
+  labs(x = "Quarter", y = "Total Wages (in thousand)", title = "Food and Drinking Places Total Wages Comparison\nVirginia Ave ",
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::dollar) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+
+
+plot_grid(qc1, qc2, ncol = 1)
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9.5, fig.asp=.75}
+
+qc_idx1 <- ggplot(va_qcew, 
+              aes(x = year_quarter, y = emp_idx*100, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2010.5, 
+                  xmax = 2011.5, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = 2007.5, 
+                  xmax = 2010.5, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+  theme_minimal() +
+  labs(x = "Quarter", y = "Employment Index", title = "Food and Drinking Places Employment Comparison\nVirginia Ave",
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period\n Data are indexed to the baseline years (3 years pre-construction)") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+
+
+qc_idx2 <- ggplot(va_qcew, 
+              aes(x = year_quarter, y = wage_idx*100, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2010.5, 
+                  xmax = 2011.5, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = 2007.5, 
+                  xmax = 2010.5, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  theme_minimal() +
+  labs(x = "Quarter", y = "Total Wages Index", title = "Food and Drinking Places Total Wages Comparison\nVirginia Ave",
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period\n Data are indexed to the baseline years (3 years pre-construction)")  +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+
+
+plot_grid(qc_idx1, qc_idx2, ncol = 1)
+
+```
+
+
+
+## Mass - copy from Va
+#### LEHD 
+
+In terms of retail performance, the treatment corridor's retail employment remains relatively flat over the study period and tracks the other comparison corridors fairly closely. The exception is the Meridian corridor that shows a large drop with a slow rebound that is likely due to the Great Recession starting in 2008. In terms of the food/accommodation sector, the treatment corridor has a similar growth trend to the Prospect and Shelby corridors while the Meridian corridor shows much more volatility over the study period.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.5}
+
+mass_agg <- agg_trend_table(indy_corridor, group = 2) 
+
+mass_agg$Type <- factor(mass_agg$Type, levels = c("Treatment","Control: Mass Ave")) 
+
+agg_retail_trend_plot <-trend_agg_plot_LEHD(mass_agg, base = "Employment", industry = "Retail", industry_code = "CNS07", corridor_name = "Massachusetts Ave.", construct_year = 2009, end_year = 2010, construct_year2 = 2006, end_year2 = 2008)
+
+agg_food_trend_plot <- trend_agg_plot_LEHD(mass_agg, base = "Employment", industry = "Food", industry_code = "CNS18", corridor_name = "Massachusetts Ave.", construct_year = 2009, end_year = 2010, construct_year2 = 2006, end_year2 = 2008)
+
+prow <- plot_grid(agg_retail_trend_plot + theme(legend.position="none"),
+                  agg_food_trend_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(agg_food_trend_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width= 9.5, fig.asp=.5}
+
+indy_corridor <- indy_corridor %>% 
+  rename(geometry = geom)
+
+mass_index <- agg_index_trend_table(indy_corridor, group = 2, construct_year = 2009)
+
+indy_index <- city_agg_index_trend_table(indy_lehd, construct_year = 2009)
+
+mass_index <- bind_rows(mass_index, indy_index)
+
+mass_index <- mass_index %>% mutate(Type = if_else(Type == "city", "City", Type)) 
+
+mass_index$Type <- factor(mass_index$Type, levels = c("Treatment", "Control: Mass Ave","City")) 
+
+
+mass_city_idx_retail_plot <- trend_agg_index_plot_LEHD(mass_index, base="Employment", industry="Retail", industry_code = "CNS07_sd", corridor_name = "Massachusetts Ave.", construct_year = 2009, end_year = 2010, construct_year2 = 2006, end_year2 = 2008)
+
+mass_city_idx_food_plot <- trend_agg_index_plot_LEHD(mass_index, base="Employment", industry="Food", industry_code = "CNS18_sd", corridor_name = "Massachusetts Ave.", construct_year = 2009, end_year = 2010, construct_year2 = 2006, end_year2 = 2008)
+
+
+prow <- plot_grid(mass_city_idx_retail_plot + theme(legend.position="none"),
+                  mass_city_idx_food_plot + theme(legend.position="none"),
+                  align = 'vh', hjust = -1, nrow = 1)
+
+legend_b <- get_legend(mass_city_idx_retail_plot + theme(legend.position="bottom"))
+
+plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
+```
+
+####  Sales Tax 
+
+In terms of sales tax revenue and growth patterns, all three corridors are appropriately comparable. Meridian has a much higher absolute amount of tax receipts, but its trajectory, though more unstable, is still generally positive and matches those of the other corridors in the set. Virginia Ave itself sees steady and increasing tax revenue over time with anomalous spike in 2014 but it quickly returns to normal. Shelby and Prospect mirror Virginia Avenue in terms of total tax receipts and also generally follow growth trends, though both have more modest growth over time than Virginia. The t-test comparison of corridor growth rates came back non-significant for all three corridors giving us qualified confidence that these are appropriate comparators.  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=.75}
+
+#query the sales tax from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+indy_sales <- dbReadTable(conn = con, name = "indy_sales_tax")
+
+
+mass_sales <- indy_sales %>% filter(group == 1)
+
+mass_sales$type <- as.character(mass_sales$type)
+mass_sales[mass_sales$corridor =="Mass Ave (control)",]$type <- "Control: Mass Ave"
+mass_sales[mass_sales$corridor=="Mass Ave",]$type <- "Treatment"
+
+mass_sales$type <- factor(mass_sales$type,levels = c("Treatment",  "Control: Mass Ave"))
+
+mass_sales_agg <- mass_sales %>% mutate(year = substr(quarter,1,4)) %>% 
+ filter(year %in% (2006:2008)) %>% 
+  group_by(type) %>% 
+  mutate(tax_revenue_base = mean(tax_revenue)) %>% 
+  select(corridor, type, tax_revenue_base) %>% unique()
+
+mass_sales <- mass_sales %>% 
+  left_join(mass_sales_agg, by = c("corridor" = "corridor", "type" = "type"))
+
+mass_sales <- mass_sales %>% 
+  mutate(tax_revenue_idx = tax_revenue/tax_revenue_base)
+
+mass_p1 <- ggplot(mass_sales, aes(x = quarter, y = tax_revenue, shape = type,
+                              group = type, colour = type)) +
+                  geom_rect(aes(xmin = as.Date("2009-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2010-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+                    geom_rect(aes(xmin = as.Date("2007-07-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2009-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+                  geom_line() +
+                  geom_point(size = 3, fill="white") +
+                 #scale_shape_manual(masslues=c(22,21,21,23))+
+                 scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+                 theme_minimal()  +
+    labs(title = "Sales Tax Comparison:\n Massachusetts Ave.", x="Year",y="Sales Tax",
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
+    guides(shape = guide_legend(title = "Street Type"), colour = guide_legend(title = "Street Type")) +
+  scale_y_continuous(labels = scales::dollar)
+
+mass_p2 <- ggplot(mass_sales, aes(x = quarter, y = tax_revenue_idx*100, shape = type,
+                              group = type, colour = type)) +
+                  geom_rect(aes(xmin = as.Date("2009-01-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2010-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+                    geom_rect(aes(xmin = as.Date("2007-07-01", "%Y-%m-%d"), 
+                  xmax = as.Date("2009-01-01","%Y-%m-%d"), 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+                  geom_line() +
+                  geom_point(size = 3, fill="white") +
+                 #scale_shape_manual(values=c(22,21,21,23))+
+                 scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+                 theme_minimal()  +
+    labs(title = "Sales Tax Comparison:\n Massachusetts Ave.", x="Year",y="Sales Tax Index",
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n Data are indexed to the baseline years (3 years pre-construction)")) +
+    guides(shape = guide_legend(title = "Street Type"), colour = guide_legend(title = "Street Type")) 
+
+
+plot_grid(mass_p1, mass_p2, ncol = 1)
+```
+
+####  QCEW 
+
+As mentioned earlier, the advantage of using QCEW data is the ability to get greater industrial detail in addition to establishment counts and total wages. In the case of Virginia Avenue, the ability to isolate slightly more detailed industries, in this case food and drinking places (NAICS code 722) gives us a clearer idea of the growth in our industries of interest. Note, for example, that the growth in food and drinking places employment is more dramatic for Virginia Avenue but the overall pattern remains similar to the LEHD estimates. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width= 9.5, fig.asp=.75}
+
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+indy_qcew <- tbl(con, "indy_qcew_modified")
+indy_qcew <- collect(indy_qcew)
+
+indy_qcew$corridor_name <- stringr::str_trim(indy_qcew$corridor_name, "both")
+
+indy_qcew$corridor_type <- factor(indy_qcew$corridor_type, levels = c("treatment", "control"))
+
+indy_qcew <- indy_qcew %>% 
+  mutate(year_quarter = paste0(year,"-",qtr), 
+          year_quarter = as.yearqtr(year_quarter)) %>% 
+  filter(naics_code != "suppressed") %>% 
+  mutate(naics_label = case_when(naics_code == "722" ~ "Food/Drinking Places",
+                                 naics_code == "448" ~ "Clothing Stores",
+                                 naics_code == "721" ~ "Accommodation"))
+
+
+mass_qcew <- indy_qcew %>% filter(corridor_group == 2)
+mass_qcew <- mass_qcew %>% 
+  mutate(corridor_name = case_when(corridor_name == "mass ave (control)" ~ "Control: Mass Ave",
+                                   corridor_name == "mass ave" ~ "Treatment"))
+
+mass_qcew$corridor_name <- factor(mass_qcew$corridor_name,
+                                levels = c("Treatment","Control: Mass Ave"))
+
+
+#plot check 1 for virginia
+
+qc1 <- ggplot(mass_qcew %>%  filter(naics_code == "722"), 
+              aes(x = year_quarter, y = employment, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2009, 
+                  xmax = 2010, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = 2007, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3) +
+  scale_x_yearqtr() +
+  theme(axis.text.x = element_text(angle=45, vjust = 0.5)) +
+  theme_minimal() +
+  labs(x = "Quarter", y = "Employment", title = "Food and Drinking Places Employment Comparison\nMassachusetts Ave. ",
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+      theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+
+
+qc2 <- ggplot(mass_qcew %>%  filter(naics_code == "722"), 
+              aes(x = year_quarter, y = qtr_wages/1000, group = corridor_name, 
+                           colour = corridor_name, shape = corridor_name)) +
+  geom_rect(aes(xmin = 2009, 
+                  xmax = 2010, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "#adff2f",linetype=0,alpha = 0.03) +
+  geom_rect(aes(xmin = 2007, 
+                  xmax = 2009, 
+                  ymin = -Inf, ymax = Inf),
+                  fill = "grey90",linetype=0,alpha = 0.03) +
+  geom_line() + 
+  geom_point(size = 3, fill = "white") +
+  scale_x_yearqtr() +
+  theme_minimal() +
+  labs(x = "Quarter", y = "Total Wages (in thousand)", title = "Food and Drinking Places Total Wages Comparison\nMassachusetts Ave. ",
+       caption = "Gray shaded area is pre-construction period\n Green shaded area is construction period") +
+  guides(shape = guide_legend("Corridor"), colour = guide_legend("Corridor")) +
+  scale_y_continuous(labels = scales::dollar) +
+    theme(axis.text.x = element_text(angle=45, vjust = 0.5)) 
+
+
+plot_grid(qc1, qc2, ncol = 1)
+
+```
+
