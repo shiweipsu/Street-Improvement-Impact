@@ -455,7 +455,7 @@ agg_index_trend_table <- function(df, group, construct_year) {
   start= construct_year-3
   end=construct_year-1
 
-  df <- df %>% filter(Group == 2) %>%
+  df <- df %>% 
     mutate(business = CNS07 + CNS18)
   
 
@@ -1435,11 +1435,11 @@ minn_agg <- city_agg_index_trend_table(minn_lehd, construct_year = 2011)
 
 north_agg <- bind_rows(north_agg, minn_agg)
 
-north_agg_idx_retail <- trend_agg_index_plot_city_LEHD(df_plot = north_agg, base = "Employment", industry = "Retail", corridor_name = "North 2nd St.",
-                                                                control_corridor = "Broadway Ave.", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+north_agg_idx_retail <- trend_agg_index_plot_city_LEHD(df_plot = north_agg, base = "Employment", industry = "Retail", corridor_name = "North Second Street",
+                                                                control_corridor = "West Broadway Avenue", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
 
-north_agg_idx_accom <- trend_agg_index_plot_city_LEHD(df_plot = north_agg, base = "Employment", industry = "Food", corridor_name = "North 2nd St.",
-                                                               control_corridor = "Broadway Ave.", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
+north_agg_idx_accom <- trend_agg_index_plot_city_LEHD(df_plot = north_agg, base = "Employment", industry = "Food", corridor_name = "North Second Street",
+                                                               control_corridor = "West Broadway Avenue", industry_code = "CNS18_sd", construct_year = 2011, end_year = 2012)
 
 prow <- plot_grid(north_agg_idx_retail + theme(legend.position="none"),
                   north_agg_idx_accom + theme(legend.position="none"),
@@ -1467,22 +1467,22 @@ minn_sale <- collect(minn_sale)
 north_agg <- agg_trend_table(minn_sale, group = 5)
 north_agg <- north_agg %>% 
   mutate(Type = case_when(Type == " Improvement" ~ "Treatment",
-                          Type == "Control" ~ "Control: West Broadway"))
-north_agg$Type <- factor(north_agg$Type, levels = c("Treatment", "Control: West Broadway"))
+                          Type == "Control" ~ "Control: West Broadway Avenue"))
+north_agg$Type <- factor(north_agg$Type, levels = c("Treatment", "Control: West Broadway Avenue"))
 
 north_agg_idx <- agg_index_trend_table(minn_sale, group = 5,2012)
 
 north_agg_idx <- north_agg_idx %>% 
   mutate(Type = stringr::str_trim(Type, "both"),
          Type = case_when(Type == "Improvement" ~ "Treatment",
-                          Type == "Control" ~ "Control: West Broadway"))
-north_agg_idx$Type <- factor(north_agg_idx$Type, levels = c("Treatment", "Control: West Broadway"))
+                          Type == "Control" ~ "Control: West Broadway Avenue"))
+north_agg_idx$Type <- factor(north_agg_idx$Type, levels = c("Treatment", "Control: West Broadway Avenue"))
 
-north_agg_retail_plot <- trend_agg_plot_LEHD_sa(north_agg, base = "Sales Revenue", industry = "Retail", corridor_name = "North 2nd St.",
-                                               control_corridor = "West Broadway", industry_code = "CNS07", construct_year = 2011, end_year = 2012)
+north_agg_retail_plot <- trend_agg_plot_LEHD_sa(north_agg, base = "Sales Revenue", industry = "Retail", corridor_name = "North Second Street",
+                                               control_corridor = "West Broadway Avenue", industry_code = "CNS07", construct_year = 2011, end_year = 2012)
  
-north_agg_retail_idx_plot <- trend_agg_index_plot_LEHD(north_agg_idx, base = "Sales Revenue", industry = "Retail", corridor_name = "North 2nd St.",
-                                                       control_corridor = "West Broadway", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
+north_agg_retail_idx_plot <- trend_agg_index_plot_LEHD(north_agg_idx, base = "Sales Revenue", industry = "Retail", corridor_name = "North Second Street",
+                                                       control_corridor = "West Broadway Avenue", industry_code = "CNS07_sd", construct_year = 2011, end_year = 2012)
 
 
 prow <- plot_grid(north_agg_retail_plot + theme(legend.position="none"),
@@ -1512,10 +1512,10 @@ north_qcew <- collect(north_qcew) %>%
 
 north_qcew <- north_qcew %>% 
   mutate(street_type = case_when(street_type == "improvement" ~ "Treatment",
-                                 street_type == "control" ~ "Control: Broadway Ave"))
+                                 street_type == "control" ~ "Control: West Broadway Avenue"))
 
 north_qcew$street_type <- factor(north_qcew$street_type, 
-                                     levels = c("Treatment", "Control: Broadway Ave"))
+                                     levels = c("Treatment", "Control: West Broadway Avenue"))
 
 north_agg <- north_qcew %>% 
  filter(year %in% (2008:2010)) %>% 
@@ -1530,10 +1530,10 @@ north_qcew <- north_qcew %>%
          wage_idx = total_wages/base_wage,
          avg_emp_idx = avg_emp/base_avg_emp)
 
-qc_emp_north <- trend_agg_plot_qcew(north_qcew, base="Employment", industry = "Retail", corridor_name = "North 2nd St.",
+qc_emp_north <- trend_agg_plot_qcew(north_qcew, base="Employment", industry = "Retail", corridor_name = "North Second Street",
                                                control_corridor = "West Broadway", base_code = "avg_emp", construct_year = 2011)
  
-qc_north_wages <- trend_agg_plot_qcew_d(north_qcew, base="Total Wages", industry = "Retail", corridor_name = "North 2nd St.",
+qc_north_wages <- trend_agg_plot_qcew_d(north_qcew, base="Total Wages", industry = "Retail", corridor_name = "North Second Street",
                                                        control_corridor = "West Broadway", base_code = "total_wages", construct_year = 2011)
 
 prow <- plot_grid(qc_emp_north + theme(legend.position="none"),
@@ -1550,10 +1550,10 @@ The indexed figures reinforce what the above figures demonstrate but they do off
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 
-qc_idx_emp_north <- trend_agg_plot_qcew_p(north_qcew, base="Employment", industry = "Retail", corridor_name = "North 2nd St.",
+qc_idx_emp_north <- trend_agg_plot_qcew_p(north_qcew, base="Employment", industry = "Retail", corridor_name = "North Second Street",
                                                control_corridor = "West Broadway", base_code = "avg_emp_idx", construct_year = 2011)
  
-qc_idx_north_wages <- trend_agg_plot_qcew_p(north_qcew, base="Total Wage", industry = "Retail", corridor_name = "North 2nd St.",
+qc_idx_north_wages <- trend_agg_plot_qcew_p(north_qcew, base="Total Wage", industry = "Retail", corridor_name = "North Second Street",
                                                        control_corridor = "West Broadway", base_code = "wage_idx", construct_year = 2011)
 
 prow <- plot_grid(qc_idx_emp_north + theme(legend.position="none"),

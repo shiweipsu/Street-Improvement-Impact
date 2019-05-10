@@ -539,38 +539,53 @@ dist_trend_plot <- function(df_plot, demo, corridor_name, cat,
 trend_plot <- function(df_plot, industry, corridor_name, 
                        industry_code = c("CNS07", "CNS07_sd", "CNS18", "CNS18_sd","CNS07_pest", "CNS18_pest",
                                          "business", "gross_sales", "business_sd", "sales_sd", "n", "n_sd"),
-                       y_lable = c("Employment", "Sales", "Establishments"), index = c("Total", "Indexed","Per Establishment"),
-                       construct_year, end_year) {
+                       y_lable = c("Employment", "Sales", "Establishments"),
+                       index = c("Total", "Indexed","Per Establishment"),
+                       construct_year, end_year, construct_year2, end_year2) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
   
-  #convert year to proper date
+  ##convert year to proper date
   
   df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
   df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
   
-  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.character(paste0(construct_year-1, "-07-01"))
   construct_date <- as.Date(construct_date, "%Y-%m-%d")
   
-  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.character(paste0(end_year-1, "-07-01"))
   end_date <- as.Date(end_date, "%Y-%m-%d")
   
-  #making the plot
+  construct_date2 <- as.character(paste0(construct_year-4, "-07-01"))
+  construct_date2 <- as.Date(construct_date2, "%Y-%m-%d")
   
-  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), shape = Type, group = Type, colour = Type)) + 
+  end_date2 <- as.character(paste0(end_year-2, "-07-01"))
+  end_date2 <- as.Date(end_date2, "%Y-%m-%d")
+  
+  ##making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(industry_code), group = Type, colour = Type, shape = Type)) + 
     geom_line()  +
-    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), 
+                  xmax = as.Date(end_date, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
               fill = "#adff2f",linetype=0,alpha = 0.03) +
+    
+    geom_rect(aes(xmin = as.Date(construct_date2, "%Y"), 
+                  xmax = as.Date(end_date2, "%Y"), 
+                  ymin = -Inf, ymax = Inf),
+              fill = "grey",linetype=0,alpha = 0.03) +
+    
     geom_point(size = 3, fill="white") +
     scale_shape_manual(values=c(22,21,21,21,23))+
     scale_colour_manual(values=c("red","green4","royalblue1","orange"))+
-    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("{industry} {y_lable} Comparison:\n {corridor_name}"), x="Year",y=glue("{index} {y_lable}"),
-         caption = "Shaded area represents the construction period") +
+    labs(title = glue("{industry} {y_base} Comparison:\n {corridor_name}"), x="Year", y=glue("{index} {y_lable}"),
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
     guides(title = "Street Type") +
     theme(legend.position = "bottom", legend.justification = "center")
   
-  
   return(ats_df)
 }
+  
