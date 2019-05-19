@@ -135,27 +135,29 @@ agg_trend_plot <- function(df_plot, industry, corridor_name,
 agg_index_trend_table <- function(df, group, construct_year) {
   
   #prepare tables for plotting
-  df <- as.data.frame(df, stringsAsFactors = FALSE) %>% select(-geometry)
-
-  df <- df %>% filter(Group == group) %>%
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  df <- df %>% filter(Group == group)
+  
+  start= construct_year-3
+  end=construct_year-1
+  
+  df <- df %>% 
     mutate(business = CNS07 + CNS18)
   
-
   df_agg <- df %>% group_by(year, Type) %>%
     summarise(CNS07 = sum(CNS07, na.rm = TRUE),
               CNS18 = sum(CNS18, na.rm = TRUE),
               business = sum(business, na.rm = TRUE))
   
-  base_year <-  df_agg %>% filter(year == as.character(construct_year)) %>% 
-    select(CNS07_base = CNS07, CNS18_base = CNS18, business_base = business, Type, year)
-  
+  base_year <-  df_agg %>% filter(year %in% c(start:end)) %>% group_by(Type) %>% 
+    summarise(CNS07_base = mean(CNS07), CNS18_base = mean(CNS18), business_base = mean(business))
   
   df_plot <- df_agg %>%  
     left_join(base_year, by = "Type") %>%
     mutate(CNS07_sd = CNS07/CNS07_base*100,
            CNS18_sd = CNS18/CNS18_base*100,
            business_sd = business/business_base*100) %>%
-    select(Type, year = year.x, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
+    select(Type, year = year, CNS07_sd, CNS18_sd, business_sd) %>% filter(!is.na(CNS07_sd))
   
   return(df_plot)
   
@@ -577,11 +579,9 @@ trend_plot <- function(df_plot, industry, corridor_name,
               fill = "grey",linetype=0,alpha = 0.03) +
     
     geom_point(size = 3, fill="white") +
-    scale_shape_manual(values=c(22,21,21,21,23))+
-    scale_colour_manual(values=c("red","green4","royalblue1","orange"))+
-    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    scale_x_date(date_breaks = "4 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("{industry} {y_base} Comparison:\n {corridor_name}"), x="Year", y=glue("{index} {y_lable}"),
+    labs(title = glue("{industry} {y_lable} Comparison:\n {corridor_name}"), x="Year", y=glue("{y_lable} {index}"),
          caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
     guides(title = "Street Type") +
     theme(legend.position = "bottom", legend.justification = "center")

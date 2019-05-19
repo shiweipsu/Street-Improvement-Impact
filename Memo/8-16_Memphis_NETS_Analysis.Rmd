@@ -32,9 +32,11 @@ a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 a
 FROM memphis_lehd a, memhpis_corridors b
 WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
 
-cooper <- memphis_corridor %>% filter(name == "Cooper Street") %>% mutate(corridor_group =1)
+cooper <- memphis_corridor %>% filter(name == "Cooper Street") %>% mutate(corridor_group=1)
 
 memphis_corridor <-rbind(memphis_corridor, cooper)
+
+memphis_corridor <- memphis_corridor[memphis_corridor$name!="Jackson Avenue",]
 
 memphis_corridor$Type <- ifelse(is.na(memphis_corridor$buildstart),"Control", "Treatment")
 memphis_corridor[memphis_corridor$name=="Madison Avenue",]$Type <- "Treatment: Madison"
@@ -42,7 +44,7 @@ memphis_corridor[memphis_corridor$name=="Broad Avenue",]$Type <- "Treatment: Bro
 memphis_corridor[memphis_corridor$name=="Central Avenue",]$Type <- "Control: Central"
 memphis_corridor[memphis_corridor$name=="Cooper Street",]$Type <- "Control: Cooper"
 memphis_corridor[memphis_corridor$name=="Highland Street",]$Type <- "Control: Highland"
-memphis_corridor[memphis_corridor$name=="Jackson Avenue",]$Type <- "Control: Jackson"
+
 memphis_corridor[memphis_corridor$name=="Union Avenue",]$Type <- "Control: Union"
 memphis_corridor$Type <- as.factor(memphis_corridor$Type)
 
@@ -75,16 +77,17 @@ names(memphis_nets_b)  <- tolower(names(memphis_nets_b))
 memphis_c <-  st_read(dsn = con, "memhpis_corridors")
 memphis_nets_bf <- st_intersection(memphis_nets, st_buffer(memphis_c, 20)) %>% select(-id, -start, -end, -shape_leng)
 
-memphis_nets_bf[memphis_nets_bf$name=="Madison Avenue",]$Type <- "Treatment: Madison"
-memphis_nets_bf[memphis_nets_bf$name=="Broad Avenue",]$Type <- "Treatment: Broad"
-memphis_nets_bf[memphis_nets_bf$name=="Central Avenue",]$Type <- "Control: Central"
-memphis_nets_bf[memphis_nets_bf$name=="Cooper Street",]$Type <- "Control: Cooper"
-memphis_nets_bf[memphis_nets_bf$name=="Highland Street",]$Type <- "Control: Highland"
-memphis_nets_bf[memphis_nets_bf$name=="Jackson Avenue",]$Type <- "Control: Jackson"
-memphis_nets_bf[memphis_nets_bf$name=="Union Avenue",]$Type <- "Control: Union"
+memphis_nets_bf <- memphis_nets_bf[memphis_nets_bf$name!="Jackson Avenue",]
+
+memphis_nets_bf[memphis_nets_bf$name=="Madison Avenue",]$type <- "Treatment: Madison"
+memphis_nets_bf[memphis_nets_bf$name=="Broad Avenue",]$type <- "Treatment: Broad"
+memphis_nets_bf[memphis_nets_bf$name=="Central Avenue",]$type <- "Control: Central"
+memphis_nets_bf[memphis_nets_bf$name=="Cooper Street",]$type <- "Control: Cooper"
+memphis_nets_bf[memphis_nets_bf$name=="Highland Street",]$type <- "Control: Highland"
+memphis_nets_bf[memphis_nets_bf$name=="Union Avenue",]$type <- "Control: Union"
 
 memphis_madison_b <- memphis_nets_b %>% 
-  filter(group==2) %>% 
+  filter(group==1) %>% 
   gather(key, value, -c(1:10,89:97)) %>% 
   separate(key, c("retail", "year"), sep=-2) %>% 
   spread(retail, value) %>% 
@@ -93,7 +96,7 @@ memphis_madison_b <- memphis_nets_b %>%
          year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
  
 memphis_madison_bf <- memphis_nets_bf %>% 
-  filter(group==2) %>% 
+  filter(group==1) %>% 
   gather(key, value, -c(1:10,89:99)) %>% 
   separate(key, c("retail", "year"), sep=-2) %>% 
   spread(retail, value) %>% 
@@ -102,7 +105,7 @@ memphis_madison_bf <- memphis_nets_bf %>%
          year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
  
 memphis_broad_b <- memphis_nets_b %>% 
-  filter(group==1) %>% 
+  filter(group==2) %>% 
   gather(key, value, -c(1:10,89:97)) %>% 
   separate(key, c("retail", "year"), sep=-2) %>% 
   spread(retail, value) %>% 
@@ -111,7 +114,7 @@ memphis_broad_b <- memphis_nets_b %>%
          year = ifelse(as.numeric(year)<16, paste0("20",year), paste0("19",year)))
  
 memphis_broad_bf <- memphis_nets_bf %>% 
-  filter(group==1) %>% 
+  filter(group==2) %>% 
   gather(key, value, -c(1:10,89:99)) %>% 
   separate(key, c("retail", "year"), sep=-2) %>% 
   spread(retail, value) %>% 
@@ -154,15 +157,15 @@ dbDisconnect(con)
 ## trend plot - industry type 1
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
 
-# one types of industry categories similar to LEHD ######################## ERROR ########################
+# one types of industry categories similar to LEHD
 broad_nets_b <- memphis_broad_b %>% 
   group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
   summarise(emp = sum(emp), sales= sum(sales), n=n(),
-            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1=="Food"| biz1== "Retail") %>%
  as.data.frame(.) %>% select(-geometry)
-##########################################################################################################
+
 memphis_nets1 <- memphis_nets1 %>% 
-  mutate(name="city", type="City", buildstart=0, buildend=0, group=1) %>% select(name:group, year:sales_pest) %>% as.data.frame()
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest) %>% as.data.frame()
 
 broad_nets_b <- rbind(broad_nets_b, memphis_nets1) %>% mutate(geometry=0)
 
@@ -188,15 +191,15 @@ broad_nets1_emp_pest$Type <- as.factor(as.character(broad_nets1_emp_pest$Type))
 
 broad_emp_pest_retail_trend_plot <- trend_plot(broad_nets1_emp_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "per Establishment")
 
 broad_emp_pest_food_trend_plot <- trend_plot(broad_nets1_emp_pest, industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "per Establishment")
 
 
 # indexed employment
-broad_nets1_emp_idx <- agg_index_trend_table(broad_nets1_emp, group = 1, construct_year = 2010)
+broad_nets1_emp_idx <- agg_index_trend_table(broad_nets1_emp, group = 2, construct_year = 2010)
 broad_nets1_emp_idx$Type <- as.factor(as.character(broad_nets1_emp_idx$Type))
 
 broad_emp_retail_indexed_trend_plot <- trend_plot(broad_nets1_emp_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -225,6 +228,7 @@ plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 # abousolute sales
 broad_nets1_sales <- broad_nets_b %>% select(-emp, -n, -emp_pest, -sales_pest) %>% spread(key = biz1, sales) %>% 
   rename(CNS07 = Retail, CNS18 = Food, Group=group, Type= type)
+
 broad_nets1_sales$Type <- as.factor(broad_nets1_sales$Type)
 
 broad_sales_retail_trend_plot <- trend_plot(filter(broad_nets1_sales, Type!="City"), industry = "Retail", industry_code = "CNS07",
@@ -243,14 +247,14 @@ broad_nets1_sales_pest$Type <- as.factor(as.character(broad_nets1_sales_pest$Typ
 
 broad_sales_pest_retail_trend_plot <- trend_plot(broad_nets1_sales_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                 y_lable = "Sales", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "per Establishment")
 
 broad_sales_pest_food_trend_plot <- trend_plot(broad_nets1_sales_pest, industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Sales", index = "Per Establishment")
+                                               y_lable = "Sales", index = "per Establishment")
 
 # indexed sales
-broad_nets1_sales_idx <- agg_index_trend_table(broad_nets1_sales, group = 1, construct_year = 2010)
+broad_nets1_sales_idx <- agg_index_trend_table(broad_nets1_sales, group = 2, construct_year = 2010)
 broad_nets1_sales_idx $Type <- as.factor(as.character(broad_nets1_sales_idx$Type))
 
 broad_sales_retail_indexed_trend_plot <- trend_plot(broad_nets1_sales_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -288,7 +292,7 @@ broad_nets_bf <- memphis_broad_bf %>%
             emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
   
 memphis_nets2 <- memphis_nets2 %>% 
-  mutate(name="city", type="City", buildstart=0, buildend=0, group=1) %>% select(name:group, year:sales_pest)
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest)
 
 broad_nets_bf <- rbind(broad_nets_bf, memphis_nets2) %>% mutate(geometry=0)
 
@@ -313,15 +317,15 @@ broad_nets2_emp_pest $Type <- as.factor(broad_nets2_emp_pest $Type)
 
 broad_emp_pest_retail_trend_plot <- trend_plot(broad_nets2_emp_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "per Establishment")
 
 broad_emp_pest_food_trend_plot <- trend_plot(broad_nets2_emp_pest, industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "per Establishment")
 
 
 # indexed employment
-broad_nets2_emp_idx <- agg_index_trend_table(broad_nets2_emp, group = 1, construct_year = 2010)
+broad_nets2_emp_idx <- agg_index_trend_table(broad_nets2_emp, group = 2, construct_year = 2010)
 broad_nets2_emp_idx$Type <- as.factor(broad_nets2_emp_idx$Type)
 
 broad_emp_retail_indexed_trend_plot <- trend_plot(broad_nets2_emp_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -367,15 +371,15 @@ broad_nets2_sales_pest$Type <- as.factor(broad_nets2_sales_pest$Type)
 
 broad_sales_pest_retail_trend_plot <- trend_plot(broad_nets2_sales_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                 y_lable = "Sales", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "per Establishment")
 
 broad_sales_pest_food_trend_plot <- trend_plot(broad_nets2_sales_pest, industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Sales", index = "Per Establishment")
+                                               y_lable = "Sales", index = "per Establishment")
 
 
 # indexed sales
-broad_nets2_sales_idx <- agg_index_trend_table(broad_nets2_sales, group = 1, construct_year = 2010)
+broad_nets2_sales_idx <- agg_index_trend_table(broad_nets2_sales, group = 2, construct_year = 2010)
 broad_nets2_sales_idx$Type <- as.factor(broad_nets2_sales_idx$Type)
 
 broad_sales_retail_indexed_trend_plot <- trend_plot(broad_nets2_sales_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -406,26 +410,26 @@ plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 # compute post change table compare to base year
 broad_nets1_emp %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
 
 broad_nets1_sales %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
 
 
 broad_nets2_emp %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
 
 broad_nets2_sales %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
   
@@ -438,8 +442,8 @@ broad_nets2_sales %>%
 broad_nets1_emp$Type <- relevel(broad_nets1_emp$Type,ref = "Treatment: Broad")
 broad_nets2_emp$Type <- relevel(broad_nets2_emp$Type,ref = "Treatment: Broad")
 
-broad_nets1_emp_did <- did_agg_analysis(filter(broad_nets1_emp, Type!="City" & year>2005), group = 1, endyear = 2010)
-broad_nets2_emp_did <- did_agg_analysis(filter(broad_nets2_emp, Type!="City" & year>2005), group = 1, endyear = 2010)
+broad_nets1_emp_did <- did_agg_analysis(filter(broad_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2010)
+broad_nets2_emp_did <- did_agg_analysis(filter(broad_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2010)
 stargazer(broad_nets1_emp_did[[1]], broad_nets2_emp_did[[1]], broad_nets1_emp_did[[2]], broad_nets2_emp_did[[2]],
           broad_nets1_emp_did[[3]], broad_nets2_emp_did[[3]],
           title = "Broad Avenue Corridor Difference-in-Difference Estimates", 
@@ -450,8 +454,8 @@ stargazer(broad_nets1_emp_did[[1]], broad_nets2_emp_did[[1]], broad_nets1_emp_di
 broad_nets1_sales$Type <- relevel(broad_nets1_sales$Type,ref = "Treatment: Broad")
 broad_nets2_sales$Type <- relevel(broad_nets2_sales$Type,ref = "Treatment: Broad")
 
-broad_nets1_sales_did <- did_agg_analysis(filter(broad_nets1_sales, Type!="City" & year>2005), group = 1, endyear = 2010)
-broad_nets2_sales_did <- did_agg_analysis(filter(broad_nets2_sales, Type!="City" & year>2005), group = 1, endyear = 2010)
+broad_nets1_sales_did <- did_agg_analysis(filter(broad_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2010)
+broad_nets2_sales_did <- did_agg_analysis(filter(broad_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2010)
 stargazer(broad_nets1_sales_did[[1]], broad_nets2_sales_did[[1]], broad_nets1_sales_did[[2]], broad_nets2_sales_did[[2]], 
           title = "Broad Avenue Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
@@ -465,7 +469,8 @@ stargazer(broad_nets2_emp_did[[1]], broad_nets2_emp_did[[2]], broad_nets2_emp_di
           type = "text", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
 
 # ITS
-broad_nets1_emp <- broad_nets1_emp %>% mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
+broad_nets1_emp <- broad_nets1_emp %>%
+  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
 broad_nets2_emp <- broad_nets2_emp %>% ungroup %>% 
   mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
 broad_nets1_sales <- broad_nets1_sales %>% 
@@ -473,8 +478,8 @@ broad_nets1_sales <- broad_nets1_sales %>%
 broad_nets2_sales <- broad_nets2_sales %>% ungroup %>% 
   mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
 
-broad_nets1_emp_its <- agg_its_analysis(filter(broad_nets1_emp, Type!="City" & year>2005), group = 1, endyear = 2010)
-broad_nets2_emp_its <- agg_its_analysis(filter(broad_nets2_emp, Type!="City" & year>2005), group = 1, endyear = 2010)
+broad_nets1_emp_its <- agg_its_analysis(filter(broad_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2010)
+broad_nets2_emp_its <- agg_its_analysis(filter(broad_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2010)
 stargazer(broad_nets1_emp_its[[1]], broad_nets2_emp_its[[1]], broad_nets1_emp_its[[2]], broad_nets2_emp_its[[2]], 
           broad_nets1_emp_its[[3]], broad_nets2_emp_its[[3]],
           title = "Broad Avenue Corridor Difference-in-Difference Estimates", 
@@ -482,8 +487,8 @@ stargazer(broad_nets1_emp_its[[1]], broad_nets2_emp_its[[1]], broad_nets1_emp_it
           type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business Emp."), model.numbers = F)
 
 
-broad_nets1_sales_its <- agg_its_analysis(filter(broad_nets1_sales, Type!="City" & year>2005), group = 1, endyear = 2010)
-broad_nets2_sales_its <- agg_its_analysis(filter(broad_nets2_sales, Type!="City" & year>2005), group = 1, endyear = 2010)
+broad_nets1_sales_its <- agg_its_analysis(filter(broad_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2010)
+broad_nets2_sales_its <- agg_its_analysis(filter(broad_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2010)
 stargazer(broad_nets1_sales_its[[1]], broad_nets2_sales_its[[1]], broad_nets1_sales_its[[2]], broad_nets2_sales_its[[2]], 
           title = "Broad Avenue Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
@@ -504,15 +509,15 @@ stargazer(broad_nets2_emp_its[[1]], broad_nets2_emp_its[[2]], broad_nets2_emp_it
 ## trend plot - industry type 1
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.asp=1.3}
 
-# one types of industry categories similar to LEHD ######################## ERROR ########################
+# one types of industry categories similar to LEHD
 madison_nets_b <- memphis_madison_b %>% 
   group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
   summarise(emp = sum(emp), sales= sum(sales), n=n(),
-            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1=="Food"| biz1== "Retail") %>%
  as.data.frame(.) %>% select(-geometry)
-##########################################################################################################
+
 memphis_nets1 <- memphis_nets1 %>% 
-  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest) %>% as.data.frame()
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=1) %>% select(name:group, year:sales_pest) %>% as.data.frame()
 
 madison_nets_b <- rbind(madison_nets_b, memphis_nets1) %>% mutate(geometry=0)
 
@@ -538,15 +543,15 @@ madison_nets1_emp_pest$Type <- as.factor(as.character(madison_nets1_emp_pest$Typ
 
 madison_emp_pest_retail_trend_plot <- trend_plot(madison_nets1_emp_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "per Establishment")
 
 madison_emp_pest_food_trend_plot <- trend_plot(madison_nets1_emp_pest, industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "per Establishment")
 
 
 # indexed employment
-madison_nets1_emp_idx <- agg_index_trend_table(madison_nets1_emp, group = 2, construct_year = 2011)
+madison_nets1_emp_idx <- agg_index_trend_table(madison_nets1_emp, group = 1, construct_year = 2011)
 madison_nets1_emp_idx$Type <- as.factor(as.character(madison_nets1_emp_idx$Type))
 
 madison_emp_retail_indexed_trend_plot <- trend_plot(madison_nets1_emp_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -593,14 +598,14 @@ madison_nets1_sales_pest$Type <- as.factor(as.character(madison_nets1_sales_pest
 
 madison_sales_pest_retail_trend_plot <- trend_plot(madison_nets1_sales_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                 y_lable = "Sales", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "per Establishment")
 
 madison_sales_pest_food_trend_plot <- trend_plot(madison_nets1_sales_pest, industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Sales", index = "Per Establishment")
+                                               y_lable = "Sales", index = "per Establishment")
 
 # indexed sales
-madison_nets1_sales_idx <- agg_index_trend_table(madison_nets1_sales, group = 2, construct_year = 2011)
+madison_nets1_sales_idx <- agg_index_trend_table(madison_nets1_sales, group = 1, construct_year = 2011)
 madison_nets1_sales_idx $Type <- as.factor(as.character(madison_nets1_sales_idx$Type))
 
 madison_sales_retail_indexed_trend_plot <- trend_plot(madison_nets1_sales_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -638,7 +643,7 @@ madison_nets_bf <- memphis_madison_bf %>%
             emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
   
 memphis_nets2 <- memphis_nets2 %>% 
-  mutate(name="city", type="City", buildstart=0, buildend=0, group=2) %>% select(name:group, year:sales_pest)
+  mutate(name="city", type="City", buildstart=0, buildend=0, group=1) %>% select(name:group, year:sales_pest)
 
 madison_nets_bf <- rbind(madison_nets_bf, memphis_nets2) %>% mutate(geometry=0)
 
@@ -663,15 +668,15 @@ madison_nets2_emp_pest $Type <- as.factor(madison_nets2_emp_pest $Type)
 
 madison_emp_pest_retail_trend_plot <- trend_plot(madison_nets2_emp_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "per Establishment")
 
 madison_emp_pest_food_trend_plot <- trend_plot(madison_nets2_emp_pest, industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "madison Avenue", construct_year = 2011, end_year = 2012,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "per Establishment")
 
 
 # indexed employment
-madison_nets2_emp_idx <- agg_index_trend_table(madison_nets2_emp, group = 2, construct_year = 2011)
+madison_nets2_emp_idx <- agg_index_trend_table(madison_nets2_emp, group = 1, construct_year = 2011)
 madison_nets2_emp_idx$Type <- as.factor(madison_nets2_emp_idx$Type)
 
 madison_emp_retail_indexed_trend_plot <- trend_plot(madison_nets2_emp_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -717,15 +722,15 @@ madison_nets2_sales_pest$Type <- as.factor(madison_nets2_sales_pest$Type)
 
 madison_sales_pest_retail_trend_plot <- trend_plot(madison_nets2_sales_pest, industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                 y_lable = "Sales", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "per Establishment")
 
 madison_sales_pest_food_trend_plot <- trend_plot(madison_nets2_sales_pest, industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Sales", index = "Per Establishment")
+                                               y_lable = "Sales", index = "per Establishment")
 
 
 # indexed sales
-madison_nets2_sales_idx <- agg_index_trend_table(madison_nets2_sales, group = 2, construct_year = 2011)
+madison_nets2_sales_idx <- agg_index_trend_table(madison_nets2_sales, group = 1, construct_year = 2011)
 madison_nets2_sales_idx$Type <- as.factor(madison_nets2_sales_idx$Type)
 
 madison_sales_retail_indexed_trend_plot <- trend_plot(madison_nets2_sales_idx, industry = "Retail", industry_code = "CNS07_sd",
@@ -756,25 +761,25 @@ plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 # compute post change table compare to base year
 madison_nets1_emp %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
 
 madison_nets1_sales %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
 
 madison_nets2_emp %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
 
 madison_nets2_sales %>% 
   filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(Type) %>% 
+  group_by(name) %>% 
   mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
          food_accom_growth = (CNS18/lag(CNS18)-1)*100)
   
@@ -787,8 +792,8 @@ madison_nets2_sales %>%
 madison_nets1_emp$Type <- relevel(madison_nets1_emp$Type,ref = "Treatment: Madison")
 madison_nets2_emp$Type <- relevel(madison_nets2_emp$Type,ref = "Treatment: Madison")
 
-madison_nets1_emp_did <- did_agg_analysis(filter(madison_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2011)
-madison_nets2_emp_did <- did_agg_analysis(filter(madison_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2011)
+madison_nets1_emp_did <- did_agg_analysis(filter(madison_nets1_emp, Type!="City" & year>2005), group = 1, endyear = 2011)
+madison_nets2_emp_did <- did_agg_analysis(filter(madison_nets2_emp, Type!="City" & year>2005), group = 1, endyear = 2011)
 stargazer(madison_nets1_emp_did[[1]], madison_nets2_emp_did[[1]], madison_nets1_emp_did[[2]], madison_nets2_emp_did[[2]],
           madison_nets1_emp_did[[3]], madison_nets2_emp_did[[3]],
           title = "Madison Avenue Corridor Difference-in-Difference Estimates", 
@@ -799,8 +804,8 @@ stargazer(madison_nets1_emp_did[[1]], madison_nets2_emp_did[[1]], madison_nets1_
 madison_nets1_sales$Type <- relevel(madison_nets1_sales$Type,ref = "Treatment: Madison")
 madison_nets2_sales$Type <- relevel(madison_nets2_sales$Type,ref = "Treatment: Madison")
 
-madison_nets1_sales_did <- did_agg_analysis(filter(madison_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2011)
-madison_nets2_sales_did <- did_agg_analysis(filter(madison_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2011)
+madison_nets1_sales_did <- did_agg_analysis(filter(madison_nets1_sales, Type!="City" & year>2005), group = 1, endyear = 2011)
+madison_nets2_sales_did <- did_agg_analysis(filter(madison_nets2_sales, Type!="City" & year>2005), group = 1, endyear = 2011)
 stargazer(madison_nets1_sales_did[[1]], madison_nets2_sales_did[[1]], madison_nets1_sales_did[[2]], madison_nets2_sales_did[[2]], 
           title = "Madison Avenue Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
@@ -822,8 +827,8 @@ madison_nets1_sales <- madison_nets1_sales %>%
 madison_nets2_sales <- madison_nets2_sales %>% ungroup %>% 
   mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", Type))
 
-madison_nets1_emp_its <- agg_its_analysis(filter(madison_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2011)
-madison_nets2_emp_its <- agg_its_analysis(filter(madison_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2011)
+madison_nets1_emp_its <- agg_its_analysis(filter(madison_nets1_emp, Type!="City" & year>2005), group = 1, endyear = 2011)
+madison_nets2_emp_its <- agg_its_analysis(filter(madison_nets2_emp, Type!="City" & year>2005), group = 1, endyear = 2011)
 stargazer(madison_nets1_emp_its[[1]], madison_nets2_emp_its[[1]], madison_nets1_emp_its[[2]], madison_nets2_emp_its[[2]], 
           madison_nets1_emp_its[[3]], madison_nets2_emp_its[[3]],
           title = "Madison Avenue Corridor Difference-in-Difference Estimates", 
@@ -831,8 +836,8 @@ stargazer(madison_nets1_emp_its[[1]], madison_nets2_emp_its[[1]], madison_nets1_
           type = "text", dep.var.labels = c("Retail Emp.", "Food Emp.", "Business Emp."), model.numbers = F)
 
 
-madison_nets1_sales_its <- agg_its_analysis(filter(madison_nets1_sales, Type!="City" & year>2005), group = 2, endyear = 2011)
-madison_nets2_sales_its <- agg_its_analysis(filter(madison_nets2_sales, Type!="City" & year>2005), group = 2, endyear = 2011)
+madison_nets1_sales_its <- agg_its_analysis(filter(madison_nets1_sales, Type!="City" & year>2005), group = 1, endyear = 2011)
+madison_nets2_sales_its <- agg_its_analysis(filter(madison_nets2_sales, Type!="City" & year>2005), group = 1, endyear = 2011)
 stargazer(madison_nets1_sales_its[[1]], madison_nets2_sales_its[[1]], madison_nets1_sales_its[[2]], madison_nets2_sales_its[[2]], 
           title = "Madison Avenue Corridor Difference-in-Difference Estimates", 
           column.labels  = c("Type 1", "Type 2", "Type 1","Type 2"), 
