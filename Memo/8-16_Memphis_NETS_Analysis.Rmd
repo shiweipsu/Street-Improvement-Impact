@@ -470,13 +470,13 @@ stargazer(broad_nets2_emp_did[[1]], broad_nets2_emp_did[[2]], broad_nets2_emp_di
 
 # ITS
 broad_nets1_emp <- broad_nets1_emp %>%
-  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", as.character(Type)))
 broad_nets2_emp <- broad_nets2_emp %>% ungroup %>% 
-  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", as.character(Type)))
 broad_nets1_sales <- broad_nets1_sales %>% 
-  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", as.character(Type)))
 broad_nets2_sales <- broad_nets2_sales %>% ungroup %>% 
-  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Broad", "Treatment", as.character(Type)))
 
 broad_nets1_emp_its <- agg_its_analysis(filter(broad_nets1_emp, Type!="City" & year>2005), group = 2, endyear = 2010)
 broad_nets2_emp_its <- agg_its_analysis(filter(broad_nets2_emp, Type!="City" & year>2005), group = 2, endyear = 2010)
@@ -819,13 +819,14 @@ stargazer(madison_nets2_emp_did[[1]], madison_nets2_emp_did[[2]], madison_nets2_
           type = "text", dep.var.labels = c("Employment","Employment","Sales", "Sales", "Sales"), model.numbers = F)
 
 # ITS
-madison_nets1_emp <- madison_nets1_emp %>% mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", Type))
+madison_nets1_emp <- madison_nets1_emp %>%
+  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", as.character(Type)))
 madison_nets2_emp <- madison_nets2_emp %>% ungroup %>% 
-  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", as.character(Type)))
 madison_nets1_sales <- madison_nets1_sales %>% 
-  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", as.character(Type)))
 madison_nets2_sales <- madison_nets2_sales %>% ungroup %>% 
-  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", Type))
+  mutate(Type = ifelse(Type=="Treatment: Madison", "Treatment", as.character(Type)))
 
 madison_nets1_emp_its <- agg_its_analysis(filter(madison_nets1_emp, Type!="City" & year>2005), group = 1, endyear = 2011)
 madison_nets2_emp_its <- agg_its_analysis(filter(madison_nets2_emp, Type!="City" & year>2005), group = 1, endyear = 2011)
