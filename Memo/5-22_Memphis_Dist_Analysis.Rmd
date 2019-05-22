@@ -1,0 +1,840 @@
+---
+title: "5-22_Memphis_Dist_Analysis"
+author: "Wei Shi"
+date: "May 22, 2019"
+output: html_document
+---
+
+```{r setup,include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+## load data
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+if(!require(pacman)){install.packages("pacman"); library(pacman)}
+p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, gridExtra)
+
+#query the corridors from bike_lanes
+user <- "shiwei"
+host <- "pgsql102.rc.pdx.edu"
+pw <- scan(here::here("batteries.pgpss"), what = "")
+dbname <- "bike_lanes"
+
+con <- dbConnect("PostgreSQL", host = host, user = user, dbname = dbname, 
+                 password = pw, port = 5433)
+
+source(here::here("Code/corridor_comparison_functions.R"))
+
+memphis_corridor <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns18 as cns18, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd03 as cd03, a.cd04 as cd04, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+FROM memphis_lehd a, memhpis_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+cooper <- memphis_corridor %>% filter(name == "Cooper Street") %>% mutate(corridor_group =1)
+
+memphis_corridor <-rbind(memphis_corridor, cooper)
+
+memphis_corridor$Type <- ifelse(is.na(memphis_corridor$buildstart),"Control", "Treatment")
+memphis_corridor[memphis_corridor$name =="Madison Avenue",]$Type <- "Treatment: Madison"
+memphis_corridor[memphis_corridor$name =="Broad Avenue",]$Type <- "Treatment: Broad"
+memphis_corridor[memphis_corridor$name =="Central Avenue",]$Type <- "Control: Central"
+memphis_corridor[memphis_corridor$name=="Cooper Street",]$Type <- "Control: Cooper"
+memphis_corridor[memphis_corridor$name=="Highland Street",]$Type <- "Control: Highland"
+memphis_corridor[memphis_corridor$name=="Jackson Avenue",]$Type <- "Control: Jackson"
+memphis_corridor[memphis_corridor$name=="Union Avenue",]$Type <- "Control: Union"
+# memphis_corridor$Type <- as.factor(memphis_corridor$Type)
+
+memphis_corridor <- memphis_corridor %>%
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04, Group = corridor_group,
+         BuildStart = buildstart, BuildEnd = buildend, Name = name)
+
+memphis_lehd <- st_read(dsn = con, query = "SELECT * FROM memphis_lehd") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+memphis_corridor_rac <- st_read(dsn = con, query = "select a.geoid10 as geoid, a.c000 as c000,
+a.cns07 as cns07, a.cns08 as cns08, a.cns12 as cns12, a.cns14 as cns14, a.cns15 as cns15, 
+a.cns16 as cns16, a.cns17 as cns17, a.cns18 as cns18, a.cns19 as cns19, a.ce01 as ce01, a.ce02 as ce02, a.ce03 as ce03, a.cr01 as cr01,a.cr02 as cr02, a.cr03 as cr03, a.cr04 as cr04, a.cr05 as cr05, a.cr07 as cr07, a.cs02 as cs02, a.cd01 as cd01, a.cd02 as cd02, a.cd03 as cd03, a.cd04 as cd04, b.name as Name, 
+b.buildstart as buildstart, b.buildend as buildend, b.group as corridor_group, a.year as year, a.geometry
+FROM memphis_rac a, memhpis_corridors b
+WHERE ST_Intersects(ST_Buffer(b.geom, 20), a.geometry);")
+
+cooper <- memphis_corridor_rac %>% filter(name == "Cooper Street") %>% mutate(corridor_group =1)
+
+memphis_corridor_rac <-rbind(memphis_corridor_rac, cooper)
+
+memphis_corridor_rac$Type <- ifelse(is.na(memphis_corridor_rac$buildstart),"Control", "Treatment")
+memphis_corridor_rac[memphis_corridor_rac$name =="Madison Avenue",]$Type <- "Treatment: Madison"
+memphis_corridor_rac[memphis_corridor_rac$name =="Broad Avenue",]$Type <- "Treatment: Broad"
+memphis_corridor_rac[memphis_corridor_rac$name =="Central Avenue",]$Type <- "Control: Central"
+memphis_corridor_rac[memphis_corridor_rac$name=="Cooper Street",]$Type <- "Control: Cooper"
+memphis_corridor_rac[memphis_corridor_rac$name=="Highland Street",]$Type <- "Control: Highland"
+memphis_corridor_rac[memphis_corridor_rac$name=="Jackson Avenue",]$Type <- "Control: Jackson"
+memphis_corridor_rac[memphis_corridor_rac$name=="Union Avenue",]$Type <- "Control: Union"
+# memphis_corridor_rac$Type <- as.factor(memphis_corridor_rac$Type)
+
+memphis_corridor_rac <- memphis_corridor_rac %>%
+  rename(C000 = c000, CNS07 = cns07, CNS08 = cns08, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04,Group = corridor_group,
+         BuildStart = buildstart, BuildEnd = buildend, Name = name)
+
+memphis_rac <- st_read(dsn = con, query = "SELECT * FROM memphis_rac") %>% as.data.frame() %>% 
+  rename(C000 = c000, CNS07 = cns07, CNS18 = cns18, CNS12 = cns12, CNS14 = cns14, CNS15 = cns15,
+         CNS16 = cns16, CNS17 = cns17, CNS18 = cns18, CNS19 = cns19, CE01=ce01, CE02=ce02, 
+         CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
+         CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
+
+```
+
+# Broad Ave
+# additional distributional analysis - income (bar graph)
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+broad_inc <- memphis_corridor %>% as.data.frame() %>% filter(Group == 2) %>% 
+  mutate(Type = factor(Type, levels = c("Treatment: Broad", "Control: Central", "Control: Cooper"))) %>% 
+  group_by(Type, year) %>% 
+  summarise(low_income = sum(CE01), 
+            mid_income = sum(CE02), 
+            high_income = sum(CE03)) %>% 
+  group_by(Type) %>% 
+  gather(income_level, employment,low_income, mid_income, high_income) %>% 
+  mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
+         income_level = factor(income_level, levels=c("high_income", "mid_income", "low_income")),
+         n = case_when(Type == "Treatment: Broad" ~ 5,
+                       Type == "Control: Central" ~10,
+                       Type == "Control: Cooper" ~ 21)) 
+
+ggplot(data=broad_inc, aes(x=year, y=employment/n)) +
+  geom_bar(aes(fill=income_level),stat = "identity")+
+  facet_wrap(~Type)+
+  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+  labs(title="Income Composition Trend Among Corridors", x="Year", y ="Employment per block", 
+       caption = "Bike lane is constructed in 2009") +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete(name="Income Level",
+                      breaks=c("high_income", "mid_income", "low_income"),
+                      labels=c("High income", "Middle income", "Low income"))
+  
+
+```
+
+
+# additional distributional analysis - race (line chart)
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
+broad_race <- memphis_corridor %>% as.data.frame() %>% filter(Group == 2) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100) 
+
+memphis_race <- memphis_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:other_perc)
+
+
+broad_race <- rbind(as.data.frame(broad_race), as.data.frame(memphis_race))
+broad_race[broad_race$year<2009,][,c(3:8,10:15)] <- NA
+broad_race$Type <- as.factor(as.character(broad_race$Type))
+  
+
+white_plot <- dist_trend_plot(broad_race,demo = "White", demo_code = "white_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011, 52, 77)
+
+black_plot <- dist_trend_plot(broad_race,demo = "Black", demo_code = "black_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011, 20,45)
+
+ameindian_plot <- dist_trend_plot(broad_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Broad Avenue", cat = "Employment",construct_year = 2010, end_year = 2011, 0,25)
+
+asian_plot <- dist_trend_plot(broad_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011,0,25)
+
+hawaii_plot <- dist_trend_plot(broad_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011,0,25)
+
+other_plot <- dist_trend_plot(broad_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011,0,25)
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+```
+
+
+# additional distributional analysis - race (table)
+```{r}
+start_end_race <- broad_race %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+
+  
+# calculate year by year race categories percentage change  
+y_o_y_race <- broad_race %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+
+```
+
+# additional distributional analysis - education (line chart)
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+broad_edu <- memphis_corridor %>% as.data.frame() %>% filter(Group == 2) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100) 
+
+memphis_edu <- memphis_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:bach_perc)
+
+
+broad_edu <- rbind(as.data.frame(broad_edu), as.data.frame(memphis_edu))
+broad_edu[broad_edu$year<2009,][,c(3:6,8:11)] <- NA
+broad_edu$Type <- as.factor(as.character(broad_edu$Type))
+  
+
+hisch_under_plot <- dist_trend_plot(broad_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011, 5, 15)
+
+hisch_plot <- dist_trend_plot(broad_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011, 15, 30)
+
+col_plot <- dist_trend_plot(broad_edu,demo = "College", demo_code = "col_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011, 15, 30)
+
+bach_plot <- dist_trend_plot(broad_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011,10,25)
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
+```
+
+# additional distributional analysis - edu (table)
+```{r}
+start_end_edu <- broad_edu %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_edu <- broad_edu %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+```
+
+
+# distributional rac - race table
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
+broad_race <- memphis_corridor_rac %>% as.data.frame() %>% filter(Group == 2) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100) 
+
+memphis_race <- memphis_rac %>% 
+  group_by(year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:other_perc)
+
+
+broad_race <- rbind(as.data.frame(broad_race), as.data.frame(memphis_race))
+broad_race[broad_race$year<2009,][,c(3:8,10:15)] <- NA
+broad_race$Type <- as.factor(as.character(broad_race$Type))
+
+white_plot <- dist_trend_plot(broad_race,demo = "White", demo_code = "white_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011, 36, 91)
+
+black_plot <- dist_trend_plot(broad_race,demo = "Black", demo_code = "black_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011, 5,60)
+
+ameindian_plot <- dist_trend_plot(broad_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Broad Avenue",cat = "Residents", construct_year = 2010, end_year = 2011, 0,55)
+
+asian_plot <- dist_trend_plot(broad_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Broad Avenue",cat = "Residents", construct_year = 2010, end_year = 2011,0,55)
+
+hawaii_plot <- dist_trend_plot(broad_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011,0,55)
+
+other_plot <- dist_trend_plot(broad_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Broad Avenue",cat = "Residents", construct_year = 2010, end_year = 2011,0,55)
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+
+start_end_race <- broad_race %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_race <- broad_race %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+
+```
+
+      
+# distributional rac - edu table
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+broad_edu <- memphis_corridor_rac %>% as.data.frame() %>% filter(Group == 2) %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100) 
+
+memphis_edu <- memphis_rac %>% 
+  group_by(year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:bach_perc)
+
+
+broad_edu <- rbind(as.data.frame(broad_edu), as.data.frame(memphis_edu))
+broad_edu[broad_edu$year<2009,][,c(3:6,8:11)] <- NA
+broad_edu$Type <- as.factor(as.character(broad_edu$Type))
+
+hisch_under_plot <- dist_trend_plot(broad_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011, 0, 25)
+
+hisch_plot <- dist_trend_plot(broad_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Broad Avenue", cat = "Redidents", construct_year = 2010, end_year = 2011, 10, 35)
+
+col_plot <- dist_trend_plot(broad_edu,demo = "College", demo_code = "col_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011, 10, 35)
+
+bach_plot <- dist_trend_plot(broad_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011,10,35)
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
+  
+start_end_edu <- broad_edu %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_edu <- broad_edu %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T))) 
+
+```
+
+
+# gender
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+broad_gender <- memphis_corridor %>% as.data.frame() %>% filter(Group == 2) %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+memphis_gender <- memphis_lehd %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+broad_gender <- rbind(as.data.frame(broad_gender), as.data.frame(memphis_gender))
+broad_gender[broad_gender$year<2009,][,c(3,5)] <- NA
+broad_gender$Type <- as.factor(as.character(broad_gender$Type))
+
+gender_plot <- dist_trend_plot(broad_gender,demo = "Female", demo_code = "female_perc", corridor_name = "Broad Avenue", cat = "Employment", construct_year = 2010, end_year = 2011, 30, 55)
+
+broad_gender_rac <- memphis_corridor_rac %>% as.data.frame() %>% filter(Group == 2) %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+memphis_gender_rac <- memphis_rac %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+broad_gender_rac <- rbind(as.data.frame(broad_gender_rac), as.data.frame(memphis_gender_rac))
+broad_gender_rac[broad_gender_rac$year<2009,][,c(3,5)] <- NA
+broad_gender_rac$Type <- as.factor(as.character(broad_gender_rac$Type))
+
+gender_rac_plot <- dist_trend_plot(broad_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Broad Avenue", cat = "Residents", construct_year = 2010, end_year = 2011, 35, 60)
+
+
+
+mylegend<-g_legend(gender_plot)
+
+grid.arrange(arrangeGrob(gender_plot + theme(legend.position="none"), gender_rac_plot + theme(legend.position="none"),
+                         nrow = 1),
+             mylegend, nrow=2,heights=c(10,1))
+```
+
+
+# Madison Ave
+## additional distributional analysis - income (bar graph)
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+madison_inc <- memphis_corridor %>% as.data.frame() %>% filter(Group == 1 & Type !="Control: Jackson") %>% 
+  mutate(Type = factor(Type, levels = c("Treatment: Madison", "Control: Union", "Control: Highland", "Control: Cooper"))) %>% 
+  group_by(Type, year) %>% 
+  summarise(low_income = sum(CE01), 
+            mid_income = sum(CE02), 
+            high_income = sum(CE03)) %>% 
+  group_by(Type) %>% 
+  gather(income_level, employment,low_income, mid_income, high_income) %>% 
+  mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
+         income_level = factor(income_level, levels=c("high_income", "mid_income", "low_income")),
+         n = case_when(Type == "Treatment: Madison" ~ 29,
+                       Type == "Control: Union" ~ 30,
+                       Type == "Control: Highland" ~ 22,
+                       Type == "Control: Cooper" ~ 21)) 
+
+ggplot(data=madison_inc, aes(x=year, y=employment/n)) +
+  geom_bar(aes(fill=income_level),stat = "identity")+
+  facet_wrap(~Type)+
+  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+  labs(title="Income Composition Trend Among Corridors", x="Year", y ="Employment per block", 
+       caption = "Bike lane is constructed in 2009") +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete(name="Income Level",
+                      breaks=c("high_income", "mid_income", "low_income"),
+                      labels=c("High income", "Middle income", "Low income"))
+  
+
+```
+
+## additional distributional analysis - race (line chart)
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
+madison_race <- memphis_corridor %>% as.data.frame() %>% filter(Group == 1 & Type !="Control: Jackson") %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100) 
+
+memphis_race <- memphis_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:other_perc)
+
+
+madison_race <- rbind(as.data.frame(madison_race), as.data.frame(memphis_race))
+madison_race[madison_race$year<2009,][,c(3:8,10:15)] <- NA
+madison_race$Type <- as.factor(as.character(madison_race$Type))
+  
+dist_trend_plot <- function(df_plot, demo, corridor_name, cat,
+                           demo_code = c("low_inc_perc", "white_perc","black_perc","ameindian_perc", "asian_perc",
+                                         "hawaii_perc", "other_perc","hisch_under_perc", "hisch_perc", "col_perc",
+                                         "bach_perc","female_perc", "bach_col_perc"), 
+                           construct_year, end_year, ylim_low, ylim_high) {
+  
+  df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
+  
+  #convert year to proper date
+  
+  df_plot$year <-as.character(paste0(df_plot$year, "-01-01"))
+  df_plot$year <- as.Date(df_plot$year, "%Y-%m-%d")
+  
+  #df_plot$year <- year(df_plot$year)
+  
+  #prepare construct_year and end_year as a date
+  
+  construct_date <- as.character(paste0(construct_year, "-01-01"))
+  construct_date <- as.Date(construct_date, "%Y-%m-%d")
+  
+  #construct_date <- year(construct_year)
+  
+  end_date <- as.character(paste0(end_year, "-01-01"))
+  end_date <- as.Date(end_date, "%Y-%m-%d")
+  
+  #end_date <- year(end_year)
+  
+  #making the plot
+  
+  ats_df <- ggplot(df_plot, aes(x = year, y = get(demo_code), shape = Type, group = Type, colour = Type)) + 
+    geom_line()  +
+    geom_rect(aes(xmin = as.Date(construct_date, "%Y"), xmax = as.Date(end_date, "%Y"), ymin = -Inf, ymax = Inf),
+              fill = "#adff2f",linetype=0,alpha = 0.03) +
+    geom_point(aes(fill= Type),size=3) +
+    scale_shape_manual(values=c(22,21,21,21,23))+
+    scale_fill_manual(values = c("white", "white", "white", "white", "orchid"))+
+    scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+    theme_minimal() +
+    labs(title = glue("Percentage of {demo} {cat}:\n {corridor_name}"), x="Year",y="Percentage",
+         caption = "Shaded area represents the construction period") +
+    guides(title = "Street Type") +
+    ylim(ylim_low, ylim_high) +
+    theme(legend.position = "bottom")
+  
+  
+  return(ats_df)
+}
+
+white_plot <- dist_trend_plot(madison_race,demo = "White", demo_code = "white_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012, 40, 65)
+
+black_plot <- dist_trend_plot(madison_race,demo = "Black", demo_code = "black_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012, 33,58)
+
+ameindian_plot <- dist_trend_plot(madison_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Madison Avenue", cat = "Employment",construct_year = 2011, end_year = 2012, 0,25)
+
+asian_plot <- dist_trend_plot(madison_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012,0,25)
+
+hawaii_plot <- dist_trend_plot(madison_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012,0,25)
+
+other_plot <- dist_trend_plot(madison_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012,0,25)
+
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+```
+
+## additional distributional analysis - race (table)
+```{r}
+start_end_race <- madison_race %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+
+  
+# calculate year by year race categories percentage change  
+y_o_y_race <- madison_race %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+
+```
+
+
+## additional distributional analysis - education (line chart)
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+madison_edu <- memphis_corridor %>% as.data.frame() %>% filter(Group == 1 & Type != "Control: Jackson") %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100) 
+
+memphis_edu <- memphis_lehd %>% 
+  group_by(year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:bach_perc)
+
+
+madison_edu <- rbind(as.data.frame(madison_edu), as.data.frame(memphis_edu))
+madison_edu[madison_edu$year<2009,][,c(3:6,8:11)] <- NA
+madison_edu$Type <- as.factor(as.character(madison_edu$Type))
+  
+
+hisch_under_plot <- dist_trend_plot(madison_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012, 5, 15)
+
+hisch_plot <- dist_trend_plot(madison_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012, 18, 28)
+
+col_plot <- dist_trend_plot(madison_edu,demo = "College", demo_code = "col_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012, 18, 28)
+
+bach_plot <- dist_trend_plot(madison_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012,11,23)
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
+```
+
+## additional distributional analysis - edu (table)
+```{r}
+start_end_edu <- madison_edu %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_edu <- madison_edu %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+```
+
+
+## distributional rac - race table
+```{r echo=FALSE, fig.asp=1.5, fig.width=9.5, message=FALSE, warning=FALSE}
+madison_race <- memphis_corridor_rac %>% as.data.frame() %>% filter(Group == 1& Type !="Control: Jackson") %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100) 
+
+memphis_race <- memphis_rac %>% 
+  group_by(year) %>% 
+  summarise(
+    white = sum(CR01), black = sum(CR02), ameindian = sum(CR03), asian = sum(CR04), 
+    hawaii=sum(CR05), other=sum(CR07), tot_emp = sum(C000)) %>% 
+  mutate(white_perc = white/tot_emp*100,
+         black_perc = black/tot_emp*100,
+         ameindian_perc = ameindian/tot_emp*100,
+         asian_perc = asian/tot_emp*100,
+         hawaii_perc = hawaii/tot_emp*100,
+         other_perc = other/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:other_perc)
+
+
+madison_race <- rbind(as.data.frame(madison_race), as.data.frame(memphis_race))
+madison_race[madison_race$year<2009,][,c(3:8,10:15)] <- NA
+madison_race$Type <- as.factor(as.character(madison_race$Type))
+
+white_plot <- dist_trend_plot(madison_race,demo = "White", demo_code = "white_perc", corridor_name = "Madison Avenue", cat = "Residents", construct_year = 2011, end_year = 2012,36, 91)
+
+black_plot <- dist_trend_plot(madison_race,demo = "Black", demo_code = "black_perc", corridor_name = "Madison Avenue", cat = "Residents", construct_year = 2011, end_year = 2012, 5,60)
+
+ameindian_plot <- dist_trend_plot(madison_race,demo = "American Indian", demo_code = "ameindian_perc", corridor_name = "Madison Avenue",cat = "Residents", construct_year = 2011, end_year = 2012, 0,55)
+
+asian_plot <- dist_trend_plot(madison_race,demo = "Asian", demo_code = "asian_perc", corridor_name = "Madison Avenue",cat = "Residents", construct_year = 2011, end_year = 2012,0,55)
+
+hawaii_plot <- dist_trend_plot(madison_race,demo = "Native Hawaiian", demo_code = "hawaii_perc", corridor_name = "Madison Avenue", cat = "Residents", construct_year = 2011, end_year = 2012,0,55)
+
+other_plot <- dist_trend_plot(madison_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Madison Avenue",cat = "Residents", construct_year = 2011, end_year = 2012,0,55)
+
+mylegend<-g_legend(white_plot)
+
+grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
+                         asian_plot + theme(legend.position="none"), ameindian_plot + theme(legend.position="none"),
+                         hawaii_plot + theme(legend.position="none"), other_plot + theme(legend.position="none"),
+                         nrow=3),
+             mylegend, nrow=4,heights=c(10, 1,1,1))
+
+start_end_race <- madison_race %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_race <- madison_race %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T)))
+
+```
+
+## distributional rac - edu table
+```{r echo=FALSE, fig.asp=1, fig.width=9.5, message=FALSE, warning=FALSE}
+madison_edu <- memphis_corridor_rac %>% as.data.frame() %>% filter(Group == 1 & Type !="Control: Jackson") %>% 
+  group_by(Type, year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100) 
+
+memphis_edu <- memphis_rac %>% 
+  group_by(year) %>% 
+  summarise(
+    hisch_under = sum(CD01), hisch = sum(CD02), col = sum(CD03), bach = sum(CD04), tot_emp = sum(C000)) %>% 
+  mutate(hisch_under_perc = hisch_under/tot_emp*100,
+         hisch_perc = hisch/tot_emp*100,
+         col_perc = col/tot_emp*100,
+         bach_perc = bach/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:bach_perc)
+
+
+madison_edu <- rbind(as.data.frame(madison_edu), as.data.frame(memphis_edu))
+madison_edu[madison_edu$year<2009,][,c(3:6,8:11)] <- NA
+madison_edu$Type <- as.factor(as.character(madison_edu$Type))
+
+hisch_under_plot <- dist_trend_plot(madison_edu,demo = "Less Than High School", demo_code = "hisch_under_perc", corridor_name = "Madison Street", cat = "Residents", construct_year = 2011, end_year = 2012, 0, 20)
+
+hisch_plot <- dist_trend_plot(madison_edu,demo = "High School", demo_code = "hisch_perc", corridor_name = "Madison Street", cat = "Redidents", construct_year = 2011, end_year = 2012, 10, 30)
+
+col_plot <- dist_trend_plot(madison_edu,demo = "College", demo_code = "col_perc", corridor_name = "Madison Street", cat = "Residents", construct_year = 2011, end_year = 2012, 13, 33)
+
+bach_plot <- dist_trend_plot(madison_edu,demo = "Bachelor or Above", demo_code = "bach_perc", corridor_name = "Madison Street", cat = "Residents", construct_year = 2011, end_year = 2012,15,35)
+
+mylegend<-g_legend(hisch_plot)
+
+grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch_plot + theme(legend.position="none"),
+                         col_plot + theme(legend.position="none"), bach_plot + theme(legend.position="none"),
+                         nrow=2),
+             mylegend, nrow=3,heights=c(10, 1,1))
+  
+start_end_edu <- madison_edu %>%
+  select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
+  filter(complete.cases(.)) %>%
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  
+  
+# calculate year by year race categories percentage change  
+y_o_y_edu <- madison_edu %>% 
+  select(Type, year, ends_with("_perc")) %>% 
+  mutate_if(is.numeric, funs(change = ./lag(.)*100 -100)) %>% 
+  group_by(Type) %>% 
+  summarise_at(vars(ends_with("_change")), funs(mean(., na.rm=T))) 
+
+```
+
+## gender
+```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
+madison_gender <- memphis_corridor %>% as.data.frame() %>% filter(Group == 1 & Type !="Control: Jackson") %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+memphis_gender <- memphis_lehd %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+madison_gender <- rbind(as.data.frame(madison_gender), as.data.frame(memphis_gender))
+madison_gender[madison_gender$year<2009,][,c(3,5)] <- NA
+madison_gender$Type <- as.factor(as.character(madison_gender$Type))
+
+gender_plot <- dist_trend_plot(madison_gender,demo = "Female", demo_code = "female_perc", corridor_name = "Madison Street", cat = "Employment", construct_year = 2011, end_year = 2012, 35, 65)
+
+madison_gender_rac <- memphis_corridor_rac %>% as.data.frame() %>% filter(Group == 1 & Type !="Control: Jackson") %>% 
+  group_by(Type, year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100) 
+
+memphis_gender_rac <- memphis_rac %>% 
+  group_by(year) %>% 
+  summarise(female = sum(CS02), tot_emp = sum(C000)) %>% 
+  mutate(female_perc = female/tot_emp*100,
+         Type = "City") %>% 
+  select(Type, year:female_perc)
+
+madison_gender_rac <- rbind(as.data.frame(madison_gender_rac), as.data.frame(memphis_gender_rac))
+madison_gender_rac[madison_gender_rac$year<2009,][,c(3,5)] <- NA
+madison_gender_rac$Type <- as.factor(as.character(madison_gender_rac$Type))
+
+gender_rac_plot <- dist_trend_plot(madison_gender_rac,demo = "Female", demo_code = "female_perc", corridor_name = "Madison Street", cat = "Residents", construct_year = 2011, end_year = 2012, 35, 65)
+
+
+
+mylegend<-g_legend(gender_plot)
+
+grid.arrange(arrangeGrob(gender_plot + theme(legend.position="none"), gender_rac_plot + theme(legend.position="none"),
+                         nrow = 1),
+             mylegend, nrow=2,heights=c(10,1))
+```
+
