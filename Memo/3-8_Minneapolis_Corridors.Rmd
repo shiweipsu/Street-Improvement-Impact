@@ -199,6 +199,19 @@ t.test(riverside$business, cedar$business)
 t.test(riverside$busi_perc1, cedar$busi_perc1)
 t.test(riverside$busi_perc2, cedar$busi_perc2)
 
+riverside_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, grouptype=="improvement", year<=2008) 
+cedar_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, grouptype=="control", year<=2008) 
+
+t.test(riverside_growth$biz_growth,cedar_growth$biz_growth)
+t.test(riverside_growth$retail_growth,cedar_growth$retail_growth)
+t.test(riverside_growth$food_accom_growth,cedar_growth$food_accom_growth)
+
+
+
 ```
 
 
@@ -440,6 +453,17 @@ t.test(lyndale$business, grand$business)
 t.test(lyndale$busi_perc1, grand$busi_perc1)
 t.test(lyndale$busi_perc2, grand$busi_perc2)
 
+lyndale_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==4, grouptype=="improvement", year<=2008) 
+grand_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==4, grouptype=="control", year<=2008) 
+
+t.test(lyndale_growth$biz_growth,grand_growth$biz_growth)
+t.test(lyndale_growth$retail_growth,grand_growth$retail_growth)
+t.test(lyndale_growth$food_accom_growth,grand_growth$food_accom_growth)
+
 
 ```
 
@@ -503,6 +527,17 @@ broadway <- broadway %>%
 t.test(second$business, broadway$business)
 t.test(second$busi_perc1, broadway$busi_perc1)
 t.test(second$busi_perc2, broadway$busi_perc2)
+
+second_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==5, grouptype=="improvement", year<=2011) 
+brd_growth <- minn_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==5, grouptype=="control", year<=2011) 
+
+t.test(second_growth$biz_growth,brd_growth$biz_growth)
+t.test(second_growth$retail_growth,brd_growth$retail_growth)
+t.test(second_growth$food_accom_growth,brd_growth$food_accom_growth)
 ```
 
 
