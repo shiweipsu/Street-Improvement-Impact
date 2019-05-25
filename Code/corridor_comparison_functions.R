@@ -579,9 +579,9 @@ trend_plot <- function(df_plot, industry, corridor_name,
               fill = "grey",linetype=0,alpha = 0.03) +
     
     geom_point(size = 3, fill="white") +
-    scale_x_date(date_breaks = "4 years", date_labels = "%Y") +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("{industry} {y_lable} Comparison:\n {corridor_name}"), x="Year", y=glue("{y_lable} {index}"),
+    labs(title = glue("{industry} {y_lable} Comparison:\n {corridor_name}"), x="Year", y=glue("{index} {y_lable} "),
          caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
     guides(title = "Street Type") +
     theme(legend.position = "bottom", legend.justification = "center")
