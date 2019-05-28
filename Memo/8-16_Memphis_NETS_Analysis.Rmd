@@ -882,16 +882,18 @@ nets_t <- function(df, construction_year){
   post_start=construction_year+1
   post_end=construction_year+3
   
+  df$name <- as.factor(df$name)
+  df$year <- as.numeric(df$year)
+  
   base <- filter(df, year%in%(base_start:base_end)) %>% 
+    group_by(name) %>% 
   mutate(CNS07_base = (CNS07/lag(CNS07)-1),
          CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
   summarise(CNS07=round(mean(CNS07),0), CNS18=round(mean(CNS18),0), 
          CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
   
-  df$name <- as.factor(df$name)
-  
   post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
-    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+    bind_rows(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
           select(year, name, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
   group_by(name) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
 
