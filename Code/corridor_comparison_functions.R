@@ -543,6 +543,7 @@ trend_plot <- function(df_plot, industry, corridor_name,
                                          "business", "gross_sales", "business_sd", "sales_sd", "n", "n_sd"),
                        y_lable = c("Employment", "Sales", "Establishments"),
                        index = c("Total", "Indexed","Per Establishment"),
+                       unit = c("", "in millions"), index2=ifelse(index=="Indexed",glue("{y_lable} is indexed to the baseline years (3 years pre-construction)"),""),
                        construct_year, end_year, construct_year2, end_year2) {
   
   df_plot$Type <- factor(df_plot$Type, levels = rev(levels(df_plot$Type)))
@@ -581,8 +582,8 @@ trend_plot <- function(df_plot, industry, corridor_name,
     geom_point(size = 3, fill="white") +
     scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
     theme_minimal() +
-    labs(title = glue("{industry} {y_lable} Comparison:\n {corridor_name}"), x="Year", y=glue("{index} {y_lable} "),
-         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period")) +
+    labs(title = glue("{industry} {y_lable} Comparison:\n {corridor_name}"), x="Year", y=glue("{index} {y_lable} {unit}"),
+         caption = glue("Gray shaded area is pre-construction period\n Green shaded area is construction period\n {index2}")) +
     guides(title = "Street Type") +
     theme(legend.position = "bottom", legend.justification = "center")
   

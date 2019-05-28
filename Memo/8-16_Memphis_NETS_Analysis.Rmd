@@ -197,11 +197,11 @@ broad_nets1_emp $Type <- as.factor(broad_nets1_emp$Type)
 
 broad_emp_retail_trend_plot <- trend_plot(filter(broad_nets1_emp, Type!="City" & year>2003), industry = "Retail", industry_code = "CNS07",
                                           corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                          y_lable = "Employment", index = "Total")
+                                          y_lable = "Employment", index = "Total", unit="")
 
 broad_emp_food_trend_plot <- trend_plot(filter(broad_nets1_emp, Type!="City"& year>2003), industry = "Food",industry_code = "CNS18",
                                         corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                        y_lable = "Employment", index = "Total")
+                                        y_lable = "Employment", index = "Total", unit="")
 
 
 # employment per establishment
@@ -211,11 +211,11 @@ broad_nets1_emp_pest$Type <- as.factor(as.character(broad_nets1_emp_pest$Type))
 
 broad_emp_pest_retail_trend_plot <- trend_plot(filter(broad_nets1_emp_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "Per Establishment", unit="")
 
 broad_emp_pest_food_trend_plot <- trend_plot(filter(broad_nets1_emp_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "Per Establishment", unit="")
 
 
 # indexed employment
@@ -224,11 +224,11 @@ broad_nets1_emp_idx$Type <- as.factor(as.character(broad_nets1_emp_idx$Type))
 
 broad_emp_retail_indexed_trend_plot <- trend_plot(filter(broad_nets1_emp_idx, year>2003), industry = "Retail", industry_code = "CNS07_sd",
                                                   corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                  y_lable = "Employment", index = "Indexed")
+                                                  y_lable = "Employment", index = "Indexed", unit="")
 
 broad_emp_food_indexed_trend_plot <- trend_plot(filter(broad_nets1_emp_idx, year>2003), industry = "Food",industry_code = "CNS18_sd",
                                                 corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                y_lable = "Employment", index = "Indexed")
+                                                y_lable = "Employment", index = "Indexed", unit="")
 
 prow <- plot_grid(broad_emp_retail_trend_plot + theme(legend.position="none"),
                   broad_emp_food_trend_plot + theme(legend.position="none"),
@@ -253,11 +253,11 @@ broad_nets1_sales$Type <- as.factor(broad_nets1_sales$Type)
 
 broad_sales_retail_trend_plot <- trend_plot(filter(broad_nets1_sales, Type!="City"& year>2003), industry = "Retail", industry_code = "CNS07",
                                             corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                            y_lable = "Sales (in millions)", index = "Total")
+                                            y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 broad_sales_food_trend_plot <- trend_plot(filter(broad_nets1_sales, Type!="City"& year>2003), industry = "Food",industry_code = "CNS18",
                                           corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                          y_lable = "Sales (in millions)", index = "Total")
+                                          y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 
 # sales per establishment
@@ -267,11 +267,11 @@ broad_nets1_sales_pest$Type <- as.factor(as.character(broad_nets1_sales_pest$Typ
 
 broad_sales_pest_retail_trend_plot <- trend_plot(filter(broad_nets1_sales_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                 y_lable = "Sales (in millions)", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 broad_sales_pest_food_trend_plot <- trend_plot(filter(broad_nets1_sales_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Sales (in millions)", index = "Per Establishment")
+                                               y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 # indexed sales
 broad_nets1_sales_idx <- agg_index_trend_table(broad_nets1_sales, group = 2, construct_year = 2010)
@@ -279,11 +279,11 @@ broad_nets1_sales_idx $Type <- as.factor(as.character(broad_nets1_sales_idx$Type
 
 broad_sales_retail_indexed_trend_plot <- trend_plot(filter(broad_nets1_sales_idx, year>2003), industry = "Retail", industry_code = "CNS07_sd",
                                                     corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                    y_lable = "Sales", index = "Indexed")
+                                                    y_lable = "Sales", index = "Indexed", unit="")
 
 broad_sales_food_indexed_trend_plot <- trend_plot(filter(broad_nets1_sales_idx, year>2003), industry = "Food",industry_code = "CNS18_sd",
                                                   corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                  y_lable = "Sales", index = "Indexed")
+                                                  y_lable = "Sales", index = "Indexed", unit="")
 
 prow <- plot_grid(broad_sales_retail_trend_plot + theme(legend.position="none"),
                   broad_sales_food_trend_plot + theme(legend.position="none"),
@@ -324,11 +324,11 @@ broad_nets2_emp $Type <- as.factor(broad_nets2_emp $Type)
 
 broad_emp_retail_trend_plot <- trend_plot(filter(broad_nets2_emp, Type!="City" & year>2003), industry = "Retail", industry_code = "CNS07",
                                           corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                          y_lable = "Employment", index = "Total")
+                                          y_lable = "Employment", index = "Total", unit="")
 
 broad_emp_food_trend_plot <- trend_plot(filter(broad_nets2_emp, Type!="City" & year>2003), industry = "Food",industry_code = "CNS18",
                                         corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                        y_lable = "Employment", index = "Total")
+                                        y_lable = "Employment", index = "Total", unit="")
 
 # employment per establishment
 broad_nets2_emp_pest <- broad_nets_bf %>% select(-sales, -n, -emp, -sales_pest) %>% spread(key = biz2, emp_pest) %>% 
@@ -337,11 +337,11 @@ broad_nets2_emp_pest $Type <- as.factor(broad_nets2_emp_pest $Type)
 
 broad_emp_pest_retail_trend_plot <- trend_plot(filter(broad_nets2_emp_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "Per Establishment", unit="")
 
 broad_emp_pest_food_trend_plot <- trend_plot(filter(broad_nets2_emp_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "Per Establishment", unit="")
 
 
 # indexed employment
@@ -350,11 +350,11 @@ broad_nets2_emp_idx$Type <- as.factor(broad_nets2_emp_idx$Type)
 
 broad_emp_retail_indexed_trend_plot <- trend_plot(filter(broad_nets2_emp_idx, year>2003), industry = "Retail", industry_code = "CNS07_sd",
                                                   corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                  y_lable = "Employment", index = "Indexed")
+                                                  y_lable = "Employment", index = "Indexed", unit="")
 
 broad_emp_food_indexed_trend_plot <- trend_plot(filter(broad_nets2_emp_idx, year>2003), industry = "Food",industry_code = "CNS18_sd",
                                                 corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                y_lable = "Employment", index = "Indexed")
+                                                y_lable = "Employment", index = "Indexed", unit="")
 
 prow <- plot_grid(broad_emp_retail_trend_plot + theme(legend.position="none"),
                   broad_emp_food_trend_plot + theme(legend.position="none"),
@@ -377,11 +377,11 @@ broad_nets2_sales $Type <- as.factor(broad_nets2_sales$Type)
 
 broad_sales_retail_trend_plot <- trend_plot(filter(broad_nets2_sales, Type!="City" & year>2003), industry = "Retail", industry_code = "CNS07",
                                             corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                            y_lable = "Sales (in millions)", index = "Total")
+                                            y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 broad_sales_food_trend_plot <- trend_plot(filter(broad_nets2_sales, Type!="City" & year>2003), industry = "Food",industry_code = "CNS18",
                                           corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                          y_lable = "Sales (in millions)", index = "Total")
+                                          y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 
 # sales per establishment
@@ -391,11 +391,11 @@ broad_nets2_sales_pest$Type <- as.factor(broad_nets2_sales_pest$Type)
 
 broad_sales_pest_retail_trend_plot <- trend_plot(filter(broad_nets2_sales_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                 y_lable = "Sales (in millions)", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 broad_sales_pest_food_trend_plot <- trend_plot(filter(broad_nets2_sales_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                               y_lable = "Sales (in millions)", index = "Per Establishment")
+                                               y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 
 # indexed sales
@@ -404,11 +404,11 @@ broad_nets2_sales_idx$Type <- as.factor(broad_nets2_sales_idx$Type)
 
 broad_sales_retail_indexed_trend_plot <- trend_plot(filter(broad_nets2_sales_idx, year>2003), industry = "Retail", industry_code = "CNS07_sd",
                                                     corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                    y_lable = "Sales", index = "Indexed")
+                                                    y_lable = "Sales", index = "Indexed", unit="")
 
 broad_sales_food_indexed_trend_plot <- trend_plot(filter(broad_nets2_sales_idx, year>2003), industry = "Food",industry_code = "CNS18_sd",
                                                   corridor_name = "Broad Avenue", construct_year = 2010, end_year = 2011,
-                                                  y_lable = "Sales", index = "Indexed")
+                                                  y_lable = "Sales", index = "Indexed", unit="")
 
 prow <- plot_grid(broad_sales_retail_trend_plot + theme(legend.position="none"),
                   broad_sales_food_trend_plot + theme(legend.position="none"),
@@ -424,35 +424,7 @@ plot_grid(prow, legend_b, ncol = 1, rel_heights = c(4, .2))
 
 ```
 
-## trend analysis - table
-```{r echo=FALSE, fig.asp=0.5, fig.width=9.5, message=FALSE, warning=FALSE}
 
-# compute post change table compare to base year
-broad_nets1_emp %>% 
-  filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(name) %>% 
-  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
-         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
-
-broad_nets1_sales %>% 
-  filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(name) %>% 
-  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
-         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
-
-broad_nets2_emp %>% 
-  filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(name) %>% 
-  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
-         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
-
-broad_nets2_sales %>% 
-  filter (year %in% c(2012, 2013, 2014, 2015)) %>% 
-  group_by(name) %>% 
-  mutate(retail_growth =(CNS07/lag(CNS07)-1)*100,
-         food_accom_growth = (CNS18/lag(CNS18)-1)*100)
-  
-```
 
 # model
 ```{r, echo=FALSE, results='asis'}
@@ -560,11 +532,11 @@ madison_nets1_emp $Type <- as.factor(madison_nets1_emp$Type)
 
 madison_emp_retail_trend_plot <- trend_plot(filter(madison_nets1_emp, Type!="City" & year>2003), industry = "Retail", industry_code = "CNS07",
                                           corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                          y_lable = "Employment", index = "Total")
+                                          y_lable = "Employment", index = "Total", unit="")
 
 madison_emp_food_trend_plot <- trend_plot(filter(madison_nets1_emp, Type!="City" & year>2003), industry = "Food",industry_code = "CNS18",
                                         corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                        y_lable = "Employment", index = "Total")
+                                        y_lable = "Employment", index = "Total", unit="")
 
 
 # employment per establishment
@@ -574,11 +546,11 @@ madison_nets1_emp_pest$Type <- as.factor(as.character(madison_nets1_emp_pest$Typ
 
 madison_emp_pest_retail_trend_plot <- trend_plot(filter(madison_nets1_emp_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Employment", index = "Per Establishment")
+                                               y_lable = "Employment", index = "Per Establishment", unit="")
 
 madison_emp_pest_food_trend_plot <- trend_plot(filter(madison_nets1_emp_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                              corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                             y_lable = "Employment", index = "Per Establishment")
+                                             y_lable = "Employment", index = "Per Establishment", unit="")
 
 
 # indexed employment
@@ -587,11 +559,11 @@ madison_nets1_emp_idx$Type <- as.factor(as.character(madison_nets1_emp_idx$Type)
 
 madison_emp_retail_indexed_trend_plot <- trend_plot(filter(madison_nets1_emp_idx, year>2003), industry = "Retail", industry_code = "CNS07_sd",
                                                   corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                  y_lable = "Employment", index = "Indexed")
+                                                  y_lable = "Employment", index = "Indexed", unit="")
 
 madison_emp_food_indexed_trend_plot <- trend_plot(filter(madison_nets1_emp_idx, year>2003), industry = "Food",industry_code = "CNS18_sd",
                                                 corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                y_lable = "Employment", index = "Indexed")
+                                                y_lable = "Employment", index = "Indexed", unit="")
 
 prow <- plot_grid(madison_emp_retail_trend_plot + theme(legend.position="none"),
                   madison_emp_food_trend_plot + theme(legend.position="none"),
@@ -615,11 +587,11 @@ madison_nets1_sales$Type <- as.factor(madison_nets1_sales$Type)
 
 madison_sales_retail_trend_plot <- trend_plot(filter(madison_nets1_sales, Type!="City" & year>2003), industry = "Retail", industry_code = "CNS07",
                                             corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                            y_lable = "Sales (in millions)", index = "Total")
+                                            y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 madison_sales_food_trend_plot <- trend_plot(filter(madison_nets1_sales, Type!="City" & year>2003), industry = "Food",industry_code = "CNS18",
                                           corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                          y_lable = "Sales (in millions)", index = "Total")
+                                          y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 
 # sales per establishment
@@ -629,11 +601,11 @@ madison_nets1_sales_pest$Type <- as.factor(as.character(madison_nets1_sales_pest
 
 madison_sales_pest_retail_trend_plot <- trend_plot(filter(madison_nets1_sales_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                 y_lable = "Sales (in millions)", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 madison_sales_pest_food_trend_plot <- trend_plot(filter(madison_nets1_sales_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Sales (in millions)", index = "Per Establishment")
+                                               y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 # indexed sales
 madison_nets1_sales_idx <- agg_index_trend_table(madison_nets1_sales, group = 1, construct_year = 2011)
@@ -641,11 +613,11 @@ madison_nets1_sales_idx $Type <- as.factor(as.character(madison_nets1_sales_idx$
 
 madison_sales_retail_indexed_trend_plot <- trend_plot(filter(madison_nets1_sales_idx, year>2003), industry = "Retail", industry_code = "CNS07_sd",
                                                     corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                    y_lable = "Sales", index = "Indexed")
+                                                    y_lable = "Sales", index = "Indexed", unit="")
 
 madison_sales_food_indexed_trend_plot <- trend_plot(filter(madison_nets1_sales_idx, year>2003), industry = "Food",industry_code = "CNS18_sd",
                                                   corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                  y_lable = "Sales", index = "Indexed")
+                                                  y_lable = "Sales", index = "Indexed", unit="")
 
 prow <- plot_grid(madison_sales_retail_trend_plot + theme(legend.position="none"),
                   madison_sales_food_trend_plot + theme(legend.position="none"),
@@ -739,11 +711,11 @@ madison_nets2_sales $Type <- as.factor(madison_nets2_sales$Type)
 
 madison_sales_retail_trend_plot <- trend_plot(filter(madison_nets2_sales, Type!="City" & year>2003), industry = "Retail", industry_code = "CNS07",
                                             corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                            y_lable = "Sales (in millions)", index = "Total")
+                                            y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 madison_sales_food_trend_plot <- trend_plot(filter(madison_nets2_sales, Type!="City" & year>2003), industry = "Food",industry_code = "CNS18",
                                           corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                          y_lable = "Sales (in millions)", index = "Total")
+                                          y_lable = "Sales", index = "Total", unit = "(in millions)")
 
 
 # sales per establishment
@@ -753,11 +725,11 @@ madison_nets2_sales_pest$Type <- as.factor(madison_nets2_sales_pest$Type)
 
 madison_sales_pest_retail_trend_plot <- trend_plot(filter(madison_nets2_sales_pest, year>2003), industry = "Retail", industry_code = "CNS07_pest",
                                                  corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                                 y_lable = "Sales (in millions)", index = "Per Establishment")
+                                                 y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 madison_sales_pest_food_trend_plot <- trend_plot(filter(madison_nets2_sales_pest, year>2003), industry = "Food",industry_code = "CNS18_pest",
                                                corridor_name = "Madison Avenue", construct_year = 2011, end_year = 2012,
-                                               y_lable = "Sales (in millions)", index = "Per Establishment")
+                                               y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
 
 # indexed sales
@@ -896,3 +868,183 @@ stargazer(madison_nets2_emp_its[[1]], madison_nets2_emp_its[[2]], madison_nets2_
 
 
 ```
+
+# functions
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+percent <- function(x, digits = 2, format = "f", ...) {
+paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+
+nets_t <- function(df, construction_year){
+  base_start= construction_year-3
+  base_end = construction_year-1
+  post_start=construction_year+1
+  post_end=construction_year+3
+  
+  base <- filter(df, year%in%(base_start:base_end)) %>% 
+  mutate(CNS07_base = (CNS07/lag(CNS07)-1),
+         CNS18_base = (CNS18/lag(CNS18)-1)) %>% 
+  summarise(CNS07=round(mean(CNS07),0), CNS18=round(mean(CNS18),0), 
+         CNS07_base = mean(CNS07_base,na.rm=T), CNS18_base = mean(CNS18_base,na.rm=T)) 
+  
+  df$name <- as.factor(df$name)
+  
+  post <- df %>% filter (year %in% c(post_start:post_end)) %>% ungroup() %>% 
+    rbind(base %>% mutate(year=construction_year-2, business=CNS07+CNS18) %>% 
+          select(year, name, CNS07, CNS18, business)) %>% arrange(by_group=year) %>% 
+  group_by(name) %>% mutate(CNS07 = (CNS07/lag(CNS07)-1),CNS18 = (CNS18/lag(CNS18)-1))
+
+  post <- dcast(setDT(post), name ~ year, value.var = c("CNS07", "CNS18")) 
+  post <- post[,-c(2,6)]
+  post <- post %>% mutate(CNS07_post = rowMeans(select(.,starts_with("CNS07"))),
+                          CNS18_post = rowMeans(select(.,starts_with("CNS18"))))
+
+  nets <- merge(base, post, by="name") %>% 
+    select(name, CNS07,CNS07_base, starts_with("CNS07"),CNS18,CNS18_base, starts_with("CNS18")) %>%
+    arrange(desc(name)) %>% mutate_at(vars(contains("CNS07_")), percent) %>% mutate_at(vars(contains("CNS18_")), percent)
+
+  coln <- c("Area", "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average",
+          "Base","Growth", "1st Year", "2nd Year", "3rd Year","Average")
+  names(nets)<-coln
+
+  return(nets)
+}
+
+plot_t <- function(df){
+  options(knitr.kable.NA = '-')
+  plot <- knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,3,5),background="#ccffcc") %>% 
+  group_rows("NETS: (employment, type1)", 1,2) %>%
+  group_rows("NETS: (employment, type2)", 3,4) %>%
+  group_rows("NETS: (sales, type1)", 5,6) %>%
+  group_rows("NETS: (sales, type2)", 7,8) %>%
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "1st year growth rate is defined as the growth rate of the year after construction compared to baseline."))
+
+  return(plot)
+
+}
+
+plot_tc <- function(df){
+  options(knitr.kable.NA = '-')
+  plot <- knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,3,5),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
+
+  return(plot)
+}
+
+```
+
+# madison
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+nets1e <- nets_t(madison_nets1_emp, 2011)
+nets1s <- nets_t(madison_nets1_sales, 2011)
+nets2e <- nets_t(madison_nets2_emp, 2011)
+nets2s <- nets_t(madison_nets2_sales, 2011)
+
+# make combined table         
+t <- rbind(lehd, sales, qcew, nets1e, nets1s, nets2e, nets2s)
+t[t=="NaN"]<-NA
+t[t==0]<-NA
+ 
+options(knitr.kable.NA = '-')
+  knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,5,9),background="#ccffcc") %>% 
+  group_rows("LEHD: [employment]",1,4) %>% 
+  group_rows("Sales: [sales revenue]",5,8) %>% 
+  group_rows("QCEW: [employment]",9,12) %>%
+  group_rows("NETS: (employment, type1)",13,16) %>%
+  group_rows("NETS: (employment, type2)", 17,20) %>%
+  group_rows("NETS: (sales, type1)", 21,24) %>%
+  group_rows("NETS: (sales, type2)", 25,28) %>%
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "1st year growth rate is defined as the growth rate of the year after construction compared to baseline."))
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("LEHD\n[employment]",4), rep("Sales\n[sales revenue])",4),rep("QCEW\n[employment]",4),
+                     rep("NETS1\n[employment]",4),rep("NETS1\n[sales revenue]",4),rep("NETS2\n[employment]",4),rep("NETS2\n[sales revenue]",4)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+options(knitr.kable.NA = '-')
+  knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,5,9),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
+
+```
+
+
+# broad
+```{r, echo=FALSE, message=FALSE, warning=FALSE,results="asis"}
+
+nets1e <- nets_t(broad_nets1_emp, 2010)
+nets1s <- nets_t(broad_nets1_sales, 2010)
+nets2e <- nets_t(broad_nets2_emp, 2010)
+nets2s <- nets_t(broad_nets2_sales, 2010)
+
+# make combined table         
+t <- rbind(nets1e, nets1s, nets2e, nets2s)
+t[t=="NaN"]<-NA
+t[t==0]<-NA
+ 
+options(knitr.kable.NA = '-')
+  knitr::kable(t, align = "lcccccccccccc",  format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","Baseline"=2,"Post-implementation"=4,"Baseline"=2,"Post-implementation"=4)) %>% 
+  add_header_above(c("", "Retail"= 6, "Food"= 6)) %>% 
+  row_spec(c(1,4,7),background="#ccffcc") %>% 
+  group_rows("NETS: (employment, type1)", 1,3) %>%
+  group_rows("NETS: (employment, type2)", 4,6) %>%
+  group_rows("NETS: (sales, type1)", 7,9) %>%
+  group_rows("NETS: (sales, type2)", 10,12) %>%
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "1st year growth rate is defined as the growth rate of the year after construction compared to baseline."))
+
+
+t_c <- t[c(1:3,7:9,13)] 
+data <- data.frame(c(rep("NETS1\n[employment]",3),rep("NETS1\n[sales revenue]",3),rep("NETS2\n[employment]",3),rep("NETS2\n[sales revenue]",3)))
+t_c <- bind_cols(data, t_c)
+coln <- c("Data","Area", "Baseline","Pre-Growth", "Post-Growth","Baseline","Pre-Growth", "Post-Growth")
+names(t_c)<-coln
+
+options(knitr.kable.NA = '-')
+  knitr::kable(t_c, align = "llcccccc", format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width=F, font_size=11) %>% 
+  add_header_above(c("","", "Retail"= 3, "Food"= 3)) %>% 
+  row_spec(c(1,4,7),background="#ccffcc") %>% 
+  column_spec(1, bold=T,background="white", width="0.5in") %>% 
+  collapse_rows(columns=1) %>% 
+  footnote(number = c("Baseline is defined as the average of previous three years before construction year;",
+             "Pre-growth rate is defined as average of baseline annual growth rate;",
+             "Post-growth rate is defined as average annual growth rate of three time points after construction year."))
+
+
+
+```
+
