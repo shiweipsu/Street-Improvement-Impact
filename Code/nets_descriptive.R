@@ -26,7 +26,7 @@ nets1 <- nets_a %>%
   summarise(emp = sum(emp, na.rm = T), sales= sum(sales, na.rm = T), n=n(),
             emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.) 
 
-nets11 <- filter(nets1, city == "PORTLAND"| city == "SAN FRANCISCO"| city == "MINNEAPOLIS"| city =="INDIANAPOLIS") 
+nets11 <- filter(nets1, city == "PORTLAND"| city == "SAN FRANCISCO"| city == "MINNEAPOLIS"| city =="MEMPHIS") 
 nets11 <- nets11 %>% ungroup() %>% 
   mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
          city = factor(city))
@@ -52,16 +52,16 @@ ggplot(data=nets11, aes(x=year, y=emp)) +
                       labels=c("Retail Services", "Food Services")) +
   scale_y_continuous(labels = function(x) format(x, scientific = F))
 
-ggplot(data=nets11, aes(x=year, y=sales)) +
+ggplot(data=nets11, aes(x=year, y=sales/1000000000)) +
   geom_bar(aes(fill=business1),stat = "identity")+
   facet_wrap(~city)+
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  labs(title="Retail Sales Trend Across Study Cities", x="Year", y ="Sales") +
+  labs(title="Retail Sales Trend Across Study Cities", x="Year", y ="Sales (in Billions)") +
   theme(legend.position = "bottom") +
   scale_fill_discrete(name="Business Type",
                       breaks=c("Retail", "Food"),
-                      labels=c("Retail Services", "Food Services")) +
-  scale_y_continuous(labels = function(x) format(x, scientific = T))
+                      labels=c("Retail Services", "Food Services")) 
+
 
 
 nets2 <- nets_a %>% 
@@ -69,7 +69,7 @@ nets2 <- nets_a %>%
   summarise(emp = sum(emp, na.rm = T), sales= sum(sales, na.rm = T), n=n(),
             emp_pest = emp/n, sales_pest = sales/n) %>% drop_na(.)
 
-nets22 <- filter(nets2, city == "PORTLAND"| city == "SAN FRANCISCO"| city == "MINNEAPOLIS"| city =="INDIANAPOLIS") 
+nets22 <- filter(nets2, city == "PORTLAND"| city == "SAN FRANCISCO"| city == "MINNEAPOLIS"| city =="MEMPHIS") 
 nets22 <- nets22 %>% ungroup() %>% 
   mutate(year = as.Date(as.character(paste0(year, "-01-01")),"%Y-%m-%d"),
          city = factor(city))
@@ -95,13 +95,12 @@ ggplot(data=nets22, aes(x=year, y=emp)) +
                       labels=c("Retail Services", "Food Services")) +
   scale_y_continuous(labels = function(x) format(x, scientific = F))
 
-ggplot(data=nets22, aes(x=year, y=sales)) +
+ggplot(data=nets22, aes(x=year, y=sales/1000000000)) +
   geom_bar(aes(fill=business2),stat = "identity")+
   facet_wrap(~city)+
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  labs(title="Retail Sales Trend Across Study Cities", x="Year", y ="Sales") +
+  labs(title="Retail Sales Trend Across Study Cities", x="Year", y ="Sales (in Billions)") +
   theme(legend.position = "bottom") +
   scale_fill_discrete(name="Business Type",
                       breaks=c("Retail", "Food"),
-                      labels=c("Retail Services", "Food Services")) +
-  scale_y_continuous(labels = function(x) format(x, scientific = T))
+                      labels=c("Retail Services", "Food Services")) 
