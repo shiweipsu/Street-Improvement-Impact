@@ -96,6 +96,13 @@ memphis_rac <- st_read(dsn = con, query = "SELECT * FROM memphis_rac") %>% as.da
          CE03=ce03, CR01=cr01, CR02=cr02, CR03=cr03, CR04=cr04, CR05=cr05, CR07=cr07, CS02=cs02, 
          CD01=cd01, CD02=cd02, CD03=cd03, CD04=cd04)
 
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+
 ```
 
 # Broad Ave
@@ -120,7 +127,7 @@ ggplot(data=broad_inc, aes(x=year, y=employment/n)) +
   facet_wrap(~Type)+
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
   labs(title="Income Composition Trend Among Corridors", x="Year", y ="Employment per block", 
-       caption = "Bike lane is constructed in 2009") +
+       caption = "Bike lane is constructed in 2010") +
   theme(legend.position = "bottom") +
   scale_fill_discrete(name="Income Level",
                       breaks=c("high_income", "mid_income", "low_income"),
@@ -250,11 +257,11 @@ grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch
 
 # additional distributional analysis - edu (table)
 ```{r}
-start_end_edu <- broad_edu %>%
+start_end_edu <- broad_edu %>% filter(year>2010) %>%
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/4*100))
   
   
 # calculate year by year race categories percentage change  
@@ -319,11 +326,11 @@ grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot 
                          nrow=3),
              mylegend, nrow=4,heights=c(10, 1,1,1))
 
-start_end_race <- broad_race %>%
+start_end_race <- broad_race %>% filter(year>2010) %>% 
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/4*100))
   
   
 # calculate year by year race categories percentage change  
@@ -378,11 +385,11 @@ grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch
                          nrow=2),
              mylegend, nrow=3,heights=c(10, 1,1))
   
-start_end_edu <- broad_edu %>%
+start_end_edu <- broad_edu %>% filter(year>2010) %>% 
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/4*100))
   
   
 # calculate year by year race categories percentage change  
@@ -466,7 +473,7 @@ ggplot(data=madison_inc, aes(x=year, y=employment/n)) +
   facet_wrap(~Type)+
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
   labs(title="Income Composition Trend Among Corridors", x="Year", y ="Employment per block", 
-       caption = "Bike lane is constructed in 2009") +
+       caption = "Bike lane is constructed in 2011") +
   theme(legend.position = "bottom") +
   scale_fill_discrete(name="Income Level",
                       breaks=c("high_income", "mid_income", "low_income"),
@@ -568,12 +575,6 @@ hawaii_plot <- dist_trend_plot(madison_race,demo = "Native Hawaiian", demo_code 
 
 other_plot <- dist_trend_plot(madison_race,demo = "Two or More Races", demo_code = "other_perc", corridor_name = "Madison Avenue", cat = "Employment", construct_year = 2011, end_year = 2012,0,25)
 
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
-
 mylegend<-g_legend(white_plot)
 
 grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot + theme(legend.position="none"),
@@ -585,11 +586,11 @@ grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot 
 
 ## additional distributional analysis - race (table)
 ```{r}
-start_end_race <- madison_race %>%
+start_end_race <- madison_race %>% filter(year>2011) %>%
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/3*100))
 
   
 # calculate year by year race categories percentage change  
@@ -648,11 +649,11 @@ grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch
 
 ## additional distributional analysis - edu (table)
 ```{r}
-start_end_edu <- madison_edu %>%
+start_end_edu <- madison_edu %>% filter(year >2011) %>% 
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/3*100))
   
   
 # calculate year by year race categories percentage change  
@@ -717,11 +718,11 @@ grid.arrange(arrangeGrob(white_plot + theme(legend.position="none"), black_plot 
                          nrow=3),
              mylegend, nrow=4,heights=c(10, 1,1,1))
 
-start_end_race <- madison_race %>%
+start_end_race <- madison_race %>% filter(year >2011) %>% 
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/3*100))
   
   
 # calculate year by year race categories percentage change  
@@ -775,11 +776,11 @@ grid.arrange(arrangeGrob(hisch_under_plot + theme(legend.position="none"), hisch
                          nrow=2),
              mylegend, nrow=3,heights=c(10, 1,1))
   
-start_end_edu <- madison_edu %>%
+start_end_edu <- madison_edu %>% filter(year>2011) %>% 
   select(Type, year, ends_with("_perc")) %>% # select variables ends with "_perc"
   filter(complete.cases(.)) %>%
   group_by(Type) %>% 
-  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/6*100))
+  summarise_at(vars(ends_with("_perc")), funs(change = (last(.)-first(.))/first(.)/3*100))
   
   
 # calculate year by year race categories percentage change  
