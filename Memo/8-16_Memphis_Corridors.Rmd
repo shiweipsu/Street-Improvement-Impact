@@ -166,14 +166,14 @@ Our first treatment corridor is Madison Avenue in Midtown district, which instal
 #comparisons-----
 
 # prepare city level data & block level corridor data at the year before construction
-conyear <- first(filter(memphis_corridor, Group== 1, Type== "Treatment")$BuildStart)-1 
+conyear <- first(filter(memphis_corridor, Group== 1, Type== "Treatment: Madison")$BuildStart)-1 
 # find the year before construction
 
 
 memphis_lehd_2010 <- memphis_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
 
 
-madison <- memphis_corridor %>% filter(Group ==1, Type =="Treatment", year==conyear) %>% employ_ratio_test(.)
+madison <- memphis_corridor %>% filter(Group ==1, Type =="Treatment: Madison", year==conyear) %>% employ_ratio_test(.)
 
 cooper <- memphis_corridor %>% filter(Group ==1, Type =="Control: Cooper", year ==conyear) %>% employ_ratio_test(.)
 
@@ -235,7 +235,7 @@ t.test(madison$ratio2, union$ratio2)
 
 madison_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
-  filter(Group==1, Type=="Treatment", year<=conyear) 
+  filter(Group==1, Type=="Treatment: Madison", year<=conyear) 
 cooper_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
   filter(Group==2, Type=="Control: Cooper", year<=conyear) 
@@ -354,14 +354,14 @@ Our second treatment corridor is Broad Avenue, which installed buffered bike lan
 #comparisons-----
 
 # prepare city level data & block level corridor data at the year before construction
-conyear <- first(filter(memphis_corridor, Group== 2, Type== "Treatment")$BuildStart)-1 
+conyear <- first(filter(memphis_corridor, Group== 2, Type== "Treatment: Broad")$BuildStart)-1 
 # find the year before construction
 
 
 memphis_lehd_2009 <- memphis_lehd %>% filter(year == conyear, CNS07+ CNS18 > 0)
 
 
-broad <- memphis_corridor %>% filter(Group ==2, Type =="Treatment", year==conyear) %>% employ_ratio_test(.)
+broad <- memphis_corridor %>% filter(Group ==2, Type =="Treatment: Broad", year==conyear) %>% employ_ratio_test(.)
 
 central <- memphis_corridor %>% filter(Group ==2, Type =="Control: Central", year ==conyear) %>% employ_ratio_test(.)
 
@@ -404,7 +404,7 @@ t.test(broad$ratio2, cooper$ratio2) # sig
 
 broad_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
-  filter(Group==2, Type=="Treatment", year<=conyear) 
+  filter(Group==2, Type=="Treatment: Broad", year<=conyear) 
 central_growth <- memphis_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
   filter(Group==2, Type=="Control: Central", year<=conyear) 
