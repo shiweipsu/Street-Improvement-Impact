@@ -182,6 +182,7 @@ seattle_lehd_2013 <- seattle_lehd %>% filter(year == conyear, CNS07+CNS18 > 0)
 
 secondave <- seattle_corridor %>% filter(Group==1, Type=="Study", year==conyear) %>% employ_ratio_test(.)
 forthave <- seattle_corridor %>% filter(Group==1, Name=="4th Ave", year==conyear) %>% employ_ratio_test(.)
+firstave <- seattle_corridor %>% filter(Group==1, Name=="1st Ave", year==conyear) %>% employ_ratio_test(.)
 
 # find quantile dataframe 
 
@@ -196,6 +197,8 @@ secondave %>% summarise(TotEmp = sum(C000)/nrow(secondave), RetailEmp = sum(CNS0
                                      AccomEmp = sum(CNS18)/nrow(secondave)) %>% as.data.frame
 forthave %>% summarise(TotEmp = sum(C000)/nrow(forthave), RetailEmp = sum(CNS07)/nrow(forthave),
                                      AccomEmp = sum(CNS18)/nrow(forthave)) %>% as.data.frame
+firstave %>% summarise(TotEmp = sum(C000)/nrow(forthave), RetailEmp = sum(CNS07)/nrow(firstave),
+                                     AccomEmp = sum(CNS18)/nrow(firstave)) %>% as.data.frame
 # get employment at block level, divided by nrow()
  
 
@@ -206,6 +209,12 @@ t.test(secondave$Food_Accom, forthave$Food_Accom)
 t.test(secondave$ratio1, forthave$ratio1)
 t.test(secondave$ratio2, forthave$ratio2)
 
+t.test(secondave$Business, firstave$Business)
+t.test(secondave$Retail, firstave$Retail)
+t.test(secondave$Food_Accom, firstave$Food_Accom)
+t.test(secondave$ratio1, firstave$ratio1)
+t.test(secondave$ratio2, firstave$ratio2)
+
 
 # t-tests: growth rate----
 
@@ -215,10 +224,17 @@ secondave_growth <- seattle_growth %>%
 forthave_growth <- seattle_growth %>%  
   mutate(year=as.numeric(as.character(year))) %>% 
   filter(Group==1, Name=="4th Ave", year<=conyear) 
+firstave_growth <- seattle_growth %>%  
+  mutate(year=as.numeric(as.character(year))) %>% 
+  filter(Group==1, Name=="1st Ave", year<=conyear) 
 
 t.test(secondave_growth$biz_growth,forthave_growth$biz_growth)
 t.test(secondave_growth$retail_growth,forthave_growth$retail_growth)
 t.test(secondave_growth$food_accom_growth,forthave_growth$food_accom_growth)
+
+t.test(secondave_growth$biz_growth,firstave_growth$biz_growth)
+t.test(secondave_growth$retail_growth,firstave_growth$retail_growth)
+t.test(secondave_growth$food_accom_growth,firstave_growth$food_accom_growth)
 ```
 
 
