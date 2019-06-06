@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 if(!require(pacman)){install.packages("pacman"); library(pacman)}
 p_load(here, RPostgreSQL, sf, ggplot2, directlabels,ggthemes, tidyverse, dbplyr, stargazer,cowplot, lubridate, gridExtra,data.table)
 
-user <- "minji2"
+user <- "shiwei"
 host <- "pgsql102.rc.pdx.edu"
 pw <- scan(here::here("batteries.pgpss"), what = "")
 dbname <- "bike_lanes"
@@ -148,7 +148,7 @@ dbDisconnect(con)
 central_nets_b <- minn_central_b %>% 
   group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
   summarise(emp = sum(emp), sales= sum(sales)/1000000, n=n(),
-            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1=="Food"| biz1== "Retail")%>%
  as.data.frame(.) %>% select(-geometry)
 
 minn_nets1 <- minn_nets1 %>% 
@@ -232,11 +232,11 @@ central_nets1_sales_pest <- central_nets_b %>% select(-sales, -n, -emp, -emp_pes
   rename(CNS07_pest = Retail, CNS18_pest = Food, Group=group, Type= type)
 central_nets1_sales_pest $Type <- as.factor(as.character(central_nets1_sales_pest $Type))
 
-central_sales_pest_retail_trend_plot <- trend_plot(central_nets1_sales_pest, industry = "Retail", industry_code = "CNS07_pest",
+central_sales_pest_retail_trend_plot <- trend_plot(filter(central_nets1_sales_pest, year >2003), industry = "Retail", industry_code = "CNS07_pest",
                                                    corridor_name = "Central Avenue", construct_year = 2012, end_year = 2013,
                                                    y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
-central_sales_pest_food_trend_plot <- trend_plot(central_nets1_sales_pest, industry = "Food",industry_code = "CNS18_pest",
+central_sales_pest_food_trend_plot <- trend_plot(filter(central_nets1_sales_pest, year >2003), industry = "Food",industry_code = "CNS18_pest",
                                                  corridor_name = "Central Avenue", construct_year = 2012, end_year = 2013,
                                                  y_lable = "Sales", index = "Per Establishment", unit = "(in millions)")
 
@@ -244,12 +244,12 @@ central_sales_pest_food_trend_plot <- trend_plot(central_nets1_sales_pest, indus
 central_nets1_sales_idx <- agg_index_trend_table(central_nets1_sales, group = 3, construct_year = 2012)
 central_nets1_sales_idx $Type <- as.factor(as.character(central_nets1_sales_idx $Type))
 
-central_sales_retail_indexed_trend_plot <- trend_plot(central_nets1_sales_idx, industry = "Retail",
+central_sales_retail_indexed_trend_plot <- trend_plot(filter(central_nets1_sales_idx, year>2003), industry = "Retail",
                                                       industry_code = "CNS07_sd", corridor_name = "Central Avenue",
                                                       construct_year = 2012, end_year = 2013,
                                                       y_lable = "Sales", index = "Indexed", unit="")
 
-central_sales_food_indexed_trend_plot <- trend_plot(central_nets1_sales_idx, industry = "Food",
+central_sales_food_indexed_trend_plot <- trend_plot(filter(central_nets1_sales_idx, year>2003), industry = "Food",
                                                     industry_code = "CNS18_sd", corridor_name = "Central Avenue",
                                                     construct_year = 2012, end_year = 2013,
                                                     y_lable = "Sales", index = "Indexed", unit="")
@@ -501,7 +501,7 @@ stargazer(central_nets2_emp_its[[1]], central_nets2_emp_its[[2]], central_nets2_
 frkl_nets_b <- minn_frkl_b %>% 
   group_by(name, type, buildstart, buildend, group, year, biz1) %>% 
   summarise(emp = sum(emp), sales= sum(sales)/1000000, n=n(),
-            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1==c("Food", "Retail")) %>%
+            emp_pest = emp/n, sales_pest = sales/n) %>% filter(biz1=="Food"|biz1== "Retail") %>%
  as.data.frame(.) %>% select(-geometry)
 
 minn_nets1 <- minn_nets1 %>% 
